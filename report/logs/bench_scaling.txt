@@ -1,0 +1,78 @@
+$ uv run python -m hhlake.bench --suite scaling --runs 3 --restart-storage
+bench session 2026-10-07T15:17:53Z
+machine: Apple M5, 10 cores / 10 threads, RAM 16 GiB, Darwin 27.0.0, Python 3.13.15
+S3: http://localhost:19000/hh-lake, cwd /Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko
+
+=== suite scaling: 7 scenarios × (1 cold + 3 warm), RSS sampling every 20 ms, tree rescan every 100 ms
+  docker hh-lake-rustfs [start]: mem 468.1MiB / 7.653GiB (5.97%), cpu 0.03%, net 121MB / 5.09GB, pids 53
+
+[scaling] mr_w1_c32: python -m hhlake.mr.run --k 1 2 3 --workers 1 --chunk-mib 32 --no-write
+  docker restart hh-lake-rustfs: healthy after 0.9 s
+  cold       14.390 s  peak RSS    462.3 MiB  procs   3  cpu avg   45.5% peak   98.8%  max single   394.2 MiB  exit 0
+  warm 1     16.918 s  peak RSS    429.0 MiB  procs   3  cpu avg   45.2% peak   99.6%  max single   371.5 MiB  exit 0
+  warm 2     16.947 s  peak RSS    406.1 MiB  procs   3  cpu avg   44.4% peak   99.4%  max single   345.6 MiB  exit 0
+  warm 3     16.797 s  peak RSS    471.6 MiB  procs   3  cpu avg   44.1% peak   99.5%  max single   364.5 MiB  exit 0
+  docker hh-lake-rustfs [after mr_w1_c32]: mem 4.515GiB / 7.653GiB (59.00%), cpu 0.57%, net 161MB / 3.47GB, pids 526
+
+[scaling] mr_w2_c32: python -m hhlake.mr.run --k 1 2 3 --workers 2 --chunk-mib 32 --no-write
+  docker restart hh-lake-rustfs: healthy after 1.0 s
+  cold       15.282 s  peak RSS    977.3 MiB  procs   4  cpu avg   70.1% peak  197.8%  max single   437.1 MiB  exit 0
+  warm 1     14.528 s  peak RSS    762.7 MiB  procs   4  cpu avg   75.6% peak  198.7%  max single   326.4 MiB  exit 0
+  warm 2     14.561 s  peak RSS   1029.2 MiB  procs   4  cpu avg   74.5% peak  199.2%  max single   479.4 MiB  exit 0
+  warm 3     14.650 s  peak RSS    885.9 MiB  procs   4  cpu avg   68.4% peak  198.8%  max single   395.6 MiB  exit 0
+  docker hh-lake-rustfs [after mr_w2_c32]: mem 3.299GiB / 7.653GiB (43.11%), cpu 0.07%, net 158MB / 3.47GB, pids 411
+
+[scaling] mr_w4_c32: python -m hhlake.mr.run --k 1 2 3 --workers 4 --chunk-mib 32 --no-write
+  docker restart hh-lake-rustfs: healthy after 0.9 s
+  cold       12.684 s  peak RSS   1228.5 MiB  procs   6  cpu avg  114.4% peak  398.8%  max single   308.7 MiB  exit 0
+  warm 1     13.782 s  peak RSS   1061.2 MiB  procs   6  cpu avg  106.8% peak  396.0%  max single   268.6 MiB  exit 0
+  warm 2     13.903 s  peak RSS    838.1 MiB  procs   6  cpu avg  104.7% peak  401.4%  max single   220.7 MiB  exit 0
+  warm 3     12.382 s  peak RSS   1138.0 MiB  procs   6  cpu avg  112.8% peak  397.1%  max single   280.6 MiB  exit 0
+  docker hh-lake-rustfs [after mr_w4_c32]: mem 4.79GiB / 7.653GiB (62.59%), cpu 0.06%, net 157MB / 3.48GB, pids 466
+
+[scaling] mr_w8_c32: python -m hhlake.mr.run --k 1 2 3 --workers 8 --chunk-mib 32 --no-write
+  docker restart hh-lake-rustfs: healthy after 1.0 s
+  cold       12.252 s  peak RSS   1356.5 MiB  procs  10  cpu avg  172.0% peak  759.6%  max single   186.0 MiB  exit 0
+  warm 1     12.751 s  peak RSS   1159.4 MiB  procs  10  cpu avg  168.4% peak  769.8%  max single   164.9 MiB  exit 0
+  warm 2     13.028 s  peak RSS   1145.0 MiB  procs  10  cpu avg  166.9% peak  775.4%  max single   193.6 MiB  exit 0
+  warm 3     15.716 s  peak RSS   1156.3 MiB  procs  10  cpu avg  149.8% peak  744.6%  max single   162.3 MiB  exit 0
+  docker hh-lake-rustfs [after mr_w8_c32]: mem 4.431GiB / 7.653GiB (57.90%), cpu 0.87%, net 158MB / 3.52GB, pids 437
+
+[scaling] mr_w10_c32: python -m hhlake.mr.run --k 1 2 3 --workers 10 --chunk-mib 32 --no-write
+  docker restart hh-lake-rustfs: healthy after 1.0 s
+  cold       13.553 s  peak RSS   1399.0 MiB  procs  12  cpu avg  188.7% peak  813.4%  max single   159.4 MiB  exit 0
+  warm 1     17.264 s  peak RSS   1302.5 MiB  procs  12  cpu avg  160.3% peak  872.0%  max single   159.7 MiB  exit 0
+  warm 2     14.615 s  peak RSS   1410.3 MiB  procs  12  cpu avg  179.4% peak  854.8%  max single   156.5 MiB  exit 0
+  warm 3     14.700 s  peak RSS   1366.7 MiB  procs  12  cpu avg  175.1% peak  845.8%  max single   165.5 MiB  exit 0
+  docker hh-lake-rustfs [after mr_w10_c32]: mem 3.976GiB / 7.653GiB (51.95%), cpu 9.50%, net 154MB / 3.51GB, pids 466
+
+[scaling] mr_w10_c8: python -m hhlake.mr.run --k 1 2 3 --workers 10 --chunk-mib 8 --no-write
+  docker restart hh-lake-rustfs: healthy after 1.0 s
+  cold       16.563 s  peak RSS   1179.5 MiB  procs  12  cpu avg  156.5% peak  848.9%  max single   122.9 MiB  exit 0
+  warm 1     16.624 s  peak RSS   1081.9 MiB  procs  12  cpu avg  154.2% peak  843.2%  max single   117.0 MiB  exit 0
+  warm 2     16.463 s  peak RSS   1124.6 MiB  procs  12  cpu avg  155.5% peak  883.8%  max single   120.6 MiB  exit 0
+  warm 3     17.545 s  peak RSS   1053.8 MiB  procs  12  cpu avg  146.8% peak  863.3%  max single   120.9 MiB  exit 0
+  docker hh-lake-rustfs [after mr_w10_c8]: mem 3.046GiB / 7.653GiB (39.80%), cpu 0.26%, net 172MB / 3.52GB, pids 531
+
+[scaling] mr_w10_c128: python -m hhlake.mr.run --k 1 2 3 --workers 10 --chunk-mib 128 --no-write
+  docker restart hh-lake-rustfs: healthy after 1.0 s
+  cold       15.517 s  peak RSS   1675.1 MiB  procs   9  cpu avg  142.8% peak  645.0%  max single   412.2 MiB  exit 0
+  warm 1     11.287 s  peak RSS   1744.0 MiB  procs   9  cpu avg  166.7% peak  693.6%  max single   410.9 MiB  exit 0
+  warm 2     11.444 s  peak RSS   1580.0 MiB  procs   9  cpu avg  176.6% peak  682.9%  max single   394.2 MiB  exit 0
+  warm 3     11.186 s  peak RSS   1923.1 MiB  procs   9  cpu avg  171.4% peak  682.7%  max single   449.5 MiB  exit 0
+  docker hh-lake-rustfs [end]: mem 970.6MiB / 7.653GiB (12.39%), cpu 0.07%, net 138MB / 3.47GB, pids 233
+
+saved s3://hh-lake/results/bench/runs.csv, s3://hh-lake/results/bench/summary.csv, s3://hh-lake/results/bench/timeline.csv, s3://hh-lake/results/bench/docker_stats.csv
+local copies in results/bench/
+
+scenario              n  time, s: mean ± std [min … max]     peak RSS, MiB: mean ± std [min … max]       cold s  cold MiB    cpu%  fail
+mr_w1_c32             3  16.887 ± 0.079 [16.797 … 16.947]    435.6 ± 33.2 [406.1 … 471.6]                14.390     462.3      45     0
+mr_w2_c32             3  14.580 ± 0.063 [14.528 … 14.650]    892.6 ± 133.4 [762.7 … 1029.2]              15.282     977.3      73     0
+mr_w4_c32             3  13.356 ± 0.845 [12.382 … 13.903]    1012.4 ± 155.8 [838.1 … 1138.0]             12.684    1228.5     108     0
+mr_w8_c32             3  13.831 ± 1.638 [12.751 … 15.716]    1153.6 ± 7.6 [1145.0 … 1159.4]              12.252    1356.5     162     0
+mr_w10_c32            3  15.526 ± 1.505 [14.615 … 17.264]    1359.8 ± 54.2 [1302.5 … 1410.3]             13.553    1399.0     172     0
+mr_w10_c8             3  16.877 ± 0.584 [16.463 … 17.545]    1086.8 ± 35.7 [1053.8 … 1124.6]             16.563    1179.5     152     0
+mr_w10_c128           3  11.306 ± 0.130 [11.186 … 11.444]    1749.0 ± 171.6 [1580.0 … 1923.1]            15.517    1675.1     172     0
+plot report/img/bench_scaling.png
+plot report/img/bench_scaling_timeline.png
+exit code 0

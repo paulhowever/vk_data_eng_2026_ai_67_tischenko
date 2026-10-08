@@ -1,0 +1,956 @@
+skill1,count
+php,4033
+mysql,2263
+git,1809
+laravel,1441
+javascript,1202
+postgresql,1030
+docker,964
+symfony,919
+html,908
+sql,861
+ооп,813
+css,681
+linux,620
+redis,570
+rabbitmq,560
+api,517
+1с-битрикс,499
+jquery,484
+yii,379
+yii2,353
+rest,299
+веб-программирование,293
+html5,283
+backend,248
+bitrix,232
+php7,212
+css3,211
+rest api,197
+js,192
+cms wordpress,187
+mvc,182
+solid,181
+vue.js,177
+mongodb,176
+ajax,173
+nginx,167
+bootstrap,155
+php5,147
+elasticsearch,130
+kafka,126
+работа в команде,123
+clickhouse,121
+vuejs,120
+английский язык,108
+ms sql,106
+react,102
+golang,100
+битрикс24,96
+node.js,95
+json api,89
+разработка по,84
+python,83
+kubernetes,80
+удаленная работа,79
+ci/cd,78
+memcached,78
+xml,77
+vue,75
+nosql,70
+оптимизация кода,70
+go,69
+phpunit,69
+базы данных,69
+mariadb,68
+composer,61
+работа с базами данных,59
+soap,57
+atlassian jira,54
+ddd,54
+php8,54
+gitlab,52
+crm,49
+highload,49
+sphinx,48
+typescript,47
+unit testing,46
+unix,44
+http,43
+github,42
+java,42
+bitrix24,40
+orm,40
+администрирование сайтов,40
+joomla cms,39
+java script,38
+желание учиться и развиваться,38
+ответственность,38
+apache kafka,37
+scrum,37
+amocrm,36
+html/css,35
+рефакторинг кода,35
+обучение и развитие,34
+angularjs,33
+cms bitrix,33
+frontend,33
+modx,33
+phpmyadmin,33
+docker-compose,32
+zend framework,32
+json,31
+sql запросы,30
+grpc,29
+bitrix framework,26
+codeigniter,26
+jetbrains phpstorm,26
+swagger,26
+кроссбраузерная верстка,26
+jira,25
+adobe photoshop,24
+wordpress,24
+адаптивная верстка,24
+субд,24
+codeception,23
+микросервисная архитектура,23
+doctrine,22
+oop,22
+tdd,21
+graphql,20
+k8s,20
+restful api,20
+битрикс 24,20
+коммуникабельность,20
+работа в условиях многозадачности,20
+websockets,19
+gitlab ci,18
+kibana,18
+psr,18
+svn,18
+создание сайтов,18
+atlassian confluence,17
+dry,17
+opencart,17
+psalm,17
+agile project management,16
+cms,16
+ext js,16
+grafana,16
+gulp,16
+slim,16
+паттерны проектирования,16
+управление командой,16
+d7,15
+debian,15
+figma,15
+jenkins,15
+oracle,15
+reactjs,15
+sass,15
+лидерские качества,15
+разработка cms,15
+рнр,15
+agile,14
+apache,14
+magento,14
+react.js,14
+web application development,14
+webgl,14
+битрикс,14
+верстка,14
+bash,13
+web,13
+webpack,13
+"внимательность, ответственность",13
+командная работа,13
+пользователь пк,13
+стремление к профессиональному росту,13
+angular,12
+kiss,12
+laravel horizon,12
+postman,12
+scss,12
+smarty,12
+teamleading,12
+vue3,12
+3d-моделей в blender,11
+apache http server,11
+aws,11
+bitbucket,11
+"c#",11
+git-flow,11
+lumen,11
+mssql,11
+restapi,11
+spa,11
+three.js,11
+наполнение контентом,11
+ориентация на результат,11
+ответственность и пунктуальность,11
+работа с большим объемом информации,11
+1с программирование,10
+flash mysql,10
+mvp,10
+phalcon,10
+php 8,10
+redmine,10
+s3,10
+youtrack,10
+аналитический склад ума,10
+аналитическое мышление,10
+"внимательность к деталям, способность работать с большими массивами информации",10
+"коммуникабельность, ответственность",10
+руководство коллективом,10
+asterisk,9
+gitlab ci/cd,9
+php 7/8,9
+sentry,9
+web-дизайн,9
+администрирование серверов linux,9
+исполнительность,9
+разработка технических заданий,9
+управление проектами,9
+css 3.0,8
+e-commerce,8
+html-верстка,8
+kanban,8
+laravel9,8
+logstash,8
+php 7.0+,8
+php8.2,8
+prometheus,8
+slim framework,8
+sqrs,8
+twig,8
+ubuntu server,8
+знание ms office,8
+микросервисы,8
+обучаемость,8
+умение адаптироваться,8
+1c-bitrix,7
+activerecord,7
+beanstalkd,7
+ci,7
+erp,7
+https,7
+linux (ubuntu),7
+opensearch,7
+php 7.2,7
+php7+,7
+phpstan,7
+react native,7
+saas,7
+soa,7
+yii 2,7
+многозадачность,7
+позитивное мышление,7
+руководство командой разработчиков,7
+big data,6
+centos,6
+design patterns,6
+docker compose,6
+fenom,6
+manticore search,6
+roadrunner,6
+solid/dry/kiss,6
+symphony,6
+team management,6
+teamcity,6
+trello,6
+vertica,6
+webasyst,6
+websocket,6
+коммуникативные навыки,6
+пунктуальность,6
+тестирование,6
+c++,5
+code review,5
+cs-cart,5
+css-верстка,5
+elk,5
+english,5
+fastapi,5
+full stack,5
+js/ajax,5
+less,5
+moodle,5
+nuxt,5
+nuxt.js,5
+php 7,5
+php 7.4,5
+php-fpm,5
+postgres,5
+redux,5
+seo,5
+ssh,5
+грамотная речь,5
+деловая коммуникация,5
+стратегическое мышление,5
+akeneo,4
+bekend,4
+blade,4
+ci/cd - jenkins,4
+clean code,4
+cms modx,4
+confluence,4
+cистемы управления базами данных,4
+dart,4
+django framework,4
+flutter,4
+fullstack,4
+google cloud log explorer,4
+google cloud platform,4
+google cloud storage,4
+hypersonic sql,4
+lamp,4
+llm,4
+lms,4
+mysql 5.7,4
+nodejs,4
+openapi,4
+oracle pl/sql,4
+php 7+,4
+php cs fixer,4
+posgresql,4
+rector php,4
+redash,4
+sass/scss,4
+seo оптимизация,4
+shop script,4
+shopify,4
+symfony 5,4
+tcp/ip,4
+адаптивность,4
+алгоритмы и структуры данных,4
+высоконагруженные системы,4
+логика,4
+логическое мышление,4
+организаторские навыки,4
+постановка задач разработчикам,4
+разработка продукта,4
+"с#",4
+системное мышление,4
+системы контроля версий,4
+стабильность,4
+умение работать в условиях многозадачности,4
+управление временем,4
+android,3
+bdd,3
+business english,3
+centrifugo,3
+cms opencart,3
+codelgniter framework,3
+cypress,3
+doctrineorm,3
+eloquent,3
+es6,3
+express.js,3
+fabricjs,3
+flex,3
+google cloud,3
+google spanner,3
+ios,3
+javascript (es5/es6),3
+kphp,3
+mamp,3
+nats,3
+next,3
+nextjs,3
+october,3
+"php 7, javascript, эффективная коммуникация, системное мышление, ответственность, адаптивность",3
+php 7.4+,3
+php >= 7.2,3
+php_fpm,3
+phpstrom,3
+restful,3
+ruby,3
+sass/less,3
+socket.io,3
+spring framework,3
+swoole,3
+symfony 7,3
+threejs,3
+twitter bootstrap,3
+unit test,3
+vagrant,3
+vanilla php,3
+vuejs (nuxtjs),3
+vuejs 2,3
+web разработчик,3
+whmcs,3
+windows server 2016,3
+wmic,3
+woocommerce,3
+xdebug,3
+yagni,3
+zabbix,3
+zend,3
+алгоритмы,3
+архитектурная деятельность,3
+блочная верстка,3
+веб разработчик,3
+веб-дизайн,3
+веб-разработка,3
+верстка сайтов,3
+деловая переписка,3
+интеграция,3
+кafka,3
+командный игрок,3
+коммуникативность,3
+креативность,3
+критически мыслить,3
+навыки продаж,3
+настройка vps/vds серверов,3
+настройка серверов,3
+немецкий язык,3
+организационное проектирование,3
+программинг 1с bitrix,3
+продвинутый пользователь пк,3
+рostgresql,3
+работоспособность,3
+развитие продаж,3
+расстановка приоритетов,3
+сlickнouse,3
+системная интеграция,3
+системность,3
+техническая документация,3
+управление разработкой,3
+*nix системы,2
+.net framework,2
+1c,2
+1с битрикс,2
+allfusion erwin data modeler,2
+alpine.js,2
+amazon web services,2
+amphp,2
+amqp,2
+ansible,2
+api битрикса,2
+avid media composer,2
+b2b,2
+back-end,2
+backbone,2
+backender,2
+browserstack,2
+clickup,2
+codeighniter 2,2
+codeigniter 4,2
+cors,2
+couchbase,2
+cqrs,2
+crm bitrix24,2
+css3 mysql,2
+devops,2
+discord,2
+django,2
+docer,2
+drupal,2
+eda,2
+facebook api,2
+fintech,2
+flask,2
+flexbox,2
+framework,2
+ftp,2
+full-stack,2
+fullstack-разработка,2
+gamedev,2
+gcp,2
+gitflow,2
+google api,2
+google auth,2
+google play,2
+highload-проекты,2
+http api,2
+ide,2
+itsm,2
+java ee,2
+java se,2
+javascript (es6),2
+js/html/css,2
+kotlin,2
+laravel 10,2
+laravel 8.8,2
+laravel 9,2
+laravel sanctum,2
+laravel telescope,2
+laravel tinker,2
+lavarel,2
+legacy,2
+lms moodle,2
+maridadb,2
+microservices,2
+miro,2
+my sql,2
+next.js,2
+nuxtjs,2
+october cms,2
+openapi / swagger,2
+openapi\swagger,2
+pandas,2
+percona,2
+php (7.4 / 8.2),2
+php 8.x,2
+"php, symfony, js, postgresql, postgress",2
+php-разработчик,2
+php4,2
+php7/8,2
+pl/sql,2
+portainer,2
+postgesql,2
+postgress,2
+prestashop,2
+project management,2
+psr-12,2
+pydantic,2
+rxjs,2
+selenium,2
+siem системы,2
+spring,2
+sqlalchemy,2
+sre,2
+sugarcrm,2
+symfony (5.4 / 6.2),2
+symfony4/5,2
+tailwind,2
+tailwind css,2
+tdorp,2
+ubuntu,2
+uikit,2
+uml,2
+undetectedchromedrriver,2
+vanilla js,2
+web аналитика,2
+web-socket,2
+wss,2
+xml/xslt,2
+yandexs3,2
+yii1,2
+yii2 или другие mvc фреймворки,2
+автоматизация процессов,2
+администрирование серверов,2
+базовые знания html и css,2
+бизнес-процессы,2
+битикс24,2
+бус,2
+валидная верстка,2
+внимательность,2
+внутренняя оптимизация сайта,2
+гибкость,2
+грамотность,2
+договорная работа,2
+желание развиваться,2
+"знакомство с шаблонами проектирования grasp, gof",2
+инициативность,2
+исполнение поручений руководителя,2
+ит-архитектура,2
+клиент-сервер,2
+клиент-серверная архитектура,2
+моделирование бизнес процессов,2
+мотивация персонала,2
+написание сложных запросов и их оптимизация,2
+обработка информаци,2
+опп,2
+оптимизация бизнес-процессов,2
+оптимизация процессов,2
+опыт в разработке проектов с нуля. самоорганизованность. умение разбираться в чужом коде.,2
+опыт работы с postgresql/mongodb/redis,2
+организованность,2
+основы html,2
+"ответственность, дисциплинированность, усидчивость, внимательность",2
+оформление документации,2
+парсинг данных,2
+поддержка существующих решений,2
+преподавание,2
+проактивность,2
+программирование,2
+программист,2
+проектирование по,2
+разработка веб-приложений,2
+разработка кода,2
+разработка компьютерных игр,2
+разработка нового продукта,2
+реляционные бд,2
+рнр 7/8,2
+самостоятельность,2
+семантическая верстка,2
+сертификат 1с-битрикс,2
+системный подход,2
+стажер,2
+стрессоустойчивость,2
+субд (pgsql),2
+субд mysql,2
+техническая поддержка,2
+техническое задание,2
+трудоспособность,2
+"умение писать чистый код, понимание принципов ооп, solid",2
+умение читать чужой код,2
+управление эффективностью,2
+фреймворк,2
+фреймворки,2
+фронтенд-вёрстка,2
+экологичность,2
+*nix,1
+*nix консоли,1
+.netframework,1
+1c: бухгалтерия,1
+1c: предприятие,1
+1с,1
+1с-bitrix,1
+1с-битрикс управления сайтом,1
+1с-битрикс: управление сайтами,1
+1с: логистика,1
+1с: управление торговлей,1
+acid,1
+active directory,1
+alpine,1
+android sdk,1
+"api (soap, rest, json)",1
+api bitrix,1
+api key,1
+api мойсклад,1
+ar,1
+artefactory,1
+artificial intelligence,1
+asana,1
+azure,1
+backend php,1
+backend разработка,1
+billing,1
+bitrix 24,1
+bitrix d7,1
+bitrix24(коробочная версия).,1
+bitrixframework,1
+blockchain,1
+buggregator,1
+bun,1
+c/c++,1
+cades,1
+chatgpt,1
+clean architecture,1
+cloud s3,1
+cms «1с-битрикс» • sql • mysql • git • php • jquery • json,1
+core,1
+craft cms,1
+critical thinking and problem solving,1
+crm битрикс 24,1
+crm системы,1
+crm-системы,1
+cron,1
+css (scss),1
+curl,1
+data structures,1
+development,1
+di,1
+docker(-compose),1
+doctrin orm,1
+doctrine orm,1
+dreamweaver,1
+drupal api,1
+ecmascript 6,1
+elastisearch,1
+elementator,1
+elixir,1
+entityframework,1
+erp systems,1
+erp-системы на базе 1с,1
+esb,1
+evocms,1
+extjs,1
+extreact,1
+falcon,1
+filament,1
+full stack php,1
+git flow,1
+"git, mysql, php, php >= 7.2, yii 1, 2",1
+graylog,1
+grid,1
+helpdesk,1
+horizon,1
+htm5l,1
+"html, css, препроцессоры.",1
+html/css/javascript,1
+ingerations,1
+iptv,1
+itil,1
+javascrip,1
+"javascript ( jquery, ajax )",1
+"javascript, html, css",1
+jetbrains phpstom,1
+jmeter,1
+joomla,1
+"js, html, css",1
+"js, jquery, ajax",1
+js/jquery,1
+js/ts,1
+js/vue,1
+json rest api,1
+landing page,1
+langchain,1
+laravel 6.х - 10.x,1
+laravel 8+,1
+laravel nova,1
+laravel php,1
+leadership,1
+leadership development,1
+legacy code management,1
+linux ubuntu,1
+mac os,1
+magento 2,1
+make,1
+material design,1
+meilisearch,1
+memcache,1
+mercurial,1
+message brokers,1
+microsoft powerpoint,1
+"middle, middle+",1
+modx cms,1
+modx revo,1
+moment,1
+ms access,1
+ms project,1
+msa,1
+mustache,1
+mysql 8,1
+mysql/mariadb,1
+mysql/pgsql,1
+netcat cms,1
+networking,1
+nginx/apache,1
+nixos,1
+no code,1
+npm,1
+nuxt3,1
+oauth,1
+oauth2,1
+octobercms,1
+openai tools,1
+openssl,1
+oral and written communications skills,1
+oro,1
+orocrm,1
+paas,1
+pbn,1
+pdo,1
+pentest,1
+phoenix,1
+photoshop,1
+php 5.3 - 8.2,1
+"php 7+ и современные паттерны разработки (ооп, solid, mvc)",1
+"php 7,8",1
+php 7.х +,1
+php 8.2,1
+php developer,1
+php unit,1
+php разработки,1
+php7.3+,1
+php7.4,1
+php8.3,1
+phpstorm,1
+pony orm,1
+postgresql 13.2,1
+postgresql\psql,1
+processwire,1
+professionalism and strong work ethic,1
+protobuf,1
+qa,1
+quasar framework,1
+radis,1
+react js,1
+react.ja,1
+redis stableversion (5),1
+redux toolkit,1
+regex,1
+regexp,1
+reindexer,1
+replication,1
+restful apis,1
+retail,1
+retailcrm,1
+roistat,1
+selenium ide,1
+sharding,1
+shell,1
+simfony,1
+simphony,1
+sla,1
+slack,1
+sold,1
+specifications,1
+sphinxsearch,1
+sqlserver,1
+ssl/tls,1
+ssr,1
+supervisord,1
+symfony 5-6,1
+symfony 5.4,1
+sympfony,1
+tarantool,1
+tasks tracking sytems,1
+teamwork and collaboration,1
+telegram,1
+telegram api,1
+telegram bot api,1
+tilda,1
+traefik,1
+transact-sql,1
+travis ci,1
+ui,1
+ui/ux,1
+umi cms,1
+unix/linux,1
+usability,1
+ux,1
+vcs,1
+vim,1
+visual c++,1
+vite,1
+voip,1
+vue 3,1
+vue 3.х,1
+vue.js 2.6,1
+vue2,1
+vuex/pinia,1
+waf,1
+web api,1
+web design,1
+web rtc,1
+web-разработка,1
+webflow,1
+windows,1
+windows server,1
+winter cms,1
+yandex maps api,1
+yandex tracker,1
+yandexmaps api,1
+yii 1,1
+yii2 framework,1
+автоматизация продаж,1
+автоматизация технологических процессов,1
+адаптивная вёрстка,1
+администрирование,1
+администрирование процесса обучения,1
+аис,1
+аккуратность,1
+анализ кода,1
+аналитика и декомпозиция,1
+английский,1
+английский язык (upper-intermediate),1
+архитектура,1
+б24,1
+база данных,1
+базовые знания html,1
+бизнес-анализ,1
+битрикс24 api,1
+быстрая обучаемость,1
+быстрое обучение,1
+бэм,1
+верстка макета,1
+выдерживание сроков и качества,1
+высокая скорость печати,1
+высокая степень ответственности,1
+высоконагруженные сисемы,1
+грамотная устная и письменная речь,1
+графические редакторы,1
+деловое общение,1
+диагностика пк,1
+дисциплинированность,1
+желание расти и развиваться,1
+"знание html, css, bootstrap, js, jquery, ajax",1
+знание it программ,1
+знание php,1
+знание ядра d7,1
+информационные технологии,1
+киберспор,1
+командная разработка,1
+коммерческая разработка,1
+композит,1
+контроль качества,1
+корпоративная этика,1
+криптовалюта,1
+ларавел,1
+ларавель,1
+лендинг,1
+лидерство,1
+мобильность,1
+набор текста,1
+навыки работы с консолью linux,1
+написание кода,1
+настройка по,1
+настройка сетевых подключений,1
+начало карьеры,1
+низкоуровневое программирование,1
+обучение,1
+оперативный поиск информации в сети интернет,1
+оптимизация запросов,1
+оптимизация структуры бд,1
+"опыт работы с docker, rabbitmq",1
+опыт работы с rest api,1
+опыт руководства,1
+отказоустойчивый кластер,1
+отличное знание пк,1
+парсинг,1
+партнёрский маркетинг,1
+планирование карьеры,1
+подбор персонала,1
+понимание структуры xml,1
+принципs проектирования реляционных бд,1
+проведение тестирований,1
+програмист,1
+проектирование,1
+работа с доменами,1
+работа с системами аналитики,1
+работа с чужим кодом,1
+разговорный английский,1
+разработка api,1
+разработка интернет-магазинов,1
+разработка компонентов и модулей,1
+разработка сайта,1
+разработка тестирования,1
+разработчик,1
+регулярные выражения,1
+решение конфликтов,1
+решение нестандартных задач,1
+розничная торговля,1
+розничный сайт,1
+серверное программирование,1
+системное программирование,1
+скраппинг,1
+способность обучать других,1
+способность эффективно решать проблемы,1
+стремление к освоению новых технологий,1
+стремление к профессиональному развитию,1
+субд oracle,1
+сэд,1
+творческое мышление,1
+творчество,1
+техническая защита информации,1
+техническая поддержка пользователей,1
+торговля,1
+торговый маркетинг,1
+точность оценки трудозатрат,1
+транзакции,1
+умеешь работать в linux (или unix подобным ос),1
+умение верстать адаптивно,1
+умение вести переписку,1
+умение организовать работу,1
+"умение организовать работу, планировать, принимать решения",1
+умение писать документацию,1
+умение планировать,1
+умение работать руками,1
+умение работать с бд,1
+умение работать с детьми,1
+управленческие навыки,1
+фулл-стек,1
+фуллстек,1
+хороший человек,1
+целеустремленность,1
+чтение чужого кода,1
+электронный документооборот,1
+эцп,1
+ядро d7,1
+● bitrix24,1
+● пунктуальность,1
+● уверенный пользователь пк,1

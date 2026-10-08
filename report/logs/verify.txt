@@ -1,0 +1,164 @@
+verify: s3://hh-lake/results/mapreduce/ vs s3://hh-lake/results/duckdb/, both read from S3 by DuckDB httpfs @ localhost:19000
+
+raw s3://hh-lake/raw/it_vacancies_2024.csv counted by DuckDB in 4.20 s
+  metric         control    duckdb
+  records        229,388   229,388  ok
+  variant          5,382     5,382  ok
+  with_skills      4,380     4,380  ok
+
+k1  s3://hh-lake/results/mapreduce/k1.csv  vs  s3://hh-lake/results/duckdb/k1.csv
+  header      skill1,count | skill1,count  ok
+  rows              955 |       955  ok
+  unique_keys       955 |       955  ok
+  sum_count      31,835 |    31,835  ok
+  EXCEPT ALL  (mapreduce EXCEPT ALL duckdb) = 0 rows, (duckdb EXCEPT ALL mapreduce) = 0 rows  ok
+  top-10       #  mapreduce                           count   duckdb                              count
+               1  php                                 4,033   php                                 4,033
+               2  mysql                               2,263   mysql                               2,263
+               3  git                                 1,809   git                                 1,809
+               4  laravel                             1,441   laravel                             1,441
+               5  javascript                          1,202   javascript                          1,202
+               6  postgresql                          1,030   postgresql                          1,030
+               7  docker                                964   docker                                964
+               8  symfony                               919   symfony                               919
+               9  html                                  908   html                                  908
+              10  sql                                   861   sql                                   861
+
+k2  s3://hh-lake/results/mapreduce/k2.csv  vs  s3://hh-lake/results/duckdb/k2.csv
+  header      skill1,skill2,count | skill1,skill2,count  ok
+  rows           15,921 |    15,921  ok
+  unique_keys    15,921 |    15,921  ok
+  sum_count     135,362 |   135,362  ok
+  EXCEPT ALL  (mapreduce EXCEPT ALL duckdb) = 0 rows, (duckdb EXCEPT ALL mapreduce) = 0 rows  ok
+  top-10       #  mapreduce                           count   duckdb                              count
+               1  mysql + php                         2,096   mysql + php                         2,096
+               2  git + php                           1,686   git + php                           1,686
+               3  laravel + php                       1,342   laravel + php                       1,342
+               4  git + mysql                         1,116   git + mysql                         1,116
+               5  javascript + php                    1,103   javascript + php                    1,103
+               6  php + postgresql                      975   php + postgresql                      975
+               7  docker + php                          907   docker + php                          907
+               8  php + symfony                         872   php + symfony                         872
+               9  html + php                            839   html + php                            839
+              10  php + sql                             800   php + sql                             800
+
+k3  s3://hh-lake/results/mapreduce/k3.csv  vs  s3://hh-lake/results/duckdb/k3.csv
+  header      skill1,skill2,skill3,count | skill1,skill2,skill3,count  ok
+  rows          127,466 |   127,466  ok
+  unique_keys   127,466 |   127,466  ok
+  sum_count     472,071 |   472,071  ok
+  EXCEPT ALL  (mapreduce EXCEPT ALL duckdb) = 0 rows, (duckdb EXCEPT ALL mapreduce) = 0 rows  ok
+  top-10       #  mapreduce                           count   duckdb                              count
+               1  git + mysql + php                   1,030   git + mysql + php                   1,030
+               2  javascript + mysql + php              719   javascript + mysql + php              719
+               3  laravel + mysql + php                 696   laravel + mysql + php                 696
+               4  git + laravel + php                   641   git + laravel + php                   641
+               5  html + mysql + php                    546   html + mysql + php                    546
+               6  git + javascript + php                535   git + javascript + php                535
+               7  html + javascript + php               528   html + javascript + php               528
+               8  css + html + php                      495   css + html + php                      495
+               9  git + php + ооп                       481   git + php + ооп                       481
+              10  docker + mysql + php                  463   docker + mysql + php                  463
+
+control numbers (reference) vs MapReduce vs DuckDB, all read from S3
+  k  metric                         control                 mapreduce                    duckdb
+  1  unique_keys                        955                       955                       955  ok
+  1  sum_count                       31,835                    31,835                    31,835  ok
+  1  top                          php 4,033                 php 4,033                 php 4,033  ok
+  2  unique_keys                     15,921                    15,921                    15,921  ok
+  2  sum_count                      135,362                   135,362                   135,362  ok
+  2  top                  mysql + php 2,096         mysql + php 2,096         mysql + php 2,096  ok
+  3  unique_keys                    127,466                   127,466                   127,466  ok
+  3  sum_count                      472,071                   472,071                   472,071  ok
+  3  top            git + mysql + php 1,030   git + mysql + php 1,030   git + mysql + php 1,030  ok
+
+regions (Москва, Санкт-Петербург, Екатеринбург), key (area, combo)
+
+regions_k1  s3://hh-lake/results/mapreduce/regions_k1.csv  vs  s3://hh-lake/results/duckdb/regions_k1.csv
+  header      area,skill1,count | area,skill1,count  ok
+  rows            1,131 |     1,131  ok
+  unique_keys     1,131 |     1,131  ok
+  sum_count      18,038 |    18,038  ok
+  EXCEPT ALL  (mapreduce EXCEPT ALL duckdb) = 0 rows, (duckdb EXCEPT ALL mapreduce) = 0 rows  ok
+  Москва           keys     629 |     629   sum(count)   12,116 |   12,116   (mapreduce | duckdb)
+  Санкт-Петербург  keys     348 |     348   sum(count)    4,692 |    4,692   (mapreduce | duckdb)
+  Екатеринбург     keys     154 |     154   sum(count)    1,230 |    1,230   (mapreduce | duckdb)
+
+regions_k2  s3://hh-lake/results/mapreduce/regions_k2.csv  vs  s3://hh-lake/results/duckdb/regions_k2.csv
+  header      area,skill1,skill2,count | area,skill1,skill2,count  ok
+  rows           15,878 |    15,878  ok
+  unique_keys    15,878 |    15,878  ok
+  sum_count      76,155 |    76,155  ok
+  EXCEPT ALL  (mapreduce EXCEPT ALL duckdb) = 0 rows, (duckdb EXCEPT ALL mapreduce) = 0 rows  ok
+  Москва           keys   9,618 |   9,618   sum(count)   51,089 |   51,089   (mapreduce | duckdb)
+  Санкт-Петербург  keys   4,670 |   4,670   sum(count)   20,004 |   20,004   (mapreduce | duckdb)
+  Екатеринбург     keys   1,590 |   1,590   sum(count)    5,062 |    5,062   (mapreduce | duckdb)
+
+regions_k3  s3://hh-lake/results/mapreduce/regions_k3.csv  vs  s3://hh-lake/results/duckdb/regions_k3.csv
+  header      area,skill1,skill2,skill3,count | area,skill1,skill2,skill3,count  ok
+  rows          105,598 |   105,598  ok
+  unique_keys   105,598 |   105,598  ok
+  sum_count     265,467 |   265,467  ok
+  EXCEPT ALL  (mapreduce EXCEPT ALL duckdb) = 0 rows, (duckdb EXCEPT ALL mapreduce) = 0 rows  ok
+  Москва           keys  69,620 |  69,620   sum(count)  178,963 |  178,963   (mapreduce | duckdb)
+  Санкт-Петербург  keys  28,799 |  28,799   sum(count)   70,386 |   70,386   (mapreduce | duckdb)
+  Екатеринбург     keys   7,179 |   7,179   sum(count)   16,118 |   16,118   (mapreduce | duckdb)
+
+naive MapReduce v1 vs DuckDB
+
+k1  s3://hh-lake/results/mapreduce_naive/k1.csv  vs  s3://hh-lake/results/duckdb/k1.csv
+  header      skill1,count | skill1,count  ok
+  rows              955 |       955  ok
+  unique_keys       955 |       955  ok
+  sum_count      31,835 |    31,835  ok
+  EXCEPT ALL  (naive EXCEPT ALL duckdb) = 0 rows, (duckdb EXCEPT ALL naive) = 0 rows  ok
+  top-10       #  naive                               count   duckdb                              count
+               1  php                                 4,033   php                                 4,033
+               2  mysql                               2,263   mysql                               2,263
+               3  git                                 1,809   git                                 1,809
+               4  laravel                             1,441   laravel                             1,441
+               5  javascript                          1,202   javascript                          1,202
+               6  postgresql                          1,030   postgresql                          1,030
+               7  docker                                964   docker                                964
+               8  symfony                               919   symfony                               919
+               9  html                                  908   html                                  908
+              10  sql                                   861   sql                                   861
+
+k2  s3://hh-lake/results/mapreduce_naive/k2.csv  vs  s3://hh-lake/results/duckdb/k2.csv
+  header      skill1,skill2,count | skill1,skill2,count  ok
+  rows           15,921 |    15,921  ok
+  unique_keys    15,921 |    15,921  ok
+  sum_count     135,362 |   135,362  ok
+  EXCEPT ALL  (naive EXCEPT ALL duckdb) = 0 rows, (duckdb EXCEPT ALL naive) = 0 rows  ok
+  top-10       #  naive                               count   duckdb                              count
+               1  mysql + php                         2,096   mysql + php                         2,096
+               2  git + php                           1,686   git + php                           1,686
+               3  laravel + php                       1,342   laravel + php                       1,342
+               4  git + mysql                         1,116   git + mysql                         1,116
+               5  javascript + php                    1,103   javascript + php                    1,103
+               6  php + postgresql                      975   php + postgresql                      975
+               7  docker + php                          907   docker + php                          907
+               8  php + symfony                         872   php + symfony                         872
+               9  html + php                            839   html + php                            839
+              10  php + sql                             800   php + sql                             800
+
+k3  s3://hh-lake/results/mapreduce_naive/k3.csv  vs  s3://hh-lake/results/duckdb/k3.csv
+  header      skill1,skill2,skill3,count | skill1,skill2,skill3,count  ok
+  rows          127,466 |   127,466  ok
+  unique_keys   127,466 |   127,466  ok
+  sum_count     472,071 |   472,071  ok
+  EXCEPT ALL  (naive EXCEPT ALL duckdb) = 0 rows, (duckdb EXCEPT ALL naive) = 0 rows  ok
+  top-10       #  naive                               count   duckdb                              count
+               1  git + mysql + php                   1,030   git + mysql + php                   1,030
+               2  javascript + mysql + php              719   javascript + mysql + php              719
+               3  laravel + mysql + php                 696   laravel + mysql + php                 696
+               4  git + laravel + php                   641   git + laravel + php                   641
+               5  html + mysql + php                    546   html + mysql + php                    546
+               6  git + javascript + php                535   git + javascript + php                535
+               7  html + javascript + php               528   html + javascript + php               528
+               8  css + html + php                      495   css + html + php                      495
+               9  git + php + ооп                       481   git + php + ооп                       481
+              10  docker + mysql + php                  463   docker + mysql + php                  463
+
+checked in 5.12 s
+verdict: MATCH

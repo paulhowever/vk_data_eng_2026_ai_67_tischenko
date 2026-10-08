@@ -1,0 +1,97 @@
+variant rows read from s3://hh-lake/raw/it_vacancies_2024.csv by DuckDB httpfs: 5,382 in 4.11 s
+SQL net salary and skills vs segment.salary_net / segment.normalize_skills: 5,382 rows, 0 mismatches
+regions: Москва, Санкт-Петербург, Екатеринбург
+MapReduce s3://hh-lake/results/mapreduce/regions_k1.csv: 1,131 keys, sum(count) 18,038
+MapReduce s3://hh-lake/results/mapreduce/regions_k2.csv: 15,878 keys, sum(count) 76,155
+MapReduce s3://hh-lake/results/mapreduce/regions_k3.csv: 105,598 keys, sum(count) 265,467
+MapReduce counts of all 45 top combos == DuckDB recount over vacancies with skills
+
+table 1. region profile (DuckDB over S3, net salary in RUB)
+  metric                                   Москва  Санкт-Петербург     Екатеринбург       весь вариант
+  vacancies                                 2,127              790              205              5,382
+  with skills                               1,692              646              169              4,380
+  with salary                               1,022              479              146              3,055
+  salary share                              48.0%            60.6%            71.2%              56.8%
+  both bounds, of with salary               48.6%            50.5%            53.4%              50.5%
+  Q1 net                                  130,000          104,400           90,000             95,000
+  median net                              174,000          150,000          125,000            140,000
+  Q3 net                                  225,000          200,000          175,000            185,000
+  remote share                              51.8%            40.8%            31.2%              42.1%
+  experience: Нет опыта                      2.6%             4.1%             6.8%               5.8%
+  experience: От 1 года до 3 лет            33.3%            44.8%            58.5%              45.2%
+  experience: От 3 до 6 лет                 56.3%            46.6%            30.2%              43.5%
+  experience: Более 6 лет                    7.8%             4.6%             4.4%               5.5%
+  employers                                 1,013              414              123              2,248
+  median, 1-3 years               140,000 (n=402)  120,000 (n=222)   120,000 (n=87)  115,000 (n=1,521)
+  median, 3-6 years               200,000 (n=516)  175,000 (n=201)   143,550 (n=41)  175,000 (n=1,156)
+  median, remote                  179,610 (n=574)  150,000 (n=197)   139,600 (n=46)  150,000 (n=1,306)
+  median, not remote              162,975 (n=448)  148,770 (n=282)  125,000 (n=100)  130,000 (n=1,749)
+
+table 2. top 5 skills, pairs and triples per region: count from MapReduce regions_k1..k3, share of the region's vacancies with skills, net salary median from DuckDB
+
+Москва (vacancies with skills 1,692)
+  k  rank  combo                      count  share  n_salary  median_salary
+  1  1     php                        1,548  91.5%       751        175,000
+  1  2     mysql                        834  49.3%       454        167,475
+  1  3     git                          671  39.7%       366        170,000
+  1  4     laravel                      541  32.0%       272        160,475
+  1  5     postgresql                   454  26.8%       222        200,000
+  2  1     mysql + php                  749  44.3%       401        169,650
+  2  2     git + php                    618  36.5%       334        172,000
+  2  3     laravel + php                498  29.4%       247        160,950
+  2  4     php + postgresql             431  25.5%       208        200,000
+  2  5     git + mysql                  407  24.1%       219        160,950
+  3  1     git + mysql + php            368  21.7%       194        160,950
+  3  2     laravel + mysql + php        250  14.8%       128        160,000
+  3  3     git + laravel + php          217  12.8%       115        160,000
+  3  4     javascript + mysql + php     202  11.9%       136        150,000
+  3  5     docker + php + postgresql    187  11.1%       103        225,000
+
+Санкт-Петербург (vacancies with skills 646)
+  k  rank  combo                     count  share  n_salary  median_salary
+  1  1     php                         602  93.2%       394        150,000
+  1  2     mysql                       359  55.6%       248        150,000
+  1  3     git                         263  40.7%       175        145,000
+  1  4     laravel                     230  35.6%       163        150,000
+  1  5     javascript                  177  27.4%       130        123,400
+  2  1     mysql + php                 344  53.3%       241        150,000
+  2  2     git + php                   249  38.5%       169        145,000
+  2  3     laravel + php               222  34.4%       158        148,770
+  2  4     git + mysql                 174  26.9%       113        140,000
+  2  5     php + symfony               168  26.0%        99        180,000
+  3  1     git + mysql + php           165  25.5%       109        140,000
+  3  2     laravel + mysql + php       129  20.0%        96        142,500
+  3  3     javascript + mysql + php    116  18.0%        89        121,800
+  3  4     html + mysql + php          102  15.8%        83        120,000
+  3  5     git + laravel + php          94  14.6%        76        135,000
+
+Екатеринбург (vacancies with skills 169)
+  k  rank  combo                     count  share  n_salary  median_salary
+  1  1     php                         156  92.3%       115        130,500
+  1  2     mysql                       101  59.8%        84        125,000
+  1  3     javascript                   53  31.4%        43        100,000
+  1  4     laravel                      50  29.6%        29        120,000
+  1  5     git                          47  27.8%        36        120,000
+  2  1     mysql + php                  94  55.6%        77        125,000
+  2  2     javascript + php             47  27.8%        37         95,000
+  2  3     git + php                    44  26.0%        33        120,000
+  2  4     laravel + php                41  24.3%        20        112,500
+  2  5     html + php                   39  23.1%        37        120,000
+  3  1     html + mysql + php           35  20.7%        33        125,000
+  3  2     javascript + mysql + php     34  20.1%        27         95,000
+  3  3     css + mysql + php            30  17.8%        28        125,000
+  3  4     css + html + mysql           29  17.2%        28        125,000
+  3  5     css + html + php             26  15.4%        25        125,000
+
+facts for the report
+  1. median net salary: Москва 174,000, Санкт-Петербург 150,000, Екатеринбург 125,000; gap Москва/Санкт-Петербург +16.0%, Москва/Екатеринбург +39.2%, Санкт-Петербург/Екатеринбург +20.0%
+  2. same experience keeps the gap: 1-3 years Москва 140,000 (n=402), Санкт-Петербург 120,000 (n=222), Екатеринбург 120,000 (n=87), gap Москва/Санкт-Петербург +16.7%, Москва/Екатеринбург +16.7%, Санкт-Петербург/Екатеринбург +0.0%; 3-6 years Москва 200,000 (n=516), Санкт-Петербург 175,000 (n=201), Екатеринбург 143,550 (n=41), gap Москва/Санкт-Петербург +14.3%, Москва/Екатеринбург +39.3%, Санкт-Петербург/Екатеринбург +21.9%
+  3. experience 3+ years: Москва 64.1%, Санкт-Петербург 51.1%, Екатеринбург 34.6% of vacancies (whole variant 49.0%)
+  4. salary shown in Москва 48.0%, Санкт-Петербург 60.6%, Екатеринбург 71.2% of vacancies (whole variant 56.8%); both range bounds among them: Москва 48.6%, Санкт-Петербург 50.5%, Екатеринбург 53.4%
+  5. remote share Москва 51.8%, Санкт-Петербург 40.8%, Екатеринбург 31.2%; median remote vs not remote: Москва 179,610 (n=574) vs 162,975 (n=448) (+10.2%), Санкт-Петербург 150,000 (n=197) vs 148,770 (n=282) (+0.8%), Екатеринбург 139,600 (n=46) vs 125,000 (n=100) (+11.7%)
+  6. share of vacancies with skills (MapReduce regions_k1), Москва / Санкт-Петербург / Екатеринбург: html 15.8% / 20.7% / 26.0%; css 11.1% / 16.4% / 21.3%; symfony 23.5% / 27.1% / 12.4%; postgresql 26.8% / 24.9% / 18.9%
+
+wrote s3://hh-lake/results/regions/profile.csv  rows 4  (local results/regions/profile.csv)
+wrote s3://hh-lake/results/regions/top_combos.csv  rows 45  (local results/regions/top_combos.csv)
+
+total 5.20 s

@@ -1,0 +1,8 @@
+bucket: hh-lake @ http://localhost:19000
+uploaded ~/Downloads/it_vacancies_2024.csv -> s3://hh-lake/raw/it_vacancies_2024.csv
+local size   847,619,384 B
+remote size  847,619,384 B  etag "0e6d21890db664d9bf83e1427665b106-13"
+upload time  3.62 s  (223 MiB/s)
+sha256 local  303db922b541e4440906f5a7e8be32fb55e8808f950ffddb8c272f1548212a65
+sha256 remote 303db922b541e4440906f5a7e8be32fb55e8808f950ffddb8c272f1548212a65
+integrity     OK

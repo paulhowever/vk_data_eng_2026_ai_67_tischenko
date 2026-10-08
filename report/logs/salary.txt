@@ -1,0 +1,103 @@
+variant rows read from s3://hh-lake/raw/it_vacancies_2024.csv by DuckDB httpfs: 5,382 in 4.15 s
+SQL net salary and skills vs segment.salary_net / segment.normalize_skills: 5,382 rows, 0 mismatches
+
+variant: role = 'Программист, разработчик' and name contains 'php'; net = RUR mid-range, gross x 0.87, kept 20,000..1,000,000
+  subset                  vacancies  median net
+  all                         5,382
+  with skills                 4,380
+  with salary                 3,055     140,000
+  with salary and skills      2,569     140,000
+
+MapReduce s3://hh-lake/results/mapreduce/k1.csv: 955 keys, sum(count) 31,835
+MapReduce s3://hh-lake/results/mapreduce/k2.csv: 15,921 keys, sum(count) 135,362
+DuckDB median == statistics.median in all 106,695 skill groups (k=1: 696, k=2: 11,648, k=3: 94,351)
+
+support threshold: n >= 30 vacancies with salary, emp >= 10 employers
+  pairs      469 of 11,648 with salary
+  triples  1,021 of 94,351 with salary
+
+pairs that raise salary: top 10 by uplift = med_pair - med_base (base = more frequent skill by k1)
+  base        added      n  emp  med_pair  n_base  med_base    uplift  uplift_pct
+  sql         rabbitmq  44   19   262,500     505   130,000  +132,500     +101.9%
+  php         highload  31   13   261,000   2,362   140,000  +121,000      +86.4%
+  ооп         solid     35   10   250,000     507   130,000  +120,000      +92.3%
+  api         php7      47   16   250,000     356   145,000  +105,000      +72.4%
+  php         golang    31   21   240,000   2,362   140,000  +100,000      +71.4%
+  linux       rabbitmq  54   19   250,000     375   155,000   +95,000      +61.3%
+  ооп         rabbitmq  48   21   220,000     507   130,000   +90,000      +69.2%
+  backend     php7      40   15   262,500     164   174,500   +88,000      +50.4%
+  rabbitmq    php7      47   10   300,000     289   215,000   +85,000      +39.5%
+  javascript  rabbitmq  33   15   200,000     824   120,000   +80,000      +66.7%
+
+pairs that lower salary: top 10
+  base        added                       n  emp  med_pair  n_base  med_base   uplift  uplift_pct
+  postgresql  jquery                     30   17   104,400     567   170,000  -65,600      -38.6%
+  docker      css                        42   18   110,000     570   175,000  -65,000      -37.1%
+  docker      веб-программирование       30   14   110,000     570   175,000  -65,000      -37.1%
+  mysql       разработка по              30   19    78,715   1,479   140,000  -61,285      -43.8%
+  docker      html                       55   25   115,000     570   175,000  -60,000      -34.3%
+  docker      rest api                   53   28   115,000     570   175,000  -60,000      -34.3%
+  php         администрирование сайтов   34   16    80,000   2,362   140,000  -60,000      -42.9%
+  symfony     html                       56   28   128,075     417   180,000  -51,925      -28.8%
+  mysql       cms wordpress              68   41    90,000   1,479   140,000  -50,000      -35.7%
+  php         cms wordpress             130   65    90,000   2,362   140,000  -50,000      -35.7%
+
+triples that raise salary: top 10 by uplift = med_triple - med_base (base = most frequent pair by k2; control: most frequent skill by k1)
+  base pair           added      n  emp  med_triple  n_base  med_base    uplift  uplift_pct  base_skill  med_base_skill  uplift_vs_skill
+  php + sql           rabbitmq  44   19     262,500     467   130,500  +132,000     +101.1%         php         140,000         +122,500
+  php + ооп           solid     35   10     250,000     475   130,000  +120,000      +92.3%         php         140,000         +110,000
+  api + mysql         php7      38   10     262,500     256   145,000  +117,500      +81.0%       mysql         140,000         +122,500
+  api + php           php7      44   15     262,500     343   147,900  +114,600      +77.5%         php         140,000         +122,500
+  api + sql           backend   37   13     262,500     119   150,000  +112,500      +75.0%         sql         130,000         +132,500
+  docker + sql        api       36   13     262,500     139   150,000  +112,500      +75.0%      docker         175,000          +87,500
+  docker + sql        backend   39   12     262,500     139   150,000  +112,500      +75.0%      docker         175,000          +87,500
+  api + mysql         rabbitmq  47   14     250,000     256   145,000  +105,000      +72.4%       mysql         140,000         +110,000
+  mysql + postgresql  php7      57   14     262,500     286   160,000  +102,500      +64.1%       mysql         140,000         +122,500
+  mysql + postgresql  rabbitmq  76   28     261,750     286   160,000  +101,750      +63.6%       mysql         140,000         +121,750
+
+triples that lower salary: top 10
+  base pair            added           n  emp  med_triple  n_base  med_base   uplift  uplift_pct  base_skill  med_base_skill  uplift_vs_skill
+  docker + postgresql  javascript     32   18     120,900     253   200,000  -79,100      -39.5%  javascript         120,000             +900
+  docker + php         css            39   17     105,000     536   175,000  -70,000      -40.0%         php         140,000          -35,000
+  docker + php         html           52   24     111,875     536   175,000  -63,125      -36.1%         php         140,000          -28,125
+  mysql + php          разработка по  30   19      78,715   1,373   140,000  -61,285      -43.8%         php         140,000          -61,285
+  docker + php         rest api       46   26     115,000     536   175,000  -60,000      -34.3%         php         140,000          -25,000
+  php + symfony        html           55   27     126,150     391   180,000  -53,850      -29.9%         php         140,000          -13,850
+  mysql + php          cms wordpress  67   40      90,000   1,373   140,000  -50,000      -35.7%         php         140,000          -50,000
+  linux + postgresql   rest           30   15     150,000     123   200,000  -50,000      -25.0%  postgresql         170,000          -20,000
+  php + postgresql     css            33   20     121,800     534   170,000  -48,200      -28.4%         php         140,000          -18,200
+  docker + mysql       css            31   13     126,150     328   174,000  -47,850      -27.5%       mysql         140,000          -13,850
+
+single skills with n >= 30 and emp >= 10: 75; highest and lowest medians
+  skill                     count    n  emp      med
+  highload                     49   33   14  250,000
+  golang                      100   38   22  232,500
+  rabbitmq                    560  289  114  215,000
+  ci/cd                        78   47   25  200,000
+  clickhouse                  121   57   32  200,000
+  kafka                       126   32   21  200,000
+  mongodb                     176   81   40  200,000
+  solid                       181   95   45  200,000
+  elasticsearch               130   60   35  180,000
+  phpunit                      69   47   20  180,000
+  ...
+  css                         681  472  247  100,000
+  css3                        211  167  100  100,000
+  html                        908  660  334  100,000
+  php5                        147   99   65  100,000
+  python                       83   52   34  100,000
+  веб-программирование        293  236  113  100,000
+  cms wordpress               187  134   67   92,500
+  разработка по                84   67   36   90,000
+  администрирование сайтов     40   36   18   80,000
+  обучение и развитие          34   31   16   70,000
+
+wrote s3://hh-lake/results/salary/pairs.csv  rows 469  (local results/salary/pairs.csv)
+wrote s3://hh-lake/results/salary/pairs_up.csv  rows 10  (local results/salary/pairs_up.csv)
+wrote s3://hh-lake/results/salary/pairs_down.csv  rows 10  (local results/salary/pairs_down.csv)
+wrote s3://hh-lake/results/salary/triples.csv  rows 1,021  (local results/salary/triples.csv)
+wrote s3://hh-lake/results/salary/triples_up.csv  rows 10  (local results/salary/triples_up.csv)
+wrote s3://hh-lake/results/salary/triples_down.csv  rows 10  (local results/salary/triples_down.csv)
+wrote s3://hh-lake/results/salary/singles.csv  rows 955  (local results/salary/singles.csv)
+
+total 4.69 s

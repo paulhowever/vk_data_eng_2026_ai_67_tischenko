@@ -1,0 +1,151 @@
+$ uv run python -m hhlake.mr.run --k 1 2 3 --fail-mapper 7 --fail-attempt 1 --keep-tmp --job faulttest
+job faulttest  mode skills  k 1 2 3
+input s3://hh-lake/raw/it_vacancies_2024.csv  847,619,384 B  endpoint http://localhost:19000
+chunk 32 MiB  workers 10  reducers 4
+tmp s3://hh-lake/tmp/mr/faulttest/
+fault injection: mapper 7 exits with code 137 on attempt 1
+
+map    task   0  attempt 1  terminated (pool broken) exit -15 pid  15528    1.94 s  not charged
+map    task   1  attempt 1  terminated (pool broken) exit -15 pid  15529    1.93 s  not charged
+map    task   2  attempt 1  terminated (pool broken) exit -15 pid  15527    1.92 s  not charged
+map    task   3  attempt 1  terminated (pool broken) exit -15 pid  15530    1.91 s  not charged
+map    task   4  attempt 1  terminated (pool broken) exit -15 pid  15531    1.91 s  not charged
+map    task   5  attempt 1  terminated (pool broken) exit -15 pid  15533    1.89 s  not charged
+map    task   6  attempt 1  terminated (pool broken) exit -15 pid  15526    1.88 s  not charged
+map    task   7  attempt 1  crashed                  exit 137 pid  15532    1.87 s  failure 1 of 3
+map    task   8  attempt 1  terminated (pool broken) exit -15 pid  15534    1.81 s  not charged
+map    task   9  attempt 1  terminated (pool broken) exit -15 pid  15535    1.78 s  not charged
+map    task  10  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  11  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  12  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  13  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  14  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  15  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  16  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  17  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  18  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  19  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  20  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  21  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  22  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  23  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  24  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    task  25  attempt 1  lost (not started)                pid      -    0.00 s  not charged
+map    pool broken: new pool, resubmitting 26 unfinished tasks
+map    task   0  attempt 2  ok                                pid  15541    1.26 s  bytes [222, 33,555,287)  records 8,969  GET 1
+map    task   4  attempt 2  ok                                pid  15544    1.83 s  bytes [134,222,989, 167,775,029)  records 9,305  GET 1
+map    task   7  attempt 2  ok                                pid  15545    1.94 s  bytes [234,885,825, 268,435,470)  records 9,063  GET 1
+map    task   5  attempt 2  ok                                pid  15538    1.96 s  bytes [167,775,029, 201,326,829)  records 9,288  GET 1
+map    task   9  attempt 2  ok                                pid  15542    1.97 s  bytes [301,991,284, 335,549,935)  records 9,310  GET 1
+map    task   3  attempt 2  ok                                pid  15540    2.10 s  bytes [100,666,764, 134,222,989)  records 9,114  GET 1
+map    task   1  attempt 2  ok                                pid  15547    2.18 s  bytes [33,555,287, 67,111,156)  records 9,119  GET 1
+map    task   2  attempt 2  ok                                pid  15543    2.20 s  bytes [67,111,156, 100,666,764)  records 9,059  GET 1
+map    task   6  attempt 2  ok                                pid  15546    2.20 s  bytes [201,326,829, 234,885,825)  records 9,178  GET 1
+map    task   8  attempt 2  ok                                pid  15539    2.27 s  bytes [268,435,470, 301,991,284)  records 9,109  GET 1
+map    task  10  attempt 2  ok                                pid  15541    1.15 s  bytes [335,549,935, 369,105,733)  records 9,220  GET 1
+map    task  11  attempt 2  ok                                pid  15544    0.92 s  bytes [369,105,733, 402,655,883)  records 9,123  GET 1
+map    task  13  attempt 2  ok                                pid  15538    1.47 s  bytes [436,209,093, 469,763,676)  records 9,107  GET 1
+map    task  12  attempt 2  ok                                pid  15545    1.75 s  bytes [402,655,883, 436,209,093)  records 9,033  GET 1
+map    task  14  attempt 2  ok                                pid  15542    1.76 s  bytes [469,763,676, 503,319,387)  records 9,071  GET 1
+map    task  15  attempt 2  ok                                pid  15540    2.13 s  bytes [503,319,387, 536,875,223)  records 9,474  GET 1
+map    task  20  attempt 2  ok                                pid  15541    1.99 s  bytes [671,089,299, 704,648,084)  records 8,819  GET 1
+map    task  16  attempt 2  ok                                pid  15547    2.25 s  bytes [536,875,223, 570,425,853)  records 8,885  GET 1
+map    task  19  attempt 2  ok                                pid  15539    2.15 s  bytes [637,537,352, 671,089,299)  records 9,202  GET 1
+map    task  17  attempt 2  ok                                pid  15543    2.26 s  bytes [570,425,853, 603,981,789)  records 8,895  GET 1
+map    task  21  attempt 2  ok                                pid  15544    1.71 s  bytes [704,648,084, 738,202,833)  records 8,973  GET 1
+map    task  22  attempt 2  ok                                pid  15538    1.08 s  bytes [738,202,833, 771,756,695)  records 8,817  GET 1
+map    task  18  attempt 2  ok                                pid  15546    2.31 s  bytes [603,981,789, 637,537,352)  records 9,135  GET 1
+map    task  25  attempt 2  ok                                pid  15540    0.31 s  bytes [838,862,280, 847,619,384)  records 2,304  GET 1
+map    task  23  attempt 2  ok                                pid  15545    0.87 s  bytes [771,756,695, 805,306,785)  records 8,876  GET 1
+map    task  24  attempt 2  ok                                pid  15542    0.86 s  bytes [805,306,785, 838,862,280)  records 8,940  GET 1
+reduce task   3  attempt 1  ok                                pid  15543    0.20 s  parts 26  bytes 4,557,807  keys 36,118
+reduce task   1  attempt 1  ok                                pid  15547    0.20 s  parts 26  bytes 4,522,879  keys 36,154
+reduce task   0  attempt 1  ok                                pid  15541    0.20 s  parts 26  bytes 4,522,383  keys 36,138
+reduce task   2  attempt 1  ok                                pid  15539    0.20 s  parts 26  bytes 4,476,959  keys 35,932
+
+attempts: 56 total, 26 failed and retried (1 charged to the failing task, 25 collateral: terminated or never started because the pool broke)
+map 7.94 s   reduce 0.25 s   map tasks 26
+S3 input: 27 GET, 849,323,345 B (+1,703,961 B vs object)
+S3 shuffle: 104 PUT, 104 GET, 18,080,028 B
+
+map stages over 26 accepted attempts, s                   sum   mean    max  share
+  fetch: Range GET + record alignment                   31.55   1.21   1.84  70.3%
+  parse: UTF-8 decode + csv.reader                       2.59   0.10   0.12   5.8%
+  combine: filter, normalize, combinations, Counter      0.38   0.01   0.03   0.8%
+  serialize: JSON lines per reducer                      0.56   0.02   0.04   1.2%
+  put: shuffle PUT to S3                                 9.79   0.38   0.55  21.8%
+  task total                                            44.87
+  fetch throughput: median 25 MiB/s per task, 102 MiB/s for the whole map phase
+  worker start (spawn + interpreter + import boto3/hhlake): 10 processes, 0.69..0.76 s after the pool was created
+  map phase 7.94 s vs sum of task time / 10 workers = 4.49 s
+
+checks
+  ok   aligned ranges tile [header_end, size)                          yes  expected yes
+  ok   records                                                     229,388  expected 229,388
+  ok   unique vacancy_id                                           229,388  expected 229,388
+  ok   variant                                                       5,382  expected 5,382
+  ok   with skills                                                   4,380  expected 4,380
+  ok   vacancies in skills-per-vacancy histogram                     4,380  expected 4,380
+  ok   k=1 sum(count) == emitted                                    31,835  expected 31,835
+  ok   k=1 emitted == sum vac(n)*C(n,1)                             31,835  expected 31,835
+  ok   k=1 reducer key sets disjoint                                   955  expected 955
+  ok   k=1 unique keys                                                 955  expected 955
+  ok   k=1 sum count                                                31,835  expected 31,835
+  ok   k=1 top                                                 (php) 4,033  expected (php) 4,033
+  ok   k=2 sum(count) == emitted                                   135,362  expected 135,362
+  ok   k=2 emitted == sum vac(n)*C(n,2)                            135,362  expected 135,362
+  ok   k=2 reducer key sets disjoint                                15,921  expected 15,921
+  ok   k=2 unique keys                                              15,921  expected 15,921
+  ok   k=2 sum count                                               135,362  expected 135,362
+  ok   k=2 top                                          (mysql, php) 2,096  expected (mysql, php) 2,096
+  ok   k=3 sum(count) == emitted                                   472,071  expected 472,071
+  ok   k=3 emitted == sum vac(n)*C(n,3)                            472,071  expected 472,071
+  ok   k=3 reducer key sets disjoint                               127,466  expected 127,466
+  ok   k=3 unique keys                                             127,466  expected 127,466
+  ok   k=3 sum count                                               472,071  expected 472,071
+  ok   k=3 top                                     (git, mysql, php) 1,030  expected (git, mysql, php) 1,030
+
+skills per vacancy (4,380 variant vacancies with skills): mean 7.27, median 6, max 30
+  69 vacancies with n >= 20 skills (1.6%) emit k=1 5.2%, k=2 14.1%, k=3 30.4% of all combinations; full table: python -m hhlake.growth
+
+ k    emitted   combined  ratio    shuffle B      keys       sum
+ 1     31,835      4,918  15.4%      123,425       955    31,835
+ 2    135,362     58,813  43.4%    2,090,539    15,921   135,362
+ 3    472,071    334,410  70.8%   15,866,064   127,466   472,071
+
+top
+  k=1: (php) 4,033; (mysql) 2,263; (git) 1,809; (laravel) 1,441; (javascript) 1,202
+  k=2: (mysql, php) 2,096; (git, php) 1,686; (laravel, php) 1,342; (git, mysql) 1,116; (javascript, php) 1,103
+  k=3: (git, mysql, php) 1,030; (javascript, mysql, php) 719; (laravel, mysql, php) 696; (git, laravel, php) 641; (html, mysql, php) 546
+
+outputs
+  s3://hh-lake/results/mapreduce/k1.csv  20,854 B  sha256 c071dfef1f9b353cbb8c9224b8652f571be3e643a88117e0a7266f851ec4bd73  object in S3 before this run: identical
+  s3://hh-lake/results/mapreduce/k2.csv  467,629 B  sha256 ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f  object in S3 before this run: identical
+  s3://hh-lake/results/mapreduce/k3.csv  4,777,942 B  sha256 692ac3585ff04f457db6d7cf94d4906650356d354f433f0dadaa630d44f8e960  object in S3 before this run: identical
+
+tmp kept: s3://hh-lake/tmp/mr/faulttest/  107 objects
+  _manifest.json lists one accepted attempt per map task; reducers read only those prefixes
+  accepted   26 prefixes,  104 parts
+  orphans     2 prefixes,    2 parts (crashed or terminated attempts, never read)
+    map-3-a1/: part-0
+    map-7-a1/: part-0
+  manifest entry of mapper 7: attempt 2, range [234881024, 268435456], aligned [234885825, 268435470], parts [0, 1, 2, 3]
+  inspect: mc ls -r hh/hh-lake/tmp/mr/faulttest/
+  remove:  mc rm -r --force hh/hh-lake/tmp/mr/faulttest/
+ru_maxrss of single processes: master 151 MiB, largest worker 165 MiB (whole process tree: python -m hhlake.bench)
+total 9.00 s
+{"job": "faulttest", "mode": "skills", "workers": 10, "chunk_mib": 32, "map_tasks": 26, "reducers": 4, "attempts": 56, "failed_attempts": 26, "charged_failures": 1, "time_total": 9.004, "time_map": 7.943, "time_reduce": 0.253, "time_write": 0.272, "map_breakdown_s": {"fetch_s": 31.555, "parse_s": 2.586, "combine_s": 0.377, "serialize_s": 0.558, "put_s": 9.792}, "map_task_seconds_sum": 44.867, "worker_ready_s": [0.694, 0.761], "records": 229388, "unique_ids": 229388, "variant": 5382, "with_skills": 4380, "skills_per_vacancy": {"1": 89, "2": 203, "3": 281, "4": 443, "5": 629, "6": 563, "7": 479, "8": 384, "9": 308, "10": 265, "11": 212, "12": 138, "13": 74, "14": 86, "15": 54, "16": 38, "17": 42, "18": 10, "19": 13, "20": 9, "21": 9, "22": 10, "23": 13, "24": 3, "25": 6, "26": 7, "27": 1, "28": 3, "29": 1, "30": 7}, "get_requests": 27, "get_bytes": 849323345, "shuffle_put_requests": 104, "shuffle_get_requests": 104, "peak_rss_mib_master": 151.2, "peak_rss_mib_worker": 165.2, "checks_ok": true, "k": {"1": {"emitted": 31835, "combined": 4918, "unique_keys": 955, "sum_count": 31835, "shuffle_bytes": 123425, "output_key": "results/mapreduce/k1.csv", "output_bytes": 20854, "output_sha256": "c071dfef1f9b353cbb8c9224b8652f571be3e643a88117e0a7266f851ec4bd73", "same_as_previous_object": true}, "2": {"emitted": 135362, "combined": 58813, "unique_keys": 15921, "sum_count": 135362, "shuffle_bytes": 2090539, "output_key": "results/mapreduce/k2.csv", "output_bytes": 467629, "output_sha256": "ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f", "same_as_previous_object": true}, "3": {"emitted": 472071, "combined": 334410, "unique_keys": 127466, "sum_count": 472071, "shuffle_bytes": 15866064, "output_key": "results/mapreduce/k3.csv", "output_bytes": 4777942, "output_sha256": "692ac3585ff04f457db6d7cf94d4906650356d354f433f0dadaa630d44f8e960", "same_as_previous_object": true}}}
+exit code 0
+
+$ mc ls -r hh/hh-lake/tmp/mr/faulttest/ | grep -E "map-7-|_manifest"
+[2026-10-07 17:16:21 MSK] 4.9KiB STANDARD _manifest.json
+[2026-10-07 17:16:16 MSK] 120KiB STANDARD map-7-a1/part-0
+[2026-10-07 17:16:18 MSK] 120KiB STANDARD map-7-a2/part-0
+[2026-10-07 17:16:18 MSK] 121KiB STANDARD map-7-a2/part-1
+[2026-10-07 17:16:18 MSK] 120KiB STANDARD map-7-a2/part-2
+[2026-10-07 17:16:18 MSK] 123KiB STANDARD map-7-a2/part-3
+
+$ mc rm -r --force hh/hh-lake/tmp/mr/faulttest/ | tail -n 1
+Removed `hh/hh-lake/tmp/mr/faulttest/map-9-a2/part-3`.
+$ mc ls -r hh/hh-lake/tmp/
+(empty)

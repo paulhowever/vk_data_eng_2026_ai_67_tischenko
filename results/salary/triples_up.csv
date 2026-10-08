@@ -1,0 +1,11 @@
+skill1,skill2,skill3,base1,base2,added,n,emp,med_triple,n_base,med_base,uplift,uplift_pct,base_skill,med_base_skill,uplift_vs_skill
+php,rabbitmq,sql,php,sql,rabbitmq,44,19,262500.0,467,130500.0,132000.0,101.1494,php,140000.0,122500.0
+php,solid,ооп,php,ооп,solid,35,10,250000.0,475,130000.0,120000.0,92.3077,php,140000.0,110000.0
+api,mysql,php7,api,mysql,php7,38,10,262500.0,256,145000.0,117500.0,81.0345,mysql,140000.0,122500.0
+api,php,php7,api,php,php7,44,15,262500.0,343,147900.0,114600.0,77.4848,php,140000.0,122500.0
+api,backend,sql,api,sql,backend,37,13,262500.0,119,150000.0,112500.0,75.0,sql,130000.0,132500.0
+api,docker,sql,docker,sql,api,36,13,262500.0,139,150000.0,112500.0,75.0,docker,175000.0,87500.0
+backend,docker,sql,docker,sql,backend,39,12,262500.0,139,150000.0,112500.0,75.0,docker,175000.0,87500.0
+api,mysql,rabbitmq,api,mysql,rabbitmq,47,14,250000.0,256,145000.0,105000.0,72.4138,mysql,140000.0,110000.0
+mysql,php7,postgresql,mysql,postgresql,php7,57,14,262500.0,286,160000.0,102500.0,64.0625,mysql,140000.0,122500.0
+mysql,postgresql,rabbitmq,mysql,postgresql,rabbitmq,76,28,261750.0,286,160000.0,101750.0,63.5938,mysql,140000.0,121750.0

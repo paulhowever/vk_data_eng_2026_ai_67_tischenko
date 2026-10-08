@@ -1,0 +1,46 @@
+$ mc ls -r hh/hh-lake
+[2026-10-07 17:15:39 MSK] 808MiB STANDARD raw/it_vacancies_2024.csv
+[2026-10-07 16:48:16 MSK] 162MiB STANDARD raw/it_vacancies_2024.parquet
+[2026-10-07 17:56:30 MSK] 4.2KiB STANDARD results/bench/docker_stats.csv
+[2026-10-07 17:56:30 MSK] 163KiB STANDARD results/bench/runs.csv
+[2026-10-07 16:51:53 MSK] 7.6KiB STANDARD results/bench/selftest_runs.csv
+[2026-10-07 16:51:53 MSK]   890B STANDARD results/bench/selftest_summary.csv
+[2026-10-07 16:51:53 MSK]  13KiB STANDARD results/bench/selftest_timeline.csv
+[2026-10-07 17:56:30 MSK] 3.1KiB STANDARD results/bench/summary.csv
+[2026-10-07 17:56:30 MSK] 238KiB STANDARD results/bench/timeline.csv
+[2026-10-07 17:17:01 MSK]  20KiB STANDARD results/duckdb/k1.csv
+[2026-10-07 17:17:01 MSK] 457KiB STANDARD results/duckdb/k2.csv
+[2026-10-07 17:17:01 MSK] 4.6MiB STANDARD results/duckdb/k3.csv
+[2026-10-07 17:17:13 MSK]  43KiB STANDARD results/duckdb/regions_k1.csv
+[2026-10-07 17:17:18 MSK] 708KiB STANDARD results/duckdb/regions_k2.csv
+[2026-10-07 17:17:22 MSK] 5.4MiB STANDARD results/duckdb/regions_k3.csv
+[2026-10-07 17:57:15 MSK] 2.8KiB STANDARD results/growth/skills_per_vacancy.csv
+[2026-10-07 17:16:22 MSK]  20KiB STANDARD results/mapreduce/k1.csv
+[2026-10-07 17:16:22 MSK] 457KiB STANDARD results/mapreduce/k2.csv
+[2026-10-07 17:16:22 MSK] 4.6MiB STANDARD results/mapreduce/k3.csv
+[2026-10-07 17:16:06 MSK]  43KiB STANDARD results/mapreduce/regions_k1.csv
+[2026-10-07 17:16:06 MSK] 708KiB STANDARD results/mapreduce/regions_k2.csv
+[2026-10-07 17:16:06 MSK] 5.4MiB STANDARD results/mapreduce/regions_k3.csv
+[2026-10-07 17:16:41 MSK]  20KiB STANDARD results/mapreduce_naive/k1.csv
+[2026-10-07 17:16:42 MSK] 457KiB STANDARD results/mapreduce_naive/k2.csv
+[2026-10-07 17:16:42 MSK] 4.6MiB STANDARD results/mapreduce_naive/k3.csv
+[2026-10-07 17:18:40 MSK]   920B STANDARD results/regions/profile.csv
+[2026-10-07 17:18:40 MSK] 2.8KiB STANDARD results/regions/top_combos.csv
+[2026-10-07 17:18:35 MSK]  35KiB STANDARD results/salary/pairs.csv
+[2026-10-07 17:18:35 MSK]  1012B STANDARD results/salary/pairs_down.csv
+[2026-10-07 17:18:35 MSK]   796B STANDARD results/salary/pairs_up.csv
+[2026-10-07 17:18:35 MSK]  31KiB STANDARD results/salary/singles.csv
+[2026-10-07 17:18:35 MSK] 110KiB STANDARD results/salary/triples.csv
+[2026-10-07 17:18:35 MSK] 1.2KiB STANDARD results/salary/triples_down.csv
+[2026-10-07 17:18:35 MSK] 1.1KiB STANDARD results/salary/triples_up.csv
+
+$ mc du hh/hh-lake
+998MiB	34 objects	hh-lake
+
+$ mc du --depth 2 hh/hh-lake
+970MiB	2 objects	hh-lake/raw
+28MiB	32 objects	hh-lake/results
+998MiB	34 objects	hh-lake
+
+$ mc ls -r hh/hh-lake/tmp/
+(empty: intermediate MapReduce files are removed after each job)

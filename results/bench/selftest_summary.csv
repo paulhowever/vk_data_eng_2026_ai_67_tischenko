@@ -1,0 +1,6 @@
+suite,scenario,label,engine,k,workers,chunk_mib,source,n,time_mean_s,time_std_s,time_min_s,time_max_s,rss_mean_mib,rss_std_mib,rss_min_mib,rss_max_mib,cpu_avg_pct,peak_cpu_pct,max_single_rss_mib,cold_time_s,cold_rss_mib,failed
+selftest,probe_single,"1 процесс, 256 МиБ",probe,,,,,5,1.163,0.017,1.148,1.191,315.8,0.3,315.6,316.2,12.2,54.1,315.9,1.15,316.0,0
+selftest,probe_pool,4 потомка × 128 МиБ,probe,,,,,5,1.271,0.006,1.263,1.278,713.9,1.0,713.0,715.4,48.8,54.2,156.9,1.337,713.1,0
+selftest,probe_chain,3 потомка подряд × 192 МиБ,probe,,,,,5,3.524,0.03,3.496,3.571,307.9,0.6,307.6,309.0,13.7,53.0,220.4,3.519,307.9,0
+selftest,probe_nested,потомок + внук × 96 МиБ,probe,,,,,5,1.294,0.013,1.282,1.315,335.9,0.6,335.0,336.5,21.9,92.2,124.4,1.375,337.0,0
+selftest,probe_fail,выход с кодом 3,probe,,,,,0,,,,,,,,,,,,1.128,76.0,1

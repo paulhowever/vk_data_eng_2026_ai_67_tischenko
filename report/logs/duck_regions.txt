@@ -1,0 +1,53 @@
+duckdb 1.5.6  threads=10  memory_limit=12.7 GiB  external_file_cache=False
+source: s3://hh-lake/raw/it_vacancies_2024.csv (847,619,384 B) via httpfs @ localhost:19000
+mode: regions Москва, Санкт-Петербург, Екатеринбург
+string order: default_collation=binary; list_sort / ORDER BY / '<' vs Python sorted() on 19 probes (cyrillic, ё, 1c/1с, BMP vs astral): identical
+scan: source read once per k (3 scans)
+
+k=1  unique keys 1,131  sum(count) 18,038  compute 4.18 s  write 0.02 s  -> s3://hh-lake/results/duckdb/regions_k1.csv
+  md5 of ordered rows 8180bce4664df8ea7d4ed251f2a25c95
+  Екатеринбург: keys 154  sum(count) 1,230
+         156  php
+         101  mysql
+          53  javascript
+  Москва: keys 629  sum(count) 12,116
+       1,548  php
+         834  mysql
+         671  git
+  Санкт-Петербург: keys 348  sum(count) 4,692
+         602  php
+         359  mysql
+         263  git
+
+k=2  unique keys 15,878  sum(count) 76,155  compute 4.15 s  write 0.03 s  -> s3://hh-lake/results/duckdb/regions_k2.csv
+  md5 of ordered rows 3eb216eadd1a48451d216bc7b213225e
+  Екатеринбург: keys 1,590  sum(count) 5,062
+          94  mysql + php
+          47  javascript + php
+          44  git + php
+  Москва: keys 9,618  sum(count) 51,089
+         749  mysql + php
+         618  git + php
+         498  laravel + php
+  Санкт-Петербург: keys 4,670  sum(count) 20,004
+         344  mysql + php
+         249  git + php
+         222  laravel + php
+
+k=3  unique keys 105,598  sum(count) 265,467  compute 4.39 s  write 0.13 s  -> s3://hh-lake/results/duckdb/regions_k3.csv
+  md5 of ordered rows 455184ba202baaafa63843ad46da0726
+  Екатеринбург: keys 7,179  sum(count) 16,118
+          35  html + mysql + php
+          34  javascript + mysql + php
+          30  css + mysql + php
+  Москва: keys 69,620  sum(count) 178,963
+         368  git + mysql + php
+         250  laravel + mysql + php
+         217  git + laravel + php
+  Санкт-Петербург: keys 28,799  sum(count) 70,386
+         165  git + mysql + php
+         129  laravel + mysql + php
+         116  javascript + mysql + php
+
+total 13.49 s, peak RSS 446.8 MiB
+{"engine": "duckdb", "version": "1.5.6", "source": "csv", "regions": true, "threads": 10, "materialize": false, "k": {"1": {"unique_keys": 1131, "sum_count": 18038, "time_compute": 4.179, "time_write": 0.017, "time": 4.196, "output_key": "results/duckdb/regions_k1.csv", "digest": "8180bce4664df8ea7d4ed251f2a25c95", "per_area": {"Екатеринбург": {"unique_keys": 154, "sum_count": 1230}, "Москва": {"unique_keys": 629, "sum_count": 12116}, "Санкт-Петербург": {"unique_keys": 348, "sum_count": 4692}}, "top": {"Екатеринбург": {"skills": ["php"], "count": 156}, "Москва": {"skills": ["php"], "count": 1548}, "Санкт-Петербург": {"skills": ["php"], "count": 602}}}, "2": {"unique_keys": 15878, "sum_count": 76155, "time_compute": 4.153, "time_write": 0.026, "time": 4.178, "output_key": "results/duckdb/regions_k2.csv", "digest": "3eb216eadd1a48451d216bc7b213225e", "per_area": {"Екатеринбург": {"unique_keys": 1590, "sum_count": 5062}, "Москва": {"unique_keys": 9618, "sum_count": 51089}, "Санкт-Петербург": {"unique_keys": 4670, "sum_count": 20004}}, "top": {"Екатеринбург": {"skills": ["mysql", "php"], "count": 94}, "Москва": {"skills": ["mysql", "php"], "count": 749}, "Санкт-Петербург": {"skills": ["mysql", "php"], "count": 344}}}, "3": {"unique_keys": 105598, "sum_count": 265467, "time_compute": 4.386, "time_write": 0.129, "time": 4.515, "output_key": "results/duckdb/regions_k3.csv", "digest": "455184ba202baaafa63843ad46da0726", "per_area": {"Екатеринбург": {"unique_keys": 7179, "sum_count": 16118}, "Москва": {"unique_keys": 69620, "sum_count": 178963}, "Санкт-Петербург": {"unique_keys": 28799, "sum_count": 70386}}, "top": {"Екатеринбург": {"skills": ["html", "mysql", "php"], "count": 35}, "Москва": {"skills": ["git", "mysql", "php"], "count": 368}, "Санкт-Петербург": {"skills": ["git", "mysql", "php"], "count": 165}}}}, "time_total": 13.49, "peak_rss_mib": 446.8}

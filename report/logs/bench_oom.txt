@@ -1,0 +1,229 @@
+$ docker restart hh-lake-rustfs
+$ uv run python -m hhlake.bench --suite all --runs 5
+bench session 2026-10-07T14:18:56Z
+machine: Apple M5, 10 cores / 10 threads, RAM 16 GiB, Darwin 27.0.0, Python 3.13.15
+S3: http://localhost:19000/hh-lake, cwd /Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko
+
+=== suite main: 9 scenarios × (1 cold + 5 warm), RSS sampling every 20 ms, tree rescan every 100 ms
+  docker hh-lake-rustfs [start]: mem 161.3MiB / 7.653GiB (2.06%), cpu 0.86%, net 10.8kB / 3.41kB, pids 51
+
+[main] mr_k1: python -m hhlake.mr.run --k 1 --workers 10 --chunk-mib 32 --no-write
+  cold        6.858 s  peak RSS   1589.0 MiB  procs  12  cpu avg  180.5% peak  893.9%  max single   182.4 MiB  exit 0
+  warm 1      6.808 s  peak RSS   1532.0 MiB  procs  12  cpu avg  182.1% peak  908.0%  max single   174.2 MiB  exit 0
+  warm 2      6.988 s  peak RSS   1476.5 MiB  procs  12  cpu avg  179.3% peak  884.3%  max single   173.3 MiB  exit 0
+  warm 3      7.615 s  peak RSS   1429.6 MiB  procs  12  cpu avg  171.8% peak  908.9%  max single   173.2 MiB  exit 0
+  warm 4      7.302 s  peak RSS   1433.9 MiB  procs  12  cpu avg  178.5% peak  913.9%  max single   167.7 MiB  exit 0
+  warm 5      7.097 s  peak RSS   1479.1 MiB  procs  12  cpu avg  179.9% peak  882.2%  max single   194.5 MiB  exit 0
+  docker hh-lake-rustfs [after mr_k1]: mem 1.746GiB / 7.653GiB (22.81%), cpu 0.64%, net 101MB / 5.15GB, pids 461
+
+[main] mr_k2: python -m hhlake.mr.run --k 2 --workers 10 --chunk-mib 32 --no-write
+  cold        7.355 s  peak RSS   1453.9 MiB  procs  12  cpu avg  180.1% peak  908.1%  max single   171.2 MiB  exit 0
+  warm 1      7.505 s  peak RSS   1495.1 MiB  procs  12  cpu avg  177.7% peak  905.2%  max single   191.0 MiB  exit 0
+  warm 2      7.602 s  peak RSS   1473.4 MiB  procs  12  cpu avg  178.2% peak  895.6%  max single   174.2 MiB  exit 0
+  warm 3      7.495 s  peak RSS   1395.6 MiB  procs  12  cpu avg  179.2% peak  895.9%  max single   173.1 MiB  exit 0
+  warm 4      8.471 s  peak RSS   1266.3 MiB  procs  12  cpu avg  168.2% peak  839.7%  max single   161.9 MiB  exit 0
+  warm 5      7.464 s  peak RSS   1408.7 MiB  procs  12  cpu avg  180.7% peak  895.1%  max single   173.5 MiB  exit 0
+  docker hh-lake-rustfs [after mr_k2]: mem 2.157GiB / 7.653GiB (28.19%), cpu 0.04%, net 213MB / 10.3GB, pids 489
+
+[main] mr_k3: python -m hhlake.mr.run --k 3 --workers 10 --chunk-mib 32 --no-write
+  cold        7.638 s  peak RSS   1483.8 MiB  procs  12  cpu avg  184.6% peak  892.4%  max single   174.8 MiB  exit 0
+  warm 1      7.792 s  peak RSS   1440.8 MiB  procs  12  cpu avg  180.5% peak  918.2%  max single   173.5 MiB  exit 0
+  warm 2      7.773 s  peak RSS   1608.1 MiB  procs  12  cpu avg  180.4% peak  904.4%  max single   199.1 MiB  exit 0
+  warm 3      7.409 s  peak RSS   1583.3 MiB  procs  12  cpu avg  188.0% peak  903.2%  max single   188.1 MiB  exit 0
+  warm 4      7.604 s  peak RSS   1788.8 MiB  procs  12  cpu avg  185.2% peak  909.1%  max single   199.5 MiB  exit 0
+  warm 5      7.756 s  peak RSS   1581.2 MiB  procs  12  cpu avg  183.9% peak  899.3%  max single   184.8 MiB  exit 0
+  docker hh-lake-rustfs [after mr_k3]: mem 6.254GiB / 7.653GiB (81.72%), cpu 0.74%, net 412MB / 15.5GB, pids 503
+
+[main] mr_k123: python -m hhlake.mr.run --k 1 2 3 --workers 10 --chunk-mib 32 --no-write
+  cold        7.834 s  peak RSS   1650.9 MiB  procs  12  cpu avg  181.5% peak  904.7%  max single   188.6 MiB  exit 0
+  warm 1      7.681 s  peak RSS   1588.7 MiB  procs  12  cpu avg  186.9% peak  907.7%  max single   176.5 MiB  exit 0
+  warm 2      7.739 s  peak RSS   1557.3 MiB  procs  12  cpu avg  187.7% peak  904.6%  max single   202.5 MiB  exit 0
+  warm 3     10.550 s  peak RSS   1301.4 MiB  procs  12  cpu avg  152.2% peak  905.4%  max single   151.0 MiB  exit 0
+  warm 4      9.966 s  peak RSS   1303.2 MiB  procs  12  cpu avg  165.2% peak  870.2%  max single   154.2 MiB  exit 0
+  warm 5      7.924 s  peak RSS   1518.3 MiB  procs  12  cpu avg  182.0% peak  905.0%  max single   199.6 MiB  exit 0
+  docker hh-lake-rustfs [after mr_k123]: mem 6.35GiB / 7.653GiB (82.98%), cpu 0.05%, net 624MB / 20.8GB, pids 505
+
+[main] duck_k1: python -m hhlake.duck --k 1 --source csv --no-write
+  cold        5.608 s  peak RSS    424.5 MiB  procs   1  cpu avg   44.7% peak  103.7%  max single   424.5 MiB  exit 0
+  warm 1      5.265 s  peak RSS    432.8 MiB  procs   1  cpu avg   45.4% peak  122.6%  max single   432.8 MiB  exit 0
+  warm 2      5.261 s  peak RSS    429.5 MiB  procs   1  cpu avg   46.3% peak  119.6%  max single   429.5 MiB  exit 0
+  warm 3      5.384 s  peak RSS    427.9 MiB  procs   1  cpu avg   45.3% peak  121.3%  max single   427.9 MiB  exit 0
+  warm 4      5.382 s  peak RSS    458.6 MiB  procs   1  cpu avg   45.4% peak  121.6%  max single   458.6 MiB  exit 0
+  warm 5      5.382 s  peak RSS    419.1 MiB  procs   1  cpu avg   46.2% peak  122.1%  max single   423.5 MiB  exit 0
+  docker hh-lake-rustfs [after duck_k1]: mem 6.94GiB / 7.653GiB (90.69%), cpu 3.34%, net 746MB / 25.9GB, pids 497
+
+[main] duck_k2: python -m hhlake.duck --k 2 --source csv --no-write
+  cold        5.615 s  peak RSS    441.2 MiB  procs   1  cpu avg   45.0% peak  111.6%  max single   441.6 MiB  exit 0
+  warm 1      5.805 s  peak RSS    367.6 MiB  procs   1  cpu avg   43.0% peak  122.3%  max single   368.0 MiB  exit 0
+  warm 2      5.690 s  peak RSS    394.9 MiB  procs   1  cpu avg   44.1% peak  120.1%  max single   394.9 MiB  exit 0
+  warm 3      5.809 s  peak RSS    425.3 MiB  procs   1  cpu avg   44.0% peak  119.9%  max single   425.3 MiB  exit 0
+  warm 4      6.303 s  peak RSS    399.0 MiB  procs   1  cpu avg   40.7% peak  120.2%  max single   399.0 MiB  exit 0
+  warm 5      6.262 s  peak RSS    461.0 MiB  procs   1  cpu avg   41.8% peak  118.9%  max single   461.0 MiB  exit 0
+  docker hh-lake-rustfs [after duck_k2]: mem 6.625GiB / 7.653GiB (86.57%), cpu 15.14%, net 866MB / 31GB, pids 497
+
+[main] duck_k3: python -m hhlake.duck --k 3 --source csv --no-write
+  cold        5.565 s  peak RSS    501.2 MiB  procs   1  cpu avg   49.0% peak  155.3%  max single   501.6 MiB  exit 0
+  warm 1      5.693 s  peak RSS    443.4 MiB  procs   1  cpu avg   48.0% peak  118.1%  max single   448.7 MiB  exit 0
+  warm 2      5.969 s  peak RSS    432.7 MiB  procs   1  cpu avg   46.7% peak  132.9%  max single   433.1 MiB  exit 0
+  warm 3      5.963 s  peak RSS    462.9 MiB  procs   1  cpu avg   47.1% peak  117.8%  max single   463.3 MiB  exit 0
+  warm 4      5.939 s  peak RSS    471.7 MiB  procs   1  cpu avg   47.1% peak  112.4%  max single   472.3 MiB  exit 0
+  warm 5      5.849 s  peak RSS    462.7 MiB  procs   1  cpu avg   48.1% peak  121.0%  max single   463.6 MiB  exit 0
+  docker hh-lake-rustfs [after duck_k3]: mem 6.546GiB / 7.653GiB (85.54%), cpu 0.29%, net 986MB / 36.1GB, pids 501
+
+[main] duck_k123: python -m hhlake.duck --k 1 2 3 --source csv --no-write
+  cold       14.128 s  peak RSS    447.4 MiB  procs   1  cpu avg   39.6% peak  119.1%  max single   447.9 MiB  exit 0
+  warm 1     14.866 s  peak RSS    452.7 MiB  procs   1  cpu avg   38.0% peak  112.9%  max single   452.7 MiB  exit 0
+  warm 2     14.129 s  peak RSS    441.7 MiB  procs   1  cpu avg   38.9% peak  134.1%  max single   442.2 MiB  exit 0
+  warm 3     14.449 s  peak RSS    428.1 MiB  procs   1  cpu avg   39.0% peak  129.9%  max single   428.1 MiB  exit 0
+  warm 4     14.728 s  peak RSS    446.4 MiB  procs   1  cpu avg   38.6% peak  114.4%  max single   447.1 MiB  exit 0
+  warm 5     14.153 s  peak RSS    456.1 MiB  procs   1  cpu avg   39.0% peak  117.3%  max single   456.6 MiB  exit 0
+  docker hh-lake-rustfs [after duck_k123]: mem 6.822GiB / 7.653GiB (89.14%), cpu 0.05%, net 1.35GB / 51.4GB, pids 497
+
+[main] duck_k123_1scan: python -m hhlake.duck --k 1 2 3 --source csv --materialize --no-write
+  cold        5.918 s  peak RSS    452.1 MiB  procs   1  cpu avg   47.0% peak  118.1%  max single   452.3 MiB  exit 0
+  warm 1      5.628 s  peak RSS    450.2 MiB  procs   1  cpu avg   48.6% peak  118.6%  max single   450.7 MiB  exit 0
+  warm 2      5.599 s  peak RSS    443.6 MiB  procs   1  cpu avg   50.1% peak  127.7%  max single   443.6 MiB  exit 0
+  warm 3      5.487 s  peak RSS    472.2 MiB  procs   1  cpu avg   50.7% peak  120.7%  max single   472.2 MiB  exit 0
+  warm 4      5.617 s  peak RSS    450.2 MiB  procs   1  cpu avg   49.5% peak  113.1%  max single   451.1 MiB  exit 0
+  warm 5      5.571 s  peak RSS    451.4 MiB  procs   1  cpu avg   49.0% peak  119.2%  max single   451.9 MiB  exit 0
+  docker hh-lake-rustfs [end]: mem 6.719GiB / 7.653GiB (87.80%), cpu 5.64%, net 1.47GB / 56.4GB, pids 497
+
+saved s3://hh-lake/results/bench/runs.csv, s3://hh-lake/results/bench/summary.csv, s3://hh-lake/results/bench/timeline.csv, s3://hh-lake/results/bench/docker_stats.csv
+local copies in results/bench/
+
+scenario              n  time, s: mean ± std [min … max]     peak RSS, MiB: mean ± std [min … max]       cold s  cold MiB    cpu%  fail
+mr_k1                 5  7.162 ± 0.310 [6.808 … 7.615]       1470.2 ± 41.5 [1429.6 … 1532.0]              6.858    1589.0     178     0
+mr_k2                 5  7.707 ± 0.430 [7.464 … 8.471]       1407.8 ± 89.6 [1266.3 … 1495.1]              7.355    1453.9     177     0
+mr_k3                 5  7.667 ± 0.162 [7.409 … 7.792]       1600.4 ± 124.2 [1440.8 … 1788.8]             7.638    1483.8     184     0
+mr_k123               5  8.772 ± 1.375 [7.681 … 10.550]      1453.8 ± 140.5 [1301.4 … 1588.7]             7.834    1650.9     175     0
+duck_k1               5  5.335 ± 0.066 [5.261 … 5.384]       433.6 ± 14.9 [419.1 … 458.6]                 5.608     424.5      46     0
+duck_k2               5  5.974 ± 0.286 [5.690 … 6.303]       409.6 ± 35.3 [367.6 … 461.0]                 5.615     441.2      43     0
+duck_k3               5  5.883 ± 0.117 [5.693 … 5.969]       454.7 ± 16.1 [432.7 … 471.7]                 5.565     501.2      47     0
+duck_k123             5  14.465 ± 0.332 [14.129 … 14.866]    445.0 ± 11.0 [428.1 … 456.1]                14.128     447.4      39     0
+duck_k123_1scan       5  5.580 ± 0.056 [5.487 … 5.628]       453.5 ± 10.9 [443.6 … 472.2]                 5.918     452.1      50     0
+plot report/img/bench_main.png
+plot report/img/bench_main_timeline.png
+
+=== suite scaling: 7 scenarios × (1 cold + 5 warm), RSS sampling every 20 ms, tree rescan every 100 ms
+  docker hh-lake-rustfs [start]: mem 6.308GiB / 7.653GiB (82.42%), cpu 0.06%, net 1.47GB / 56.4GB, pids 501
+
+[scaling] mr_w1_c32: python -m hhlake.mr.run --k 1 2 3 --workers 1 --chunk-mib 32 --no-write
+  cold       11.589 s  peak RSS    515.7 MiB  procs   3  cpu avg   44.1% peak  116.5%  max single   447.0 MiB  exit 0
+  warm 1     11.727 s  peak RSS    514.9 MiB  procs   3  cpu avg   44.7% peak   99.8%  max single   445.2 MiB  exit 0
+  warm 2     11.512 s  peak RSS    510.5 MiB  procs   3  cpu avg   44.9% peak   99.8%  max single   457.9 MiB  exit 0
+  warm 3     11.491 s  peak RSS    481.9 MiB  procs   3  cpu avg   46.1% peak   99.9%  max single   436.9 MiB  exit 0
+  warm 4     11.544 s  peak RSS    542.7 MiB  procs   3  cpu avg   47.2% peak  100.0%  max single   491.1 MiB  exit 0
+  warm 5     11.251 s  peak RSS    442.1 MiB  procs   3  cpu avg   46.7% peak   99.9%  max single   358.0 MiB  exit 0
+  docker hh-lake-rustfs [after mr_w1_c32]: mem 6.679GiB / 7.653GiB (87.27%), cpu 0.07%, net 1.7GB / 61.7GB, pids 505
+
+[scaling] mr_w2_c32: python -m hhlake.mr.run --k 1 2 3 --workers 2 --chunk-mib 32 --no-write
+  cold        9.873 s  peak RSS    669.9 MiB  procs   4  cpu avg   62.5% peak  199.1%  max single   328.3 MiB  exit 0
+  warm 1     14.463 s  peak RSS    603.2 MiB  procs   4  cpu avg   43.2% peak  201.0%  max single   293.4 MiB  exit 0
+  warm 2     29.994 s  peak RSS    648.3 MiB  procs   4  cpu avg   22.3% peak  199.0%  max single   285.0 MiB  exit 0
+  warm 3      9.665 s  peak RSS    625.3 MiB  procs   4  cpu avg   63.5% peak  198.5%  max single   281.1 MiB  exit 0
+  warm 4     10.320 s  peak RSS    704.1 MiB  procs   4  cpu avg   59.1% peak  199.2%  max single   360.7 MiB  exit 0
+  warm 5      9.203 s  peak RSS    628.2 MiB  procs   4  cpu avg   66.6% peak  199.3%  max single   308.1 MiB  exit 0
+  docker hh-lake-rustfs [after mr_w2_c32]: mem 6.96GiB / 7.653GiB (90.95%), cpu 0.23%, net 1.93GB / 66.9GB, pids 505
+
+[scaling] mr_w4_c32: python -m hhlake.mr.run --k 1 2 3 --workers 4 --chunk-mib 32 --no-write
+  cold      349.021 s  peak RSS    376.2 MiB  procs   6  cpu avg    1.3% peak  397.9%  max single    70.8 MiB  exit 1
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/src/hhlake/mr/run.py", line 356, in <module>
+    main()
+    ~~~~^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/src/hhlake/mr/run.py", line 251, in main
+    result = engine.execute(job, chunk, args.workers, keep_tmp=args.keep_tmp)
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/src/hhlake/mr/engine.py", line 423, in execute
+    maps = master.run("map", run_map, job, tasks)
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/src/hhlake/mr/engine.py", line 383, in run
+    self._charge(stage, culprits)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/src/hhlake/mr/engine.py", line 349, in _charge
+    raise RuntimeError(f"{stage} task {index} failed {MAX_ATTEMPTS} times")
+RuntimeError: map task 0 failed 3 times
+  cold run failed, warm runs skipped
+  docker hh-lake-rustfs [after mr_w4_c32]: mem 0B / 0B (0.00%), cpu 0.00%, net 0B / 0B, pids 0
+
+[scaling] mr_w8_c32: python -m hhlake.mr.run --k 1 2 3 --workers 8 --chunk-mib 32 --no-write
+  cold        3.281 s  peak RSS     69.8 MiB  procs   1  cpu avg   14.3% peak   87.6%  max single    69.8 MiB  exit 1
+    return self._endpoint.make_request(operation_model, request_dict)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 119, in make_request
+    return self._send_request(request_dict, operation_model)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 231, in _send_request
+    raise exception
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 281, in _do_get_response
+    http_response = self._send(request)
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 385, in _send
+    return self.http_session.send(request)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/httpsession.py", line 539, in send
+    raise EndpointConnectionError(endpoint_url=request.url, error=e)
+botocore.exceptions.EndpointConnectionError: Could not connect to the endpoint URL: "http://localhost:19000/hh-lake/raw/it_vacancies_2024.csv"
+  cold run failed, warm runs skipped
+  docker hh-lake-rustfs [after mr_w8_c32]: mem 0B / 0B (0.00%), cpu 0.00%, net 0B / 0B, pids 0
+
+[scaling] mr_w10_c32: python -m hhlake.mr.run --k 1 2 3 --workers 10 --chunk-mib 32 --no-write
+  cold       13.096 s  peak RSS     69.8 MiB  procs   1  cpu avg    3.7% peak   97.8%  max single    69.8 MiB  exit 1
+    return self._endpoint.make_request(operation_model, request_dict)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 119, in make_request
+    return self._send_request(request_dict, operation_model)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 231, in _send_request
+    raise exception
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 281, in _do_get_response
+    http_response = self._send(request)
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 385, in _send
+    return self.http_session.send(request)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/httpsession.py", line 539, in send
+    raise EndpointConnectionError(endpoint_url=request.url, error=e)
+botocore.exceptions.EndpointConnectionError: Could not connect to the endpoint URL: "http://localhost:19000/hh-lake/raw/it_vacancies_2024.csv"
+  cold run failed, warm runs skipped
+  docker hh-lake-rustfs [after mr_w10_c32]: mem 0B / 0B (0.00%), cpu 0.00%, net 0B / 0B, pids 0
+
+[scaling] mr_w10_c8: python -m hhlake.mr.run --k 1 2 3 --workers 10 --chunk-mib 8 --no-write
+  cold       13.345 s  peak RSS     69.7 MiB  procs   1  cpu avg    3.6% peak   97.4%  max single    69.8 MiB  exit 1
+    return self._endpoint.make_request(operation_model, request_dict)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 119, in make_request
+    return self._send_request(request_dict, operation_model)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 231, in _send_request
+    raise exception
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 281, in _do_get_response
+    http_response = self._send(request)
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 385, in _send
+    return self.http_session.send(request)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/httpsession.py", line 539, in send
+    raise EndpointConnectionError(endpoint_url=request.url, error=e)
+botocore.exceptions.EndpointConnectionError: Could not connect to the endpoint URL: "http://localhost:19000/hh-lake/raw/it_vacancies_2024.csv"
+  cold run failed, warm runs skipped
+  docker hh-lake-rustfs [after mr_w10_c8]: mem 0B / 0B (0.00%), cpu 0.00%, net 0B / 0B, pids 0
+
+[scaling] mr_w10_c128: python -m hhlake.mr.run --k 1 2 3 --workers 10 --chunk-mib 128 --no-write
+  cold       13.910 s  peak RSS     69.7 MiB  procs   1  cpu avg    3.4% peak   97.6%  max single    69.8 MiB  exit 1
+    return self._endpoint.make_request(operation_model, request_dict)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 119, in make_request
+    return self._send_request(request_dict, operation_model)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 231, in _send_request
+    raise exception
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 281, in _do_get_response
+    http_response = self._send(request)
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/endpoint.py", line 385, in _send
+    return self.http_session.send(request)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/lib/python3.13/site-packages/botocore/httpsession.py", line 539, in send
+    raise EndpointConnectionError(endpoint_url=request.url, error=e)
+botocore.exceptions.EndpointConnectionError: Could not connect to the endpoint URL: "http://localhost:19000/hh-lake/raw/it_vacancies_2024.csv"
+  cold run failed, warm runs skipped
+  docker hh-lake-rustfs [end]: mem 0B / 0B (0.00%), cpu 0.00%, net 0B / 0B, pids 0
+
+$ docker inspect hh-lake-rustfs --format "OOMKilled={{.State.OOMKilled}} ExitCode={{.State.ExitCode}} FinishedAt={{.State.FinishedAt}}"
+OOMKilled=true ExitCode=137 FinishedAt=2026-10-07T14:29:42.531946759Z

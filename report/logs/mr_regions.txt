@@ -1,0 +1,96 @@
+job regions-k123-20261007-171559-15409  mode regions  k 1 2 3
+input s3://hh-lake/raw/it_vacancies_2024.csv  847,619,384 B  endpoint http://localhost:19000
+chunk 32 MiB  workers 10  reducers 4
+tmp s3://hh-lake/tmp/mr/regions-k123-20261007-171559-15409/
+
+map    task   0  attempt 1  ok                                pid  15417    1.34 s  bytes [222, 33,555,287)  records 8,969  GET 1
+map    task   2  attempt 1  ok                                pid  15414    1.99 s  bytes [67,111,156, 100,666,764)  records 9,059  GET 1
+map    task   1  attempt 1  ok                                pid  15420    2.23 s  bytes [33,555,287, 67,111,156)  records 9,119  GET 1
+map    task   3  attempt 1  ok                                pid  15415    2.28 s  bytes [100,666,764, 134,222,989)  records 9,114  GET 1
+map    task   6  attempt 1  ok                                pid  15411    2.50 s  bytes [201,326,829, 234,885,825)  records 9,178  GET 1
+map    task   7  attempt 1  ok                                pid  15418    2.51 s  bytes [234,885,825, 268,435,470)  records 9,063  GET 1
+map    task   9  attempt 1  ok                                pid  15416    2.50 s  bytes [301,991,284, 335,549,935)  records 9,310  GET 1
+map    task   5  attempt 1  ok                                pid  15412    2.66 s  bytes [167,775,029, 201,326,829)  records 9,288  GET 1
+map    task  10  attempt 1  ok                                pid  15417    1.40 s  bytes [335,549,935, 369,105,733)  records 9,220  GET 1
+map    task   4  attempt 1  ok                                pid  15413    2.69 s  bytes [134,222,989, 167,775,029)  records 9,305  GET 1
+map    task   8  attempt 1  ok                                pid  15419    2.70 s  bytes [268,435,470, 301,991,284)  records 9,109  GET 1
+map    task  11  attempt 1  ok                                pid  15414    1.04 s  bytes [369,105,733, 402,655,883)  records 9,123  GET 1
+map    task  12  attempt 1  ok                                pid  15420    1.06 s  bytes [402,655,883, 436,209,093)  records 9,033  GET 1
+map    task  13  attempt 1  ok                                pid  15415    1.07 s  bytes [436,209,093, 469,763,676)  records 9,107  GET 1
+map    task  14  attempt 1  ok                                pid  15411    1.74 s  bytes [469,763,676, 503,319,387)  records 9,071  GET 1
+map    task  15  attempt 1  ok                                pid  15418    1.83 s  bytes [503,319,387, 536,875,223)  records 9,474  GET 1
+map    task  16  attempt 1  ok                                pid  15416    2.12 s  bytes [536,875,223, 570,425,853)  records 8,885  GET 1
+map    task  18  attempt 1  ok                                pid  15417    2.05 s  bytes [603,981,789, 637,537,352)  records 9,135  GET 1
+map    task  21  attempt 1  ok                                pid  15414    1.76 s  bytes [704,648,084, 738,202,833)  records 8,973  GET 1
+map    task  25  attempt 1  ok                                pid  15418    0.43 s  bytes [838,862,280, 847,619,384)  records 2,304  GET 1
+map    task  20  attempt 1  ok                                pid  15419    2.08 s  bytes [671,089,299, 704,648,084)  records 8,819  GET 1
+map    task  17  attempt 1  ok                                pid  15412    2.13 s  bytes [570,425,853, 603,981,789)  records 8,895  GET 1
+map    task  19  attempt 1  ok                                pid  15413    2.11 s  bytes [637,537,352, 671,089,299)  records 9,202  GET 1
+map    task  23  attempt 1  ok                                pid  15415    1.47 s  bytes [771,756,695, 805,306,785)  records 8,876  GET 1
+map    task  22  attempt 1  ok                                pid  15420    1.55 s  bytes [738,202,833, 771,756,695)  records 8,817  GET 1
+map    task  24  attempt 1  ok                                pid  15411    0.65 s  bytes [805,306,785, 838,862,280)  records 8,940  GET 1
+reduce task   3  attempt 1  ok                                pid  15418    0.18 s  parts 26  bytes 4,608,743  keys 30,604
+reduce task   2  attempt 1  ok                                pid  15414    0.18 s  parts 26  bytes 4,632,769  keys 30,782
+reduce task   0  attempt 1  ok                                pid  15416    0.19 s  parts 26  bytes 4,592,483  keys 30,655
+reduce task   1  attempt 1  ok                                pid  15417    0.19 s  parts 26  bytes 4,582,087  keys 30,566
+
+attempts: 30 total, 0 failed and retried (0 charged to the failing task, 0 collateral: terminated or never started because the pool broke)
+map 5.60 s   reduce 0.24 s   map tasks 26
+S3 input: 27 GET, 849,323,345 B (+1,703,961 B vs object)
+S3 shuffle: 104 PUT, 104 GET, 18,416,082 B
+
+map stages over 26 accepted attempts, s                   sum   mean    max  share
+  fetch: Range GET + record alignment                   34.03   1.31   2.16  71.1%
+  parse: UTF-8 decode + csv.reader                       2.51   0.10   0.13   5.2%
+  combine: filter, normalize, combinations, Counter      0.32   0.01   0.02   0.7%
+  serialize: JSON lines per reducer                      0.42   0.02   0.03   0.9%
+  put: shuffle PUT to S3                                10.59   0.41   0.87  22.1%
+  task total                                            47.87
+  fetch throughput: median 23 MiB/s per task, 145 MiB/s for the whole map phase
+  worker start (spawn + interpreter + import boto3/hhlake): 10 processes, 0.63..0.72 s after the pool was created
+  map phase 5.60 s vs sum of task time / 10 workers = 4.79 s
+
+checks
+  ok   aligned ranges tile [header_end, size)                          yes  expected yes
+  ok   records                                                     229,388  expected 229,388
+  ok   unique vacancy_id                                           229,388  expected 229,388
+  ok   variant                                                       5,382  expected 5,382
+  ok   with skills                                                   4,380  expected 4,380
+  ok   vacancies in skills-per-vacancy histogram                     4,380  expected 4,380
+  ok   k=1 sum(count) == emitted                                    18,038  expected 18,038
+  ok   k=1 reducer key sets disjoint                                 1,131  expected 1,131
+  ok   k=2 sum(count) == emitted                                    76,155  expected 76,155
+  ok   k=2 reducer key sets disjoint                                15,878  expected 15,878
+  ok   k=3 sum(count) == emitted                                   265,467  expected 265,467
+  ok   k=3 reducer key sets disjoint                               105,598  expected 105,598
+
+regions (variant / with skills)
+  Москва            2,127 / 1,692
+  Санкт-Петербург     790 / 646
+  Екатеринбург        205 / 169
+
+ k    emitted   combined  ratio    shuffle B      keys       sum
+ 1     18,038      5,449  30.2%      247,321     1,131    18,038
+ 2     76,155     48,505  63.7%    2,688,528    15,878    76,155
+ 3    265,467    229,586  86.5%   15,480,233   105,598   265,467
+
+top
+  k=1 Москва: (php) 1,548; (mysql) 834; (git) 671
+  k=1 Санкт-Петербург: (php) 602; (mysql) 359; (git) 263
+  k=1 Екатеринбург: (php) 156; (mysql) 101; (javascript) 53
+  k=2 Москва: (mysql, php) 749; (git, php) 618; (laravel, php) 498
+  k=2 Санкт-Петербург: (mysql, php) 344; (git, php) 249; (laravel, php) 222
+  k=2 Екатеринбург: (mysql, php) 94; (javascript, php) 47; (git, php) 44
+  k=3 Москва: (git, mysql, php) 368; (laravel, mysql, php) 250; (git, laravel, php) 217
+  k=3 Санкт-Петербург: (git, mysql, php) 165; (laravel, mysql, php) 129; (javascript, mysql, php) 116
+  k=3 Екатеринбург: (html, mysql, php) 35; (javascript, mysql, php) 34; (css, mysql, php) 30
+
+outputs
+  s3://hh-lake/results/mapreduce/regions_k1.csv  44,279 B  sha256 dc8acdec785f08c4a8dfc3e8c9005c2abf084f927d0bc7e0d8635dc9a26cc3e7  object in S3 before this run: identical
+  s3://hh-lake/results/mapreduce/regions_k2.csv  724,713 B  sha256 e9f2e7c708ba8bdb1556581119ea45cb9680c7977b9a813bd8f127c4b4f5e094  object in S3 before this run: identical
+  s3://hh-lake/results/mapreduce/regions_k3.csv  5,609,937 B  sha256 e45b7cd372d776b9fd8a7330796e9cf24008a290aa3828e60c9035886391a1f1  object in S3 before this run: identical
+
+tmp removed: 105 objects under s3://hh-lake/tmp/mr/regions-k123-20261007-171559-15409/
+ru_maxrss of single processes: master 175 MiB, largest worker 183 MiB (whole process tree: python -m hhlake.bench)
+total 7.33 s
+{"job": "regions-k123-20261007-171559-15409", "mode": "regions", "workers": 10, "chunk_mib": 32, "map_tasks": 26, "reducers": 4, "attempts": 30, "failed_attempts": 0, "charged_failures": 0, "time_total": 7.328, "time_map": 5.603, "time_reduce": 0.244, "time_write": 0.303, "map_breakdown_s": {"fetch_s": 34.032, "parse_s": 2.511, "combine_s": 0.319, "serialize_s": 0.417, "put_s": 10.592}, "map_task_seconds_sum": 47.871, "worker_ready_s": [0.629, 0.725], "records": 229388, "unique_ids": 229388, "variant": 5382, "with_skills": 4380, "skills_per_vacancy": {"1": 89, "2": 203, "3": 281, "4": 443, "5": 629, "6": 563, "7": 479, "8": 384, "9": 308, "10": 265, "11": 212, "12": 138, "13": 74, "14": 86, "15": 54, "16": 38, "17": 42, "18": 10, "19": 13, "20": 9, "21": 9, "22": 10, "23": 13, "24": 3, "25": 6, "26": 7, "27": 1, "28": 3, "29": 1, "30": 7}, "get_requests": 27, "get_bytes": 849323345, "shuffle_put_requests": 104, "shuffle_get_requests": 104, "peak_rss_mib_master": 174.6, "peak_rss_mib_worker": 183.1, "checks_ok": true, "k": {"1": {"emitted": 18038, "combined": 5449, "unique_keys": 1131, "sum_count": 18038, "shuffle_bytes": 247321, "output_key": "results/mapreduce/regions_k1.csv", "output_bytes": 44279, "output_sha256": "dc8acdec785f08c4a8dfc3e8c9005c2abf084f927d0bc7e0d8635dc9a26cc3e7", "same_as_previous_object": true}, "2": {"emitted": 76155, "combined": 48505, "unique_keys": 15878, "sum_count": 76155, "shuffle_bytes": 2688528, "output_key": "results/mapreduce/regions_k2.csv", "output_bytes": 724713, "output_sha256": "e9f2e7c708ba8bdb1556581119ea45cb9680c7977b9a813bd8f127c4b4f5e094", "same_as_previous_object": true}, "3": {"emitted": 265467, "combined": 229586, "unique_keys": 105598, "sum_count": 265467, "shuffle_bytes": 15480233, "output_key": "results/mapreduce/regions_k3.csv", "output_bytes": 5609937, "output_sha256": "e45b7cd372d776b9fd8a7330796e9cf24008a290aa3828e60c9035886391a1f1", "same_as_previous_object": true}}}

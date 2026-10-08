@@ -1,0 +1,114 @@
+$ uv run python -m hhlake.bench --suite main --runs 5 --restart-storage
+bench session 2026-10-07T15:09:27Z
+machine: Apple M5, 10 cores / 10 threads, RAM 16 GiB, Darwin 27.0.0, Python 3.13.15
+S3: http://localhost:19000/hh-lake, cwd /Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko
+
+=== suite main: 9 scenarios × (1 cold + 5 warm), RSS sampling every 20 ms, tree rescan every 100 ms
+  docker hh-lake-rustfs [start]: mem 610.4MiB / 7.653GiB (7.79%), cpu 0.38%, net 102MB / 4.69GB, pids 48
+
+[main] mr_k1: python -m hhlake.mr.run --k 1 --workers 10 --chunk-mib 32 --no-write
+  docker restart hh-lake-rustfs: healthy after 0.9 s
+  cold        8.266 s  peak RSS   1534.6 MiB  procs  12  cpu avg  169.3% peak  851.5%  max single   164.2 MiB  exit 0
+  warm 1     10.207 s  peak RSS   1138.5 MiB  procs  12  cpu avg  151.8% peak  848.4%  max single   165.6 MiB  exit 0
+  warm 2      8.832 s  peak RSS   1447.1 MiB  procs  12  cpu avg  168.4% peak  765.5%  max single   174.0 MiB  exit 0
+  warm 3      7.503 s  peak RSS   1734.3 MiB  procs  12  cpu avg  186.1% peak  864.7%  max single   203.9 MiB  exit 0
+  warm 4      7.158 s  peak RSS   1756.2 MiB  procs  12  cpu avg  196.0% peak  854.7%  max single   199.2 MiB  exit 0
+  warm 5      7.774 s  peak RSS   1650.7 MiB  procs  12  cpu avg  179.9% peak  881.3%  max single   191.8 MiB  exit 0
+  docker hh-lake-rustfs [after mr_k1]: mem 1.17GiB / 7.653GiB (15.29%), cpu 1.15%, net 99.8MB / 5.15GB, pids 509
+
+[main] mr_k2: python -m hhlake.mr.run --k 2 --workers 10 --chunk-mib 32 --no-write
+  docker restart hh-lake-rustfs: healthy after 1.0 s
+  cold        7.266 s  peak RSS   1682.8 MiB  procs  12  cpu avg  189.2% peak  843.1%  max single   195.4 MiB  exit 0
+  warm 1      8.432 s  peak RSS   1509.3 MiB  procs  12  cpu avg  166.0% peak  840.5%  max single   182.8 MiB  exit 0
+  warm 2      7.425 s  peak RSS   1557.3 MiB  procs  12  cpu avg  190.7% peak  862.5%  max single   176.2 MiB  exit 0
+  warm 3      9.691 s  peak RSS   1283.6 MiB  procs  12  cpu avg  161.5% peak  814.9%  max single   159.9 MiB  exit 0
+  warm 4     10.710 s  peak RSS   1265.1 MiB  procs  12  cpu avg  153.0% peak  737.9%  max single   151.5 MiB  exit 0
+  warm 5      8.143 s  peak RSS   1637.0 MiB  procs  12  cpu avg  179.4% peak  818.7%  max single   194.0 MiB  exit 0
+  docker hh-lake-rustfs [after mr_k2]: mem 2.617GiB / 7.653GiB (34.20%), cpu 0.05%, net 113MB / 5.17GB, pids 643
+
+[main] mr_k3: python -m hhlake.mr.run --k 3 --workers 10 --chunk-mib 32 --no-write
+  docker restart hh-lake-rustfs: healthy after 0.9 s
+  cold        8.172 s  peak RSS   1889.7 MiB  procs  12  cpu avg  190.0% peak  848.2%  max single   208.7 MiB  exit 0
+  warm 1      8.139 s  peak RSS   1582.9 MiB  procs  12  cpu avg  185.9% peak  847.9%  max single   192.4 MiB  exit 0
+  warm 2      7.887 s  peak RSS   1578.7 MiB  procs  12  cpu avg  189.4% peak  892.3%  max single   193.4 MiB  exit 0
+  warm 3      8.091 s  peak RSS   1472.9 MiB  procs  12  cpu avg  185.1% peak  858.7%  max single   177.5 MiB  exit 0
+  warm 4      8.549 s  peak RSS   1412.5 MiB  procs  12  cpu avg  182.9% peak  881.3%  max single   169.2 MiB  exit 0
+  warm 5      9.343 s  peak RSS   1364.4 MiB  procs  12  cpu avg  170.3% peak  873.3%  max single   166.8 MiB  exit 0
+  docker hh-lake-rustfs [after mr_k3]: mem 5.3GiB / 7.653GiB (69.25%), cpu 10.37%, net 197MB / 5.25GB, pids 511
+
+[main] mr_k123: python -m hhlake.mr.run --k 1 2 3 --workers 10 --chunk-mib 32 --no-write
+  docker restart hh-lake-rustfs: healthy after 1.0 s
+  cold        9.216 s  peak RSS   1449.5 MiB  procs  12  cpu avg  172.4% peak  858.6%  max single   178.2 MiB  exit 0
+  warm 1      9.284 s  peak RSS   1359.1 MiB  procs  12  cpu avg  176.4% peak  834.0%  max single   161.9 MiB  exit 0
+  warm 2      8.611 s  peak RSS   1360.5 MiB  procs  12  cpu avg  183.5% peak  875.0%  max single   171.8 MiB  exit 0
+  warm 3      8.682 s  peak RSS   1421.4 MiB  procs  12  cpu avg  177.1% peak  871.2%  max single   157.4 MiB  exit 0
+  warm 4      8.179 s  peak RSS   1409.4 MiB  procs  12  cpu avg  184.3% peak  862.6%  max single   183.2 MiB  exit 0
+  warm 5      8.201 s  peak RSS   1341.1 MiB  procs  12  cpu avg  180.0% peak  864.8%  max single   176.0 MiB  exit 0
+  docker hh-lake-rustfs [after mr_k123]: mem 5.972GiB / 7.653GiB (78.03%), cpu 0.77%, net 211MB / 5.27GB, pids 556
+
+[main] duck_k1: python -m hhlake.duck --k 1 --source csv --no-write
+  docker restart hh-lake-rustfs: healthy after 0.9 s
+  cold        5.843 s  peak RSS    394.8 MiB  procs   1  cpu avg   44.4% peak  111.4%  max single   394.8 MiB  exit 0
+  warm 1      5.237 s  peak RSS    427.8 MiB  procs   1  cpu avg   47.3% peak  121.0%  max single   427.8 MiB  exit 0
+  warm 2      5.554 s  peak RSS    352.2 MiB  procs   1  cpu avg   45.2% peak  118.0%  max single   352.8 MiB  exit 0
+  warm 3      5.571 s  peak RSS    424.5 MiB  procs   1  cpu avg   45.4% peak  113.1%  max single   424.5 MiB  exit 0
+  warm 4      5.461 s  peak RSS    428.3 MiB  procs   1  cpu avg   45.8% peak  111.0%  max single   428.3 MiB  exit 0
+  warm 5      5.199 s  peak RSS    427.4 MiB  procs   1  cpu avg   46.9% peak  120.2%  max single   427.4 MiB  exit 0
+  docker hh-lake-rustfs [after duck_k1]: mem 468.8MiB / 7.653GiB (5.98%), cpu 0.08%, net 120MB / 5.09GB, pids 36
+
+[main] duck_k2: python -m hhlake.duck --k 2 --source csv --no-write
+  docker restart hh-lake-rustfs: healthy after 0.9 s
+  cold        5.590 s  peak RSS    422.3 MiB  procs   1  cpu avg   45.2% peak  120.2%  max single   422.6 MiB  exit 0
+  warm 1      5.521 s  peak RSS    399.4 MiB  procs   1  cpu avg   46.7% peak  117.5%  max single   399.4 MiB  exit 0
+  warm 2      5.403 s  peak RSS    454.2 MiB  procs   1  cpu avg   46.6% peak  121.7%  max single   454.2 MiB  exit 0
+  warm 3      5.516 s  peak RSS    424.9 MiB  procs   1  cpu avg   46.4% peak  118.1%  max single   427.2 MiB  exit 0
+  warm 4      5.261 s  peak RSS    431.7 MiB  procs   1  cpu avg   47.9% peak  120.3%  max single   432.1 MiB  exit 0
+  warm 5      5.491 s  peak RSS    431.3 MiB  procs   1  cpu avg   47.3% peak  120.6%  max single   431.3 MiB  exit 0
+  docker hh-lake-rustfs [after duck_k2]: mem 490.6MiB / 7.653GiB (6.26%), cpu 0.58%, net 120MB / 5.09GB, pids 49
+
+[main] duck_k3: python -m hhlake.duck --k 3 --source csv --no-write
+  docker restart hh-lake-rustfs: healthy after 0.9 s
+  cold        5.727 s  peak RSS    447.2 MiB  procs   1  cpu avg   48.5% peak  135.0%  max single   447.7 MiB  exit 0
+  warm 1      6.430 s  peak RSS    490.7 MiB  procs   1  cpu avg   45.6% peak  131.0%  max single   491.2 MiB  exit 0
+  warm 2      6.399 s  peak RSS    451.3 MiB  procs   1  cpu avg   46.1% peak  139.6%  max single   452.0 MiB  exit 0
+  warm 3      5.732 s  peak RSS    436.6 MiB  procs   1  cpu avg   49.2% peak  135.8%  max single   437.1 MiB  exit 0
+  warm 4      5.489 s  peak RSS    528.3 MiB  procs   1  cpu avg   50.2% peak  119.6%  max single   528.7 MiB  exit 0
+  warm 5      5.670 s  peak RSS    509.2 MiB  procs   1  cpu avg   49.7% peak  123.7%  max single   509.9 MiB  exit 0
+  docker hh-lake-rustfs [after duck_k3]: mem 482MiB / 7.653GiB (6.15%), cpu 0.03%, net 116MB / 5.09GB, pids 37
+
+[main] duck_k123: python -m hhlake.duck --k 1 2 3 --source csv --no-write
+  docker restart hh-lake-rustfs: healthy after 0.9 s
+  cold       15.331 s  peak RSS    424.4 MiB  procs   1  cpu avg   38.3% peak  156.3%  max single   424.4 MiB  exit 0
+  warm 1     17.516 s  peak RSS    427.9 MiB  procs   1  cpu avg   35.1% peak  158.4%  max single   428.3 MiB  exit 0
+  warm 2     14.495 s  peak RSS    449.0 MiB  procs   1  cpu avg   39.7% peak  130.3%  max single   449.4 MiB  exit 0
+  warm 3     15.233 s  peak RSS    484.3 MiB  procs   1  cpu avg   38.6% peak  156.2%  max single   484.9 MiB  exit 0
+  warm 4     14.649 s  peak RSS    473.3 MiB  procs   1  cpu avg   39.3% peak  150.4%  max single   474.0 MiB  exit 0
+  warm 5     13.976 s  peak RSS    449.0 MiB  procs   1  cpu avg   39.9% peak  120.2%  max single   449.5 MiB  exit 0
+  docker hh-lake-rustfs [after duck_k123]: mem 585.7MiB / 7.653GiB (7.47%), cpu 0.05%, net 353MB / 15.3GB, pids 48
+
+[main] duck_k123_1scan: python -m hhlake.duck --k 1 2 3 --source csv --materialize --no-write
+  docker restart hh-lake-rustfs: healthy after 0.9 s
+  cold        5.561 s  peak RSS    430.8 MiB  procs   1  cpu avg   48.7% peak  111.9%  max single   430.9 MiB  exit 0
+  warm 1      5.509 s  peak RSS    465.0 MiB  procs   1  cpu avg   49.3% peak  129.8%  max single   465.0 MiB  exit 0
+  warm 2      5.433 s  peak RSS    464.5 MiB  procs   1  cpu avg   49.3% peak  120.5%  max single   464.7 MiB  exit 0
+  warm 3      5.732 s  peak RSS    457.2 MiB  procs   1  cpu avg   47.8% peak  120.4%  max single   457.6 MiB  exit 0
+  warm 4      5.273 s  peak RSS    433.1 MiB  procs   1  cpu avg   49.6% peak  122.3%  max single   433.1 MiB  exit 0
+  warm 5      5.326 s  peak RSS    468.8 MiB  procs   1  cpu avg   50.3% peak  148.2%  max single   469.4 MiB  exit 0
+  docker hh-lake-rustfs [end]: mem 467.3MiB / 7.653GiB (5.96%), cpu 0.43%, net 120MB / 5.09GB, pids 41
+
+saved s3://hh-lake/results/bench/runs.csv, s3://hh-lake/results/bench/summary.csv, s3://hh-lake/results/bench/timeline.csv, s3://hh-lake/results/bench/docker_stats.csv
+local copies in results/bench/
+
+scenario              n  time, s: mean ± std [min … max]     peak RSS, MiB: mean ± std [min … max]       cold s  cold MiB    cpu%  fail
+mr_k1                 5  8.295 ± 1.238 [7.158 … 10.207]      1545.4 ± 258.1 [1138.5 … 1756.2]             8.266    1534.6     176     0
+mr_k2                 5  8.880 ± 1.310 [7.425 … 10.710]      1450.5 ± 167.2 [1265.1 … 1637.0]             7.266    1682.8     170     0
+mr_k3                 5  8.402 ± 0.578 [7.887 … 9.343]       1482.3 ± 97.8 [1364.4 … 1582.9]              8.172    1889.7     183     0
+mr_k123               5  8.591 ± 0.450 [8.179 … 9.284]       1378.3 ± 35.0 [1341.1 … 1421.4]              9.216    1449.5     180     0
+duck_k1               5  5.404 ± 0.176 [5.199 … 5.571]       412.0 ± 33.5 [352.2 … 428.3]                 5.843     394.8      46     0
+duck_k2               5  5.439 ± 0.110 [5.261 … 5.522]       428.3 ± 19.6 [399.4 … 454.2]                 5.590     422.3      47     0
+duck_k3               5  5.944 ± 0.439 [5.489 … 6.430]       483.2 ± 38.6 [436.6 … 528.3]                 5.727     447.2      48     0
+duck_k123             5  15.174 ± 1.384 [13.976 … 17.516]    456.7 ± 22.3 [427.9 … 484.3]                15.331     424.4      38     0
+duck_k123_1scan       5  5.455 ± 0.180 [5.273 … 5.732]       457.7 ± 14.4 [433.1 … 468.8]                 5.561     430.8      49     0
+plot report/img/bench_main.png
+plot report/img/bench_main_timeline.png
+exit code 0

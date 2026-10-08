@@ -1,0 +1,25 @@
+[project]
+name = "hhlake"
+version = "0.1.0"
+description = "MapReduce vs DuckDB over RustFS: PHP vacancies skills and salaries"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3>=1.40",
+    "duckdb>=1.4",
+    "psutil>=7.0",
+    "pandas>=2.2",
+    "matplotlib>=3.9",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hhlake"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

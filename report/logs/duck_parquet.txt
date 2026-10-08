@@ -1,0 +1,9 @@
+duckdb 1.5.6  threads=2  memory_limit=3.7 GiB
+s3://hh-lake/raw/it_vacancies_2024.csv (847,619,384 B) -> s3://hh-lake/raw/it_vacancies_2024.parquet
+COPY time   6.27 s
+size        169,692,564 B (161.8 MiB), csv/parquet = 5.00x
+rows        229,388 in 11 row groups of 16,958..21,987 rows (zstd, ROW_GROUP_SIZE 20000)
+columns read by the combos query (vacancy_id, area, role, name, key_skills): 7,374,375 B compressed = 4.3% of the file
+
+total 6.95 s, peak RSS 736.7 MiB
+{"engine": "duckdb", "version": "1.5.6", "to_parquet": {"time": 6.267, "size": 169692564, "csv_size": 847619384, "rows": 229388, "row_groups": 11, "projected_bytes": 7374375}, "time_total": 6.951, "peak_rss_mib": 736.7}

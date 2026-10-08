@@ -1,0 +1,88 @@
+RustFS http://localhost:19000, bucket hh-lake, mc alias hh
+
+$ docker compose ps
+NAME             IMAGE                  COMMAND                  SERVICE   CREATED       STATUS              PORTS
+hh-lake-rustfs   rustfs/rustfs:latest   "/entrypoint.sh rust…"   rustfs    2 hours ago   Up About a minute   0.0.0.0:19000->9000/tcp, [::]:19000->9000/tcp, 0.0.0.0:19001->9001/tcp, [::]:19001->9001/tcp
+
+$ mc stat hh/hh-lake/raw/it_vacancies_2024.csv
+Name      : it_vacancies_2024.csv
+Date      : 2026-10-07 17:15:39 MSK 
+Size      : 808 MiB 
+ETag      : 0e6d21890db664d9bf83e1427665b106-13 
+Type      : file 
+Checksum  : CRC32:woZ9gw==-13
+Metadata  :
+  Content-Type: binary/octet-stream
+
+$ mc ls -r hh/hh-lake
+[2026-10-07 17:15:39 MSK] 808MiB STANDARD raw/it_vacancies_2024.csv
+[2026-10-07 16:48:16 MSK] 162MiB STANDARD raw/it_vacancies_2024.parquet
+[2026-10-07 17:56:30 MSK] 4.2KiB STANDARD results/bench/docker_stats.csv
+[2026-10-07 17:56:30 MSK] 163KiB STANDARD results/bench/runs.csv
+[2026-10-07 16:51:53 MSK] 7.6KiB STANDARD results/bench/selftest_runs.csv
+[2026-10-07 16:51:53 MSK]   890B STANDARD results/bench/selftest_summary.csv
+[2026-10-07 16:51:53 MSK]  13KiB STANDARD results/bench/selftest_timeline.csv
+[2026-10-07 17:56:30 MSK] 3.1KiB STANDARD results/bench/summary.csv
+[2026-10-07 17:56:30 MSK] 238KiB STANDARD results/bench/timeline.csv
+[2026-10-07 17:17:01 MSK]  20KiB STANDARD results/duckdb/k1.csv
+[2026-10-07 17:17:01 MSK] 457KiB STANDARD results/duckdb/k2.csv
+[2026-10-07 17:17:01 MSK] 4.6MiB STANDARD results/duckdb/k3.csv
+[2026-10-07 17:17:13 MSK]  43KiB STANDARD results/duckdb/regions_k1.csv
+[2026-10-07 17:17:18 MSK] 708KiB STANDARD results/duckdb/regions_k2.csv
+[2026-10-07 17:17:22 MSK] 5.4MiB STANDARD results/duckdb/regions_k3.csv
+[2026-10-07 17:57:15 MSK] 2.8KiB STANDARD results/growth/skills_per_vacancy.csv
+[2026-10-07 17:16:22 MSK]  20KiB STANDARD results/mapreduce/k1.csv
+[2026-10-07 17:16:22 MSK] 457KiB STANDARD results/mapreduce/k2.csv
+[2026-10-07 17:16:22 MSK] 4.6MiB STANDARD results/mapreduce/k3.csv
+[2026-10-07 17:16:06 MSK]  43KiB STANDARD results/mapreduce/regions_k1.csv
+[2026-10-07 17:16:06 MSK] 708KiB STANDARD results/mapreduce/regions_k2.csv
+[2026-10-07 17:16:06 MSK] 5.4MiB STANDARD results/mapreduce/regions_k3.csv
+[2026-10-07 17:16:41 MSK]  20KiB STANDARD results/mapreduce_naive/k1.csv
+[2026-10-07 17:16:42 MSK] 457KiB STANDARD results/mapreduce_naive/k2.csv
+[2026-10-07 17:16:42 MSK] 4.6MiB STANDARD results/mapreduce_naive/k3.csv
+[2026-10-07 17:18:40 MSK]   920B STANDARD results/regions/profile.csv
+[2026-10-07 17:18:40 MSK] 2.8KiB STANDARD results/regions/top_combos.csv
+[2026-10-07 17:18:35 MSK]  35KiB STANDARD results/salary/pairs.csv
+[2026-10-07 17:18:35 MSK]  1012B STANDARD results/salary/pairs_down.csv
+[2026-10-07 17:18:35 MSK]   796B STANDARD results/salary/pairs_up.csv
+[2026-10-07 17:18:35 MSK]  31KiB STANDARD results/salary/singles.csv
+[2026-10-07 17:18:35 MSK] 110KiB STANDARD results/salary/triples.csv
+[2026-10-07 17:18:35 MSK] 1.2KiB STANDARD results/salary/triples_down.csv
+[2026-10-07 17:18:35 MSK] 1.1KiB STANDARD results/salary/triples_up.csv
+
+$ mc du hh/hh-lake
+998MiB	34 objects	hh-lake
+
+$ mc du --depth 2 hh/hh-lake
+970MiB	2 objects	hh-lake/raw
+28MiB	32 objects	hh-lake/results
+998MiB	34 objects	hh-lake
+
+$ du -sh .data/disk1 .data/disk2 .data/disk3 .data/disk4
+503M	~/vk_data_eng_2026_ai_67_tischenko/.data/disk1
+502M	~/vk_data_eng_2026_ai_67_tischenko/.data/disk2
+503M	~/vk_data_eng_2026_ai_67_tischenko/.data/disk3
+505M	~/vk_data_eng_2026_ai_67_tischenko/.data/disk4
+
+$ du -sh .data/disk1/hh-lake/raw/it_vacancies_2024.csv .data/disk2/hh-lake/raw/it_vacancies_2024.csv .data/disk3/hh-lake/raw/it_vacancies_2024.csv .data/disk4/hh-lake/raw/it_vacancies_2024.csv
+408M	~/vk_data_eng_2026_ai_67_tischenko/.data/disk1/hh-lake/raw/it_vacancies_2024.csv
+407M	~/vk_data_eng_2026_ai_67_tischenko/.data/disk2/hh-lake/raw/it_vacancies_2024.csv
+408M	~/vk_data_eng_2026_ai_67_tischenko/.data/disk3/hh-lake/raw/it_vacancies_2024.csv
+410M	~/vk_data_eng_2026_ai_67_tischenko/.data/disk4/hh-lake/raw/it_vacancies_2024.csv
+object 847,619,384 B; on disk: disk1 0.505, disk2 0.503, disk3 0.504, disk4 0.507 of the object; all disks 2.02x
+each disk keeps 1/2 of the object and 4 disks keep 2x: erasure set of 4 drives, 2 data + 2 parity shards per block (EC 2+2), any 2 drives may be lost
+
+head_object s3://hh-lake/raw/it_vacancies_2024.csv: 847,619,384 B, ETag "0e6d21890db664d9bf83e1427665b106-13" (multipart: ETag is not an MD5 of the content, integrity is checked with sha256)
+
+$ mc cat hh/hh-lake/raw/it_vacancies_2024.csv | sha256
+303db922b541e4440906f5a7e8be32fb55e8808f950ffddb8c272f1548212a65
+
+sha256 via boto3 GetObject stream: 303db922b541e4440906f5a7e8be32fb55e8808f950ffddb8c272f1548212a65
+mc cat and boto3 agree: yes; the local file hash is printed by python -m hhlake.upload
+
+S3 read throughput from this host (boto3, threads in one process)
+  1 GET of the whole object         808 MiB   3.51 s    230 MiB/s
+   1 parallel x  2 Range GETs of 32 MiB   0.37 s    171 MiB/s total, 0.19 s per GET
+   2 parallel x  4 Range GETs of 32 MiB   0.66 s    193 MiB/s total, 0.33 s per GET
+   4 parallel x  8 Range GETs of 32 MiB   1.24 s    207 MiB/s total, 0.59 s per GET
+  10 parallel x 20 Range GETs of 32 MiB   3.41 s    188 MiB/s total, 1.54 s per GET

@@ -1,0 +1,11 @@
+skill1,skill2,skill3,base1,base2,added,n,emp,med_triple,n_base,med_base,uplift,uplift_pct,base_skill,med_base_skill,uplift_vs_skill
+docker,javascript,postgresql,docker,postgresql,javascript,32,18,120900.0,253,200000.0,-79100.0,-39.55,javascript,120000.0,900.0
+css,docker,php,docker,php,css,39,17,105000.0,536,175000.0,-70000.0,-40.0,php,140000.0,-35000.0
+docker,html,php,docker,php,html,52,24,111875.0,536,175000.0,-63125.0,-36.0714,php,140000.0,-28125.0
+mysql,php,разработка по,mysql,php,разработка по,30,19,78715.0,1373,140000.0,-61285.0,-43.775,php,140000.0,-61285.0
+docker,php,rest api,docker,php,rest api,46,26,115000.0,536,175000.0,-60000.0,-34.2857,php,140000.0,-25000.0
+html,php,symfony,php,symfony,html,55,27,126150.0,391,180000.0,-53850.0,-29.9167,php,140000.0,-13850.0
+cms wordpress,mysql,php,mysql,php,cms wordpress,67,40,90000.0,1373,140000.0,-50000.0,-35.7143,php,140000.0,-50000.0
+linux,postgresql,rest,linux,postgresql,rest,30,15,150000.0,123,200000.0,-50000.0,-25.0,postgresql,170000.0,-20000.0
+css,php,postgresql,php,postgresql,css,33,20,121800.0,534,170000.0,-48200.0,-28.3529,php,140000.0,-18200.0
+css,docker,mysql,docker,mysql,css,31,13,126150.0,328,174000.0,-47850.0,-27.5,mysql,140000.0,-13850.0

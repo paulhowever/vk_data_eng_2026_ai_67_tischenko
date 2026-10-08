@@ -1,0 +1,23 @@
+name: hh-lake
+
+services:
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: hh-lake-rustfs
+    ports:
+      - "19000:9000"
+      - "19001:9001"
+    env_file: .env
+    environment:
+      RUSTFS_VOLUMES: /data/disk{1...4}
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_OBS_LOG_DIRECTORY: ""
+      RUSTFS_OBS_LOGGER_LEVEL: warn
+      RUSTFS_UNSAFE_BYPASS_DISK_CHECK: "true"
+    volumes:
+      - ./.data/disk1:/data/disk1
+      - ./.data/disk2:/data/disk2
+      - ./.data/disk3:/data/disk3
+      - ./.data/disk4:/data/disk4

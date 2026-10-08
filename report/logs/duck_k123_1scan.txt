@@ -1,0 +1,47 @@
+duckdb 1.5.6  threads=10  memory_limit=12.7 GiB  external_file_cache=False
+source: s3://hh-lake/raw/it_vacancies_2024.csv (847,619,384 B) via httpfs @ localhost:19000
+mode: all areas
+string order: default_collation=binary; list_sort / ORDER BY / '<' vs Python sorted() on 19 probes (cyrillic, ё, 1c/1с, BMP vs astral): identical
+scan: source read once into TEMP TABLE variant_skill in 4.11 s (4,380 vacancies with skills, 31,835 (vacancy, skill) rows); k=1, 2, 3 are computed from it
+
+k=1  unique keys 955  sum(count) 31,835  compute 0.00 s  write 0.01 s  -> s3://hh-lake/results/duckdb/k1.csv
+  md5 of ordered rows 9f7e23ec253a6590a5afa49cb88190be
+   1.  4,033  php
+   2.  2,263  mysql
+   3.  1,809  git
+   4.  1,441  laravel
+   5.  1,202  javascript
+   6.  1,030  postgresql
+   7.    964  docker
+   8.    919  symfony
+   9.    908  html
+  10.    861  sql
+
+k=2  unique keys 15,921  sum(count) 135,362  compute 0.01 s  write 0.02 s  -> s3://hh-lake/results/duckdb/k2.csv
+  md5 of ordered rows 1e249f26e58d86014ebe9ee10312990e
+   1.  2,096  mysql + php
+   2.  1,686  git + php
+   3.  1,342  laravel + php
+   4.  1,116  git + mysql
+   5.  1,103  javascript + php
+   6.    975  php + postgresql
+   7.    907  docker + php
+   8.    872  php + symfony
+   9.    839  html + php
+  10.    800  php + sql
+
+k=3  unique keys 127,466  sum(count) 472,071  compute 0.05 s  write 0.10 s  -> s3://hh-lake/results/duckdb/k3.csv
+  md5 of ordered rows 13319e47796fbe3d022c32560f4741cc
+   1.  1,030  git + mysql + php
+   2.    719  javascript + mysql + php
+   3.    696  laravel + mysql + php
+   4.    641  git + laravel + php
+   5.    546  html + mysql + php
+   6.    535  git + javascript + php
+   7.    528  html + javascript + php
+   8.    495  css + html + php
+   9.    481  git + php + ооп
+  10.    463  docker + mysql + php
+
+total 4.96 s, peak RSS 512.5 MiB
+{"engine": "duckdb", "version": "1.5.6", "source": "csv", "regions": false, "threads": 10, "scan": {"time": 4.112, "vacancies": 4380, "rows": 31835}, "materialize": true, "k": {"1": {"unique_keys": 955, "sum_count": 31835, "time_compute": 0.001, "time_write": 0.012, "time": 0.013, "output_key": "results/duckdb/k1.csv", "digest": "9f7e23ec253a6590a5afa49cb88190be", "top": {"skills": ["php"], "count": 4033}}, "2": {"unique_keys": 15921, "sum_count": 135362, "time_compute": 0.01, "time_write": 0.022, "time": 0.033, "output_key": "results/duckdb/k2.csv", "digest": "1e249f26e58d86014ebe9ee10312990e", "top": {"skills": ["mysql", "php"], "count": 2096}}, "3": {"unique_keys": 127466, "sum_count": 472071, "time_compute": 0.051, "time_write": 0.105, "time": 0.156, "output_key": "results/duckdb/k3.csv", "digest": "13319e47796fbe3d022c32560f4741cc", "top": {"skills": ["git", "mysql", "php"], "count": 1030}}}, "time_total": 4.962, "peak_rss_mib": 512.5}

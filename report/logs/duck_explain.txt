@@ -1,0 +1,154 @@
+duckdb 1.5.6  threads=10
+object s3://hh-lake/raw/it_vacancies_2024.csv: 847,619,384 B
+┌─────────────────────────────────────┐
+│┌───────────────────────────────────┐│
+││    Query Profiling Information    ││
+│└───────────────────────────────────┘│
+└─────────────────────────────────────┘
+EXPLAIN ANALYZE WITH vac AS (     SELECT vacancy_id, area, key_skills     FROM read_csv('s3://hh-lake/raw/it_vacancies_2024.csv', header = true, all_varchar = true)     WHERE role = 'Программист, разработчик'       AND name ILIKE '%php%' ), skills AS (     SELECT         vacancy_id,         area,         list_sort(list_distinct(list_filter(             list_transform(string_split(key_skills, ';'), x -> lower(trim(x))),             x -> x <> ''         ))) AS skills     FROM vac ), s AS (     SELECT vacancy_id, area, unnest(skills) AS skill     FROM skills ) SELECT s1.skill AS skill1, count(*) AS count FROM s AS s1 GROUP BY ALL ORDER BY count DESC, skill1
+┌─────────────────────────────────────┐
+│┌───────────────────────────────────┐│
+││         HTTPFS HTTP Stats         ││
+││                                   ││
+││           in: 808.3 MiB           ││
+││            out: 0 bytes           ││
+││              #HEAD: 1             ││
+││              #GET: 27             ││
+││              #PUT: 0              ││
+││              #POST: 0             ││
+││             #DELETE: 0            ││
+│└───────────────────────────────────┘│
+└─────────────────────────────────────┘
+┌────────────────────────────────────────────────┐
+│┌──────────────────────────────────────────────┐│
+││               Total Time: 4.12s              ││
+│└──────────────────────────────────────────────┘│
+└────────────────────────────────────────────────┘
+┌───────────────────────────┐
+│           QUERY           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│      EXPLAIN_ANALYZE      │
+│    ────────────────────   │
+│                           │
+│           0 rows          │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│          ORDER_BY         │
+│    ────────────────────   │
+│     count_star() DESC     │
+│        s1.skill ASC       │
+│                           │
+│                           │
+│                           │
+│          955 rows         │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│       HASH_GROUP_BY       │
+│    ────────────────────   │
+│         Groups: #0        │
+│                           │
+│        Aggregates:        │
+│        count_star()       │
+│                           │
+│                           │
+│                           │
+│          955 rows         │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│           skill1          │
+│                           │
+│                           │
+│                           │
+│        31,835 rows        │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│           skill           │
+│                           │
+│                           │
+│                           │
+│        31,835 rows        │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│           UNNEST          │
+│    ────────────────────   │
+│                           │
+│        31,835 rows        │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│           skills          │
+│                           │
+│                           │
+│                           │
+│         5,382 rows        │
+│           0.01s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│    ────────────────────   │
+│             #2            │
+│                           │
+│                           │
+│                           │
+│         5,382 rows        │
+│           0.00s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│           FILTER          │
+│    ────────────────────   │
+│ ((role = 'Программист, раз│
+│ работчик') AND (name ~~*  │
+│         '%php%'))         │
+│                           │
+│                           │
+│                           │
+│         5,382 rows        │
+│           0.03s           │
+└─────────────┬─────────────┘
+┌─────────────┴─────────────┐
+│         TABLE_SCAN        │
+│    ────────────────────   │
+│     Function: READ_CSV    │
+│                           │
+│        Projections:       │
+│            role           │
+│            name           │
+│         key_skills        │
+│                           │
+│    Total Files Read: 1    │
+│                           │
+│        Filename(s):       │
+│      s3://hh-lake/raw     │
+│   /it_vacancies_2024.csv  │
+│                           │
+│                           │
+│                           │
+│        229,388 rows       │
+│           35.99s          │
+└───────────────────────────┘
+
+
+HTTP requests logged by DuckDB (CALL enable_logging('HTTP') -> duckdb_logs_parsed('HTTP')):
+  url      http://localhost:19000/hh-lake/raw/it_vacancies_2024.csv
+  HEAD     1  status OK_200
+  GET      27  status PartialContent_206
+  GET body 847,619,384 B (808.4 MiB)
+  ranges   bytes=0-847619383, up to 32,000,000 B per GET, contiguous without overlap: True
+  GET ms   min 74  avg 145  max 179
+  object size 847,619,384 B, downloaded / size = 1.0000
+EXPLAIN ANALYZE wall 4.12 s
+
+total 4.77 s, peak RSS 448.4 MiB
+{"engine": "duckdb", "version": "1.5.6", "explain": {"head": 1, "get": 27, "get_bytes": 847619384, "contiguous": true, "object_size": 847619384, "time": 4.117}, "time_total": 4.767, "peak_rss_mib": 448.4}

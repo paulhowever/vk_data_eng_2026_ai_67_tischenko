@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0 -- /Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/paveltischenko/vk_data_eng_2026_ai_67_tischenko
+configfile: pyproject.toml
+collecting ... collected 8 items
+
+tests/test_bench.py::test_tree_peak_sums_concurrent_children PASSED      [ 12%]
+tests/test_bench.py::test_tree_peak_does_not_accumulate_finished_children PASSED [ 25%]
+tests/test_bench.py::test_grandchildren_are_counted PASSED               [ 37%]
+tests/test_bench.py::test_exit_code_and_timeout PASSED                   [ 50%]
+tests/test_bench.py::test_last_json_takes_final_object_line PASSED       [ 62%]
+tests/test_bench.py::test_parse_size_units PASSED                        [ 75%]
+tests/test_bench.py::test_summary_excludes_cold_and_failed_runs PASSED   [ 87%]
+tests/test_bench.py::test_merge_replaces_only_rerun_scenarios PASSED     [100%]
+
+============================== 8 passed in 6.96s ===============================

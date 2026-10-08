@@ -1,0 +1,11 @@
+skill1,skill2,base,added,n,emp,med_pair,n_base,med_base,uplift,uplift_pct
+rabbitmq,sql,sql,rabbitmq,44,19,262500.0,505,130000.0,132500.0,101.9231
+highload,php,php,highload,31,13,261000.0,2362,140000.0,121000.0,86.4286
+solid,ооп,ооп,solid,35,10,250000.0,507,130000.0,120000.0,92.3077
+api,php7,api,php7,47,16,250000.0,356,145000.0,105000.0,72.4138
+golang,php,php,golang,31,21,240000.0,2362,140000.0,100000.0,71.4286
+linux,rabbitmq,linux,rabbitmq,54,19,250000.0,375,155000.0,95000.0,61.2903
+rabbitmq,ооп,ооп,rabbitmq,48,21,220000.0,507,130000.0,90000.0,69.2308
+backend,php7,backend,php7,40,15,262500.0,164,174500.0,88000.0,50.4298
+php7,rabbitmq,rabbitmq,php7,47,10,300000.0,289,215000.0,85000.0,39.5349
+javascript,rabbitmq,javascript,rabbitmq,33,15,200000.0,824,120000.0,80000.0,66.6667

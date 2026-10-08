@@ -1,0 +1,13 @@
+naive MapReduce, 1 process, no combiner, keys joined with '|'
+input s3://hh-lake/raw/it_vacancies_2024.csv streamed: 1 GET, 847,619,384 B
+records 229,388  variant 5,382  with skills 4,380
+map (stream + parse + emit) 3.27 s, peak RSS 168 MiB
+k=1: emitted 31,835 pairs  sort+group 0.01 s  keys 955  sum 31,835  top (php) 4,033
+     s3://hh-lake/results/mapreduce_naive/k1.csv 20,854 B sha256 c071dfef1f9b353cbb8c9224b8652f571be3e643a88117e0a7266f851ec4bd73  identical to results/mapreduce/k1.csv: yes
+k=2: emitted 135,362 pairs  sort+group 0.05 s  keys 15,921  sum 135,362  top (mysql, php) 2,096
+     s3://hh-lake/results/mapreduce_naive/k2.csv 467,629 B sha256 ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f  identical to results/mapreduce/k2.csv: yes
+k=3: emitted 472,071 pairs  sort+group 0.18 s  keys 127,466  sum 472,071  top (git, mysql, php) 1,030
+     s3://hh-lake/results/mapreduce_naive/k3.csv 4,777,942 B sha256 692ac3585ff04f457db6d7cf94d4906650356d354f433f0dadaa630d44f8e960  identical to results/mapreduce/k3.csv: yes
+checks vs control numbers: ok
+total 3.78 s, peak RSS 204 MiB
+{"mode": "naive", "time_total": 3.78, "time_map": 3.266, "records": 229388, "variant": 5382, "with_skills": 4380, "get_requests": 1, "get_bytes": 847619384, "peak_rss_mib": 204.3, "checks_ok": true, "k": {"1": {"emitted": 31835, "unique_keys": 955, "sum_count": 31835, "time_sort_group": 0.01, "top": [["php"], 4033], "control_ok": true, "output_key": "results/mapreduce_naive/k1.csv", "output_bytes": 20854, "output_sha256": "c071dfef1f9b353cbb8c9224b8652f571be3e643a88117e0a7266f851ec4bd73", "same_as_mapreduce": true}, "2": {"emitted": 135362, "unique_keys": 15921, "sum_count": 135362, "time_sort_group": 0.048, "top": [["mysql", "php"], 2096], "control_ok": true, "output_key": "results/mapreduce_naive/k2.csv", "output_bytes": 467629, "output_sha256": "ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f", "same_as_mapreduce": true}, "3": {"emitted": 472071, "unique_keys": 127466, "sum_count": 472071, "time_sort_group": 0.181, "top": [["git", "mysql", "php"], 1030], "control_ok": true, "output_key": "results/mapreduce_naive/k3.csv", "output_bytes": 4777942, "output_sha256": "692ac3585ff04f457db6d7cf94d4906650356d354f433f0dadaa630d44f8e960", "same_as_mapreduce": true}}}
