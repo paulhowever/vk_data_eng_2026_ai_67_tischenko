@@ -1,0 +1,42 @@
+== Останавливаю лидера zk3, остаются zk1 zk2
+[13:14:56.564] $ docker compose stop zk3
+ Container hh-zk3 Stopping 
+ Container hh-zk3 Stopped 
+
+zkServer.sh status показал нового лидера zk2 не позже чем через 1.0 с после начала docker compose stop
+
+[13:14:57.981] $ docker logs hh-zk1 | grep 'LEADER ELECTION TOOK' | tail -1
+2026-11-01 10:14:57,221 (UTC) myid=1 FOLLOWING - LEADER ELECTION TOOK - 204 MS
+
+[13:14:58.022] $ docker logs hh-zk2 | grep 'LEADER ELECTION TOOK' | tail -1
+2026-11-01 10:14:57,229 (UTC) myid=2 LEADING - LEADER ELECTION TOOK - 214 MS
+
+[13:14:58.059] $ docker compose ps -a --format table {{.Name}}\t{{.Status}}
+NAME      STATUS
+hh-zk1    Up 7 seconds
+hh-zk2    Up 7 seconds
+hh-zk3    Exited (143) 1 second ago
+
+[13:14:58.146] $ docker exec hh-zk1 zkServer.sh status
+Client port found: 2181. Client address: localhost. Client SSL: false.
+Mode: follower
+
+[13:14:58.378] $ docker exec hh-zk2 zkServer.sh status
+Client port found: 2182. Client address: localhost. Client SSL: false.
+Mode: leader
+
+[13:14:58.593] $ docker inspect -f '{{.State.Status}}' hh-zk3
+exited
+
+[13:14:58.616] $ zkCli.sh -server zk1:2181 create /minus1 written-with-2-of-3
+Connecting to zk1:2181
+Created /minus1
+
+[13:14:59.228] $ zkCli.sh -server zk2:2182 get /minus1
+Connecting to zk2:2182
+written-with-2-of-3
+
+[13:14:59.879] $ zkCli.sh -server zk2:2182 ls /
+Connecting to zk2:2182
+[hhlake, minus1, zookeeper]
+

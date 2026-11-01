@@ -11,3 +11,9 @@ report/*.log
 report/*.out
 report/*.toc
 .ruff_cache/
+zookeeper/zk*/data/*
+!zookeeper/zk*/data/myid
+hw4/report/*.aux
+hw4/report/*.log
+hw4/report/*.out
+hw4/report/*.toc

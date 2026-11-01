@@ -1,0 +1,35 @@
+== Останавливаю второй сервер zk2 (текущий лидер), остаётся один zk1
+[13:15:00.972] $ docker compose stop zk2
+ Container hh-zk2 Stopping 
+ Container hh-zk2 Stopped 
+
+[13:15:04.622] $ docker compose ps -a --format table {{.Name}}\t{{.Status}}
+NAME      STATUS
+hh-zk1    Up 13 seconds
+hh-zk2    Exited (143) 3 seconds ago
+hh-zk3    Exited (143) 7 seconds ago
+
+[13:15:04.735] $ docker exec hh-zk1 zkServer.sh status
+Client port found: 2181. Client address: localhost. Client SSL: false.
+Error contacting service. It is probably not running.
+
+[13:15:04.972] $ docker inspect -f '{{.State.Status}}' hh-zk2
+exited
+
+[13:15:05.011] $ docker inspect -f '{{.State.Status}}' hh-zk3
+exited
+
+[13:15:05.033] $ sh -c echo srvr | nc -w 2 127.0.0.1 2181
+This ZooKeeper instance is not currently serving requests
+
+[13:15:05.063] $ sh -c echo ruok | nc -w 2 127.0.0.1 2181; echo
+imok
+
+[13:15:05.092] $ timeout 20 zkCli.sh -server zk1:2181 get /minus1
+KeeperErrorCode = ConnectionLoss for /minus1
+код выхода zkCli: 1
+
+[13:15:05.423] $ timeout 20 zkCli.sh -server zk1:2181 create /minus2 x
+KeeperErrorCode = ConnectionLoss for /minus2
+код выхода zkCli: 1
+

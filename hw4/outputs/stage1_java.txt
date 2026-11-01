@@ -1,0 +1,33 @@
+== Java локально
+[13:14:54.367] $ echo $JAVA_HOME
+/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+
+[13:14:54.389] $ /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/bin/java -version
+openjdk version "17.0.19" 2026-04-21
+OpenJDK Runtime Environment Homebrew (build 17.0.19+0)
+OpenJDK 64-Bit Server VM Homebrew (build 17.0.19+0, mixed mode, sharing)
+
+[13:14:54.550] $ which java
+/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/bin/java
+
+[13:14:54.574] $ java -version
+openjdk version "17.0.19" 2026-04-21
+OpenJDK Runtime Environment Homebrew (build 17.0.19+0)
+OpenJDK 64-Bit Server VM Homebrew (build 17.0.19+0, mixed mode, sharing)
+
+== Docker
+[13:14:54.616] $ docker version --format {{.Server.Version}}
+29.2.0
+
+== Java и ZooKeeper в образе zookeeper:3.9.6
+[13:14:54.653] $ docker exec hh-zk1 bash -c echo JAVA_HOME=$JAVA_HOME; java -version
+JAVA_HOME=/opt/java/openjdk
+openjdk version "17.0.20.1" 2026-08-18
+OpenJDK Runtime Environment Temurin-17.0.20.1+1 (build 17.0.20.1+1)
+OpenJDK 64-Bit Server VM Temurin-17.0.20.1+1 (build 17.0.20.1+1, mixed mode, sharing)
+
+[13:14:54.747] $ docker exec hh-zk1 zkServer.sh version
+ZooKeeper JMX enabled by default
+Using config: /conf/zoo.cfg
+Apache ZooKeeper, version 3.9.6 2026-09-03 19:29 UTC
+

@@ -8,6 +8,8 @@ DuckDB считают по нему частоты навыков, пар и т�
 Отчёт с выводами, таблицами и графиками: [`report/report.pdf`](report/report.pdf), исходник `report/report.tex`.
 Выводы всех прогонов, на которые ссылается отчёт, лежат в `report/logs/`.
 
+Домашнее задание 4 (ZooKeeper и запасной координатор) описано в разделе [ДЗ 4](#дз-4-отказоустойчивость-средствами-apache-zookeeper).
+
 ## Требования
 
 - Docker с Compose v2;
@@ -210,3 +212,72 @@ src/hhlake/nolocal.py    прогон без локального файла
 src/hhlake/bench.py      профилирование
 src/hhlake/memprobe.py   синтетическая нагрузка для проверки измерителя
 ```
+
+## ДЗ 4: отказоустойчивость средствами Apache ZooKeeper
+
+Отчёт: [`hw4/report/report.pdf`](hw4/report/report.pdf), исходник `hw4/report/report.tex` (собирается
+`tectonic hw4/report/report.tex`). Журналы координаторов лежат в `logs/<сценарий>/`, выводы команд — в
+`hw4/outputs/`.
+
+### Ансамбль
+
+Три сервера ZooKeeper 3.9.6 (образ `zookeeper:3.9.6`, Java 17 внутри) в Docker, у каждого свой `zoo.cfg` и `myid`:
+
+```
+zookeeper/compose.yaml           проект hh-zk, контейнеры hh-zk1..3, клиентские порты 2181/2182/2183
+zookeeper/zk{1,2,3}/conf/zoo.cfg одинаковые строки server.N, свои clientPort, порты кворума и dataDir
+zookeeper/zk{1,2,3}/data/myid    1, 2, 3 (остальное в data/ не коммитится)
+```
+
+Для этапа 1 нужна локальная Java 17 (`brew install openjdk@17`) и `JAVA_HOME`:
+
+```bash
+export JAVA_HOME="$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home"
+docker compose -f zookeeper/compose.yaml up -d
+zookeeper/stage2.sh
+```
+
+`stage2.sh` сначала ждёт, пока все три сервера ответят `Mode: leader` или `Mode: follower` (первые выборы после
+`up -d` идут несколько секунд), потом проходит этапы 1–2 и сам пишет выводы в `hw4/outputs/`: `JAVA_HOME`,
+версии Java, Docker и ZooKeeper (`stage1_java.txt`), конфиги и роли (`stage2_roles.txt`), остановка лидера и время
+выборов из журнала нового лидера (`stage2_minus1.txt`), остановка второго сервера с попытками чтения и записи
+(`stage2_minus2.txt`), возврат обоих (`stage2_restart.txt`) и эфемерный узел из второго окна `zkCli` с тайм-аутом
+его сессии (`stage2_ephemeral.txt`).
+
+### Координатор и сценарии
+
+Нужен RustFS из ДЗ 3 (`docker compose up -d` в корне) с датасетом и `results/mapreduce/k2.csv`.
+
+```bash
+docker compose up -d
+uv run python -m hhlake.zk.scenario 2>&1 | tee hw4/outputs/stage3_nofence.txt
+zookeeper/state.sh stage3_nofence > hw4/outputs/stage3_zkcli.txt 2>&1
+FENCING=1 uv run python -m hhlake.zk.scenario 2>&1 | tee hw4/outputs/stage4_fence.txt
+zookeeper/state.sh stage4_fence > hw4/outputs/stage4_zkcli.txt 2>&1
+uv run pytest -q > hw4/outputs/pytest.txt 2>&1
+```
+
+Сценарий запускает две копии `python -m hhlake.zk.coord` (coord-A, coord-B, по 1 воркеру, тайм-аут сессии 10 с).
+Когда в чекпоинте 13 из 26 map-задач, он шлёт `SIGSTOP` группе процессов лидера, держит паузу не меньше 40 с и до
+завершения запасного, затем шлёт `SIGCONT`. В конце он печатает время смены лидера, строки «записал результат» и
+«запись отклонена», состояние указателя и хронологию по всем журналам. Без `FENCING` прогон называется
+`stage3_nofence`, с `FENCING=1` — `stage4_fence`. Флаги сценария: `--pause` (40), `--pause-at` (0.5),
+`--workers` (1), `--chunk-mib` (32), `--run`, `--names` (coord-A coord-B). При прерывании сценарий будит и завершает оставшиеся копии.
+
+```
+/hhlake/<сценарий>/election/<uuid>-n_*  эфемерные последовательные узлы, лидер — наименьший номер
+/hhlake/<сценарий>/epoch                версия узла = эпоха; берётся транзакцией check(свой узел) + set
+/hhlake/<сценарий>/done/map-XXX         чекпоинт: ключи частей map-задачи в S3 и счётчики
+/hhlake/<сценарий>/result               указатель на результат; FENCING=1 — транзакция check(epoch) + set
+s3://hh-lake/results/zk/<сценарий>/epoch-<N>/k2.csv     результат лидера эпохи N
+s3://hh-lake/tmp/mr/zk-<сценарий>-e<N>/...             shuffle, удаляется сценарием
+```
+
+```
+src/hhlake/zk/common.py    пути узлов и ключей, клиент kazoo, журнал
+src/hhlake/zk/coord.py     выборы, эпоха, чекпоинт, map/reduce поверх hhlake.mr, сверка с ДЗ 3, публикация
+src/hhlake/zk/scenario.py  две копии, пауза лидера, замер, сводка
+tests/test_zk.py           эпоха и выборы, чекпоинт, reduce по частям двух эпох, публикация с защитой и без
+```
+
+Остановка: `docker compose -f zookeeper/compose.yaml down` и `docker compose down`.

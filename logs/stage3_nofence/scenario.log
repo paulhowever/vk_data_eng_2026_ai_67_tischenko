@@ -1,0 +1,27 @@
+2026-11-01 12:46:16.212 scenario сценарий stage3_nofence: FENCING=0, ZooKeeper 127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183, тайм-аут сессии 10 с, map-задач 26, пауза лидера после 13 готовых задач на 40 с
+2026-11-01 12:46:16.315 scenario сброс: /hhlake/stage3_nofence пересоздан (epoch и result версии 0), удалено объектов S3 прошлых прогонов: 2
+2026-11-01 12:46:16.318 scenario запущен coord-A, pid 7943
+2026-11-01 12:46:16.652 scenario запущен coord-B, pid 7946
+2026-11-01 12:46:16.653 scenario лидер по /hhlake/stage3_nofence/epoch: coord-A (эпоха 1), запасной coord-B
+2026-11-01 12:46:16.985 scenario сессии на серверах ансамбля (4lw cons)
+2026-11-01 12:46:17.001 scenario   сервер :2183 держит сессию 0x300000200f60002, согласованный тайм-аут 10 с
+2026-11-01 12:46:17.001 scenario   сервер :2183 держит сессию 0x300000200f60003, согласованный тайм-аут 10 с
+2026-11-01 12:46:17.001 scenario   сервер :2183 держит сессию 0x300000200f60001, согласованный тайм-аут 10 с
+2026-11-01 12:46:21.495 scenario SIGSTOP группе процессов coord-A (pgid 7943, координатор и воркеры пула): в чекпоинте 13 из 26
+2026-11-01 12:46:33.368 scenario /hhlake/stage3_nofence/epoch: версия 2, лидер coord-B; замечено через 11.87 с после SIGSTOP
+2026-11-01 12:47:01.559 scenario SIGCONT группе процессов coord-A: пауза длилась 40.1 с, coord-B завершился с кодом 0
+2026-11-01 12:47:05.740 scenario coord-A завершился с кодом 0
+2026-11-01 12:47:05.741 scenario coord-B завершился с кодом 0
+2026-11-01 12:47:05.741 scenario итог в ZooKeeper
+2026-11-01 12:47:05.741 scenario /hhlake/stage3_nofence/result: version=2 mzxid=0xb00000073 data={"key": "results/zk/stage3_nofence/epoch-1/k2.csv", "epoch": 1, "by": "coord-A", "sha256": "ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f"}
+2026-11-01 12:47:05.742 scenario /hhlake/stage3_nofence/epoch: version=2 mzxid=0xb00000055 data=coord-B
+2026-11-01 12:47:05.743 scenario чекпоинт /hhlake/stage3_nofence/done: 26 узлов
+2026-11-01 12:47:05.751 scenario файлы результата в S3 (s3://hh-lake/results/zk/stage3_nofence/): 2
+2026-11-01 12:47:05.758 scenario   results/zk/stage3_nofence/epoch-1/k2.csv  sha256 ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f
+2026-11-01 12:47:05.763 scenario   results/zk/stage3_nofence/epoch-2/k2.csv  sha256 ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f
+2026-11-01 12:47:05.769 scenario время смены лидера: от SIGSTOP coord-A до строки «стал лидером» у coord-B: 11.86 с
+2026-11-01 12:47:05.769 scenario строк «записал результат»: 2, строк «запись отклонена»: 0, версия указателя 2
+2026-11-01 12:47:05.769 scenario   2026-11-01 12:46:38.044 coord-B  записал результат: указатель /hhlake/stage3_nofence/result -> results/zk/stage3_nofence/epoch-2/k2.csv, версия указателя 1, эпоха 2
+2026-11-01 12:47:05.769 scenario   2026-11-01 12:47:05.655 coord-A  записал результат: указатель /hhlake/stage3_nofence/result -> results/zk/stage3_nofence/epoch-1/k2.csv, версия указателя 2, эпоха 1
+2026-11-01 12:47:05.769 scenario {"run": "stage3_nofence", "fencing": false, "map_tasks": 26, "paused_after": 13, "leader": "coord-A", "backup": "coord-B", "pause_s": 40.06, "failover_s": 11.86, "failover_seen_by_scenario_s": 11.87, "writes": 2, "rejects": 0, "pointer_version": 2, "pointer": {"key": "results/zk/stage3_nofence/epoch-1/k2.csv", "epoch": 1, "by": "coord-A", "sha256": "ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f"}, "result_files": ["results/zk/stage3_nofence/epoch-1/k2.csv", "results/zk/stage3_nofence/epoch-2/k2.csv"]}
+2026-11-01 12:47:06.762 scenario удалено промежуточных объектов shuffle: 156 (s3://hh-lake/tmp/mr/zk-stage3_nofence-*)

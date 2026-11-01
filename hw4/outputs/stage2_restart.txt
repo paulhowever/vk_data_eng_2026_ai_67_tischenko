@@ -1,0 +1,36 @@
+== Запускаю оба остановленных сервера: zk3 zk2
+[13:15:05.767] $ docker compose start zk3 zk2
+ Container hh-zk2 Starting 
+ Container hh-zk3 Starting 
+ Container hh-zk3 Started 
+ Container hh-zk2 Started 
+
+[13:15:07.256] $ docker compose ps -a --format table {{.Name}}\t{{.Status}}
+NAME      STATUS
+hh-zk1    Up 16 seconds
+hh-zk2    Up 1 second
+hh-zk3    Up 1 second
+
+[13:15:07.348] $ docker exec hh-zk1 zkServer.sh status
+Client port found: 2181. Client address: localhost. Client SSL: false.
+Mode: follower
+
+[13:15:07.563] $ docker exec hh-zk2 zkServer.sh status
+Client port found: 2182. Client address: localhost. Client SSL: false.
+Mode: leader
+
+[13:15:07.771] $ docker exec hh-zk3 zkServer.sh status
+Client port found: 2183. Client address: localhost. Client SSL: false.
+Mode: follower
+
+[13:15:07.971] $ zkCli.sh -server zk3:2183 get /minus1
+Connecting to zk3:2183
+written-with-2-of-3
+
+[13:15:08.563] $ zkCli.sh -server zk2:2182 get /minus1
+Connecting to zk2:2182
+written-with-2-of-3
+
+[13:15:09.213] $ zkCli.sh -server zk1:2181 delete /minus1
+Connecting to zk1:2181
+

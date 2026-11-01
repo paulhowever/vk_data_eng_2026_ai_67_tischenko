@@ -1,0 +1,43 @@
+name: hh-zk
+
+x-zk: &zk
+  image: zookeeper:3.9.6
+  command: ["zkServer.sh", "start-foreground"]
+  restart: "no"
+
+services:
+  zk1:
+    <<: *zk
+    container_name: hh-zk1
+    hostname: zk1
+    environment:
+      ZOO_DATA_DIR: /zk/zk1/data
+    ports:
+      - "2181:2181"
+    volumes:
+      - ./zk1/conf/zoo.cfg:/conf/zoo.cfg:ro
+      - ./zk1/data:/zk/zk1/data
+
+  zk2:
+    <<: *zk
+    container_name: hh-zk2
+    hostname: zk2
+    environment:
+      ZOO_DATA_DIR: /zk/zk2/data
+    ports:
+      - "2182:2182"
+    volumes:
+      - ./zk2/conf/zoo.cfg:/conf/zoo.cfg:ro
+      - ./zk2/data:/zk/zk2/data
+
+  zk3:
+    <<: *zk
+    container_name: hh-zk3
+    hostname: zk3
+    environment:
+      ZOO_DATA_DIR: /zk/zk3/data
+    ports:
+      - "2183:2183"
+    volumes:
+      - ./zk3/conf/zoo.cfg:/conf/zoo.cfg:ro
+      - ./zk3/data:/zk/zk3/data

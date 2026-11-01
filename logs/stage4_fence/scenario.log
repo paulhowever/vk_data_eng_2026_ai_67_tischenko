@@ -1,0 +1,26 @@
+2026-11-01 12:47:22.050 scenario сценарий stage4_fence: FENCING=1, ZooKeeper 127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183, тайм-аут сессии 10 с, map-задач 26, пауза лидера после 13 готовых задач на 40 с
+2026-11-01 12:47:22.146 scenario сброс: /hhlake/stage4_fence пересоздан (epoch и result версии 0), удалено объектов S3 прошлых прогонов: 1
+2026-11-01 12:47:22.149 scenario запущен coord-A, pid 9907
+2026-11-01 12:47:22.483 scenario запущен coord-B, pid 9910
+2026-11-01 12:47:22.484 scenario лидер по /hhlake/stage4_fence/epoch: coord-A (эпоха 1), запасной coord-B
+2026-11-01 12:47:22.818 scenario сессии на серверах ансамбля (4lw cons)
+2026-11-01 12:47:22.820 scenario   сервер :2181 держит сессию 0x100000253b3000f, согласованный тайм-аут 10 с
+2026-11-01 12:47:22.824 scenario   сервер :2182 держит сессию 0x200000200f20002, согласованный тайм-аут 10 с
+2026-11-01 12:47:22.827 scenario   сервер :2183 держит сессию 0x300000200f60004, согласованный тайм-аут 10 с
+2026-11-01 12:47:27.210 scenario SIGSTOP группе процессов coord-A (pgid 9907, координатор и воркеры пула): в чекпоинте 13 из 26
+2026-11-01 12:47:39.383 scenario /hhlake/stage4_fence/epoch: версия 2, лидер coord-B; замечено через 12.17 с после SIGSTOP
+2026-11-01 12:48:07.240 scenario SIGCONT группе процессов coord-A: пауза длилась 40.0 с, coord-B завершился с кодом 0
+2026-11-01 12:48:11.587 scenario coord-A завершился с кодом 0
+2026-11-01 12:48:11.587 scenario coord-B завершился с кодом 0
+2026-11-01 12:48:11.587 scenario итог в ZooKeeper
+2026-11-01 12:48:11.588 scenario /hhlake/stage4_fence/result: version=1 mzxid=0xb000000c4 data={"key": "results/zk/stage4_fence/epoch-2/k2.csv", "epoch": 2, "by": "coord-B", "sha256": "ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f"}
+2026-11-01 12:48:11.588 scenario /hhlake/stage4_fence/epoch: version=2 mzxid=0xb000000b5 data=coord-B
+2026-11-01 12:48:11.589 scenario чекпоинт /hhlake/stage4_fence/done: 26 узлов
+2026-11-01 12:48:11.596 scenario файлы результата в S3 (s3://hh-lake/results/zk/stage4_fence/): 1
+2026-11-01 12:48:11.602 scenario   results/zk/stage4_fence/epoch-2/k2.csv  sha256 ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f
+2026-11-01 12:48:11.609 scenario время смены лидера: от SIGSTOP coord-A до строки «стал лидером» у coord-B: 12.15 с
+2026-11-01 12:48:11.609 scenario строк «записал результат»: 1, строк «запись отклонена»: 1, версия указателя 1
+2026-11-01 12:48:11.609 scenario   2026-11-01 12:47:44.289 coord-B  записал результат: указатель /hhlake/stage4_fence/result -> results/zk/stage4_fence/epoch-2/k2.csv, версия указателя 1, эпоха 2
+2026-11-01 12:48:11.609 scenario   2026-11-01 12:48:11.490 coord-A  запись отклонена: BadVersionError (check /hhlake/stage4_fence/epoch version=1, а текущая эпоха 2)
+2026-11-01 12:48:11.610 scenario {"run": "stage4_fence", "fencing": true, "map_tasks": 26, "paused_after": 13, "leader": "coord-A", "backup": "coord-B", "pause_s": 40.03, "failover_s": 12.15, "failover_seen_by_scenario_s": 12.17, "writes": 1, "rejects": 1, "pointer_version": 1, "pointer": {"key": "results/zk/stage4_fence/epoch-2/k2.csv", "epoch": 2, "by": "coord-B", "sha256": "ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f"}, "result_files": ["results/zk/stage4_fence/epoch-2/k2.csv"]}
+2026-11-01 12:48:12.772 scenario удалено промежуточных объектов shuffle: 156 (s3://hh-lake/tmp/mr/zk-stage4_fence-*)

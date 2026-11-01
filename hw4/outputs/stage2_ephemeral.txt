@@ -1,0 +1,66 @@
+== Эфемерный узел: окно 2 создаёт узел, окно 1 смотрит
+[13:15:09.853] $ zkCli.sh -server zk1:2181 create /demo
+Connecting to zk1:2181
+Created /demo
+
+[13:15:10.955] окно 2> create -e /demo/eph "owned-by-window-2"
+[13:15:10.987] окно 2> stat /demo/eph
+
+[13:15:11.229] окно 2 (отдельный контейнер hh-zk-window2, интерактивный zkCli.sh -server zk2:2182):
+    [zk: zk2:2182(CONNECTED) 0] Created /demo/eph
+    [zk: zk2:2182(CONNECTED) 1] cZxid = 0xe00000008
+    ctime = Sun Nov 01 10:15:10 UTC 2026
+    mZxid = 0xe00000008
+    mtime = Sun Nov 01 10:15:10 UTC 2026
+    pZxid = 0xe00000008
+    cversion = 0
+    dataVersion = 0
+    aclVersion = 0
+    ephemeralOwner = 0x2000000cc080001
+    dataLength = 17
+    numChildren = 0
+    [zk: zk2:2182(CONNECTED) 2] 
+
+[13:15:11.259] $ zkCli.sh -server zk1:2181 stat /demo/eph
+Connecting to zk1:2181
+cZxid = 0xe00000008
+ctime = Sun Nov 01 10:15:10 UTC 2026
+mZxid = 0xe00000008
+mtime = Sun Nov 01 10:15:10 UTC 2026
+pZxid = 0xe00000008
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x2000000cc080001
+dataLength = 17
+numChildren = 0
+
+[13:15:11.893] $ zkCli.sh -server zk1:2181 ls /demo
+Connecting to zk1:2181
+[eph]
+
+== Сессия окна 2: 0x2000000cc080001, согласованный тайм-аут на сервере zk2 (4lw cons)
+[13:15:12.533] $ echo cons | nc -w 2 127.0.0.1 2182 | grep sid=0x2000000cc080001
+ /172.23.0.5:47088[1](queued=0,recved=3,sent=3,sid=0x2000000cc080001,lop=EXIS,est=1793528110802,to=30000,lcxid=0x2,lzxid=0xe00000008,lresp=56678,llat=1,minlat=0,avglat=1,maxlat=3)
+
+[13:15:12.568] $ sh -c echo mntr | nc -w 2 127.0.0.1 2181 | grep zk_ephemerals_count
+zk_ephemerals_count	1
+
+== Закрываю окно 2: docker kill (zkCli убит без закрытия сессии, как при закрытии окна терминала)
+[13:15:12.638] $ docker kill hh-zk-window2
+hh-zk-window2
+
+zk_ephemerals_count на zk1 стал 0 не позже чем через 29.8 с после закрытия окна (опрос mntr раз в ~0.12 с, опросов 250)
+
+[13:15:42.432] $ zkCli.sh -server zk1:2181 ls /demo
+Connecting to zk1:2181
+[]
+
+[13:15:43.069] $ zkCli.sh -server zk1:2181 stat /demo/eph
+Connecting to zk1:2181
+Node does not exist: /demo/eph
+2026-11-01 10:15:43,284 [myid:] - ERROR [main:o.a.z.u.ServiceUtils@48] - Exiting JVM with code 1
+
+[13:15:43.709] $ zkCli.sh -server zk1:2181 delete /demo
+Connecting to zk1:2181
+

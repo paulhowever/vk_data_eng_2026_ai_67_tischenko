@@ -1,0 +1,123 @@
+== Конфигурации: строки server.N одинаковые, clientPort, порты кворума и dataDir у каждого свои
+[13:14:54.847] $ cat zk1/conf/zoo.cfg
+tickTime=2000
+initLimit=10
+syncLimit=5
+dataDir=/zk/zk1/data
+clientPort=2181
+quorumListenOnAllIPs=true
+admin.enableServer=false
+4lw.commands.whitelist=srvr,stat,mntr,ruok,cons
+server.1=zk1:2888:3888
+server.2=zk2:2889:3889
+server.3=zk3:2890:3890
+
+[13:14:54.871] $ cat zk1/data/myid
+1
+
+[13:14:54.894] $ cat zk2/conf/zoo.cfg
+tickTime=2000
+initLimit=10
+syncLimit=5
+dataDir=/zk/zk2/data
+clientPort=2182
+quorumListenOnAllIPs=true
+admin.enableServer=false
+4lw.commands.whitelist=srvr,stat,mntr,ruok,cons
+server.1=zk1:2888:3888
+server.2=zk2:2889:3889
+server.3=zk3:2890:3890
+
+[13:14:54.919] $ cat zk2/data/myid
+2
+
+[13:14:54.943] $ cat zk3/conf/zoo.cfg
+tickTime=2000
+initLimit=10
+syncLimit=5
+dataDir=/zk/zk3/data
+clientPort=2183
+quorumListenOnAllIPs=true
+admin.enableServer=false
+4lw.commands.whitelist=srvr,stat,mntr,ruok,cons
+server.1=zk1:2888:3888
+server.2=zk2:2889:3889
+server.3=zk3:2890:3890
+
+[13:14:54.965] $ cat zk3/data/myid
+3
+
+[13:14:54.988] $ diff zk1/conf/zoo.cfg zk2/conf/zoo.cfg
+4,5c4,5
+< dataDir=/zk/zk1/data
+< clientPort=2181
+---
+> dataDir=/zk/zk2/data
+> clientPort=2182
+
+[13:14:55.012] $ diff zk1/conf/zoo.cfg zk3/conf/zoo.cfg
+4,5c4,5
+< dataDir=/zk/zk1/data
+< clientPort=2181
+---
+> dataDir=/zk/zk3/data
+> clientPort=2183
+
+== Запуск: каждый контейнер выполняет штатную команду zkServer.sh start-foreground
+[13:14:55.036] $ docker compose ps --format table {{.Name}}\t{{.Command}}\t{{.Status}}\t{{.Ports}}
+NAME      COMMAND                  STATUS         PORTS
+hh-zk1    "/docker-entrypoint.…"   Up 4 seconds   0.0.0.0:2181->2181/tcp, [::]:2181->2181/tcp
+hh-zk2    "/docker-entrypoint.…"   Up 4 seconds   0.0.0.0:2182->2182/tcp, [::]:2182->2182/tcp
+hh-zk3    "/docker-entrypoint.…"   Up 4 seconds   0.0.0.0:2183->2183/tcp, [::]:2183->2183/tcp
+
+[13:14:55.114] $ docker exec hh-zk1 sh -c ps -o pid,user,args -p 1 | sed -E "s/-cp [^ ]+/-cp .../"
+  PID USER     COMMAND
+    1 zookeep+ /opt/java/openjdk/bin/java -Dzookeeper.log.dir=/logs -Dzookeeper.log.file=zookeeper--server-zk1.log -XX:+HeapDumpOnOutOfMemoryError -XX:OnOutOfMemoryError=kill -9 %p -cp ... -Xmx1000m -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false org.apache.zookeeper.server.quorum.QuorumPeerMain /conf/zoo.cfg
+
+== Роли
+[13:14:55.225] $ docker exec hh-zk1 zkServer.sh status
+Client port found: 2181. Client address: localhost. Client SSL: false.
+Mode: follower
+
+[13:14:55.488] $ docker exec hh-zk2 zkServer.sh status
+Client port found: 2182. Client address: localhost. Client SSL: false.
+Mode: follower
+
+[13:14:55.737] $ docker exec hh-zk3 zkServer.sh status
+Client port found: 2183. Client address: localhost. Client SSL: false.
+Mode: leader
+
+[13:14:55.913] $ sh -c echo srvr | nc -w 2 127.0.0.1 2181
+Zookeeper version: 3.9.6-a355171b081b5b60749db8f19cca1528b0df936f, built on 2026-09-03 19:29 UTC
+Latency min/avg/max: 0/0.0/0
+Received: 5
+Sent: 4
+Connections: 1
+Outstanding: 0
+Zxid: 0xb000000ea
+Mode: follower
+Node count: 68
+
+[13:14:55.951] $ sh -c echo srvr | nc -w 2 127.0.0.1 2182
+Zookeeper version: 3.9.6-a355171b081b5b60749db8f19cca1528b0df936f, built on 2026-09-03 19:29 UTC
+Latency min/avg/max: 0/0.0/0
+Received: 5
+Sent: 4
+Connections: 1
+Outstanding: 0
+Zxid: 0xb000000ea
+Mode: follower
+Node count: 68
+
+[13:14:55.982] $ sh -c echo srvr | nc -w 2 127.0.0.1 2183
+Zookeeper version: 3.9.6-a355171b081b5b60749db8f19cca1528b0df936f, built on 2026-09-03 19:29 UTC
+Latency min/avg/max: 0/0.0/0
+Received: 5
+Sent: 4
+Connections: 1
+Outstanding: 0
+Zxid: 0xc00000000
+Mode: leader
+Node count: 68
+Proposal sizes last/min/max: -1/-1/-1
+
