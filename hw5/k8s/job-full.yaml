@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pairs-full
+  namespace: hh-lake
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: pairs
+        run: full
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: pairs
+          image: hhlake-pairs:hw5
+          imagePullPolicy: IfNotPresent
+          args: ["full", "--chunk-mib", "32"]
+          envFrom:
+            - secretRef:
+                name: hh-lake-s3
+          env:
+            - name: S3_ENDPOINT
+              value: http://rustfs.hh-lake.svc.cluster.local:9000
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            requests:
+              cpu: 500m
+              memory: 208Mi
+            limits:
+              cpu: "1"
+              memory: 208Mi

@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pairs-map-quota
+  namespace: team-php
+spec:
+  completionMode: Indexed
+  completions: 8
+  parallelism: 4
+  backoffLimitPerIndex: 2
+  maxFailedIndexes: 0
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: pairs
+        run: quota
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: pairs
+          image: hhlake-pairs:hw5
+          imagePullPolicy: IfNotPresent
+          args: ["map", "--parts", "8", "--chunk-mib", "32", "--run", "quota"]
+          envFrom:
+            - secretRef:
+                name: hh-lake-s3
+          env:
+            - name: S3_ENDPOINT
+              value: http://rustfs.hh-lake.svc.cluster.local:9000
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName

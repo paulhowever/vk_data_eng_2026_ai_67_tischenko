@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pairs-low
+  namespace: hh-lake
+spec:
+  completions: 2
+  parallelism: 2
+  backoffLimit: 2
+  podFailurePolicy:
+    rules:
+      - action: Ignore
+        onPodConditions:
+          - type: DisruptionTarget
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: pairs
+        run: low
+    spec:
+      priorityClassName: batch-low
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 5
+      containers:
+        - name: pairs
+          image: hhlake-pairs:hw5
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c", "for i in $(seq 1 20); do echo pass $i; python -m k8spairs full --chunk-mib 32 --out results/k8s/low | grep -E '^(time|memory)' || exit 1; done"]
+          envFrom:
+            - secretRef:
+                name: hh-lake-s3
+          env:
+            - name: S3_ENDPOINT
+              value: http://rustfs.hh-lake.svc.cluster.local:9000
+          resources:
+            requests:
+              cpu: "6"
+              memory: 208Mi
+            limits:
+              cpu: "6"
+              memory: 208Mi
