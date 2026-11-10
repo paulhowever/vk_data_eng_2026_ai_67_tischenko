@@ -1,0 +1,86 @@
+$ kind version
+kind v0.33.0 go1.27.1 darwin/arm64
+
+$ kubectl version
+Client Version: v1.34.1
+Kustomize Version: v5.7.1
+Server Version: v1.37.0
+Warning: version difference between client (1.34) and server (1.37) exceeds the supported minor version skew of +/-1
+
+$ docker info --format NCPU={{.NCPU}} MemTotal={{.MemTotal}} ServerVersion={{.ServerVersion}}
+NCPU=10 MemTotal=8217317376 ServerVersion=29.2.0
+
+$ kind get clusters
+hh-lake
+
+$ kubectl get nodes -o wide
+NAME                    STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION             CONTAINER-RUNTIME
+hh-lake-control-plane   Ready    control-plane   14m   v1.37.0   172.23.0.3    <none>        Debian GNU/Linux 13 (trixie)   6.12.67-linuxkit (arm64)   containerd://2.3.4
+hh-lake-worker          Ready    <none>          14m   v1.37.0   172.23.0.4    <none>        Debian GNU/Linux 13 (trixie)   6.12.67-linuxkit (arm64)   containerd://2.3.4
+hh-lake-worker2         Ready    <none>          14m   v1.37.0   172.23.0.2    <none>        Debian GNU/Linux 13 (trixie)   6.12.67-linuxkit (arm64)   containerd://2.3.4
+
+$ kubectl get pods -A -o wide
+NAMESPACE            NAME                                            READY   STATUS      RESTARTS   AGE     IP            NODE                    NOMINATED NODE   READINESS GATES
+hh-lake              pairs-full-measure-8cj7n                        0/1     Completed   0          9m29s   10.244.2.5    hh-lake-worker          <none>           <none>
+hh-lake              pairs-full-oom-h4j97                            0/1     OOMKilled   0          10m     10.244.2.2    hh-lake-worker          <none>           <none>
+hh-lake              pairs-full-whs9w                                0/1     Completed   0          8m59s   10.244.2.6    hh-lake-worker          <none>           <none>
+hh-lake              pairs-high-86vtd                                0/1     Completed   0          5m48s   10.244.2.19   hh-lake-worker          <none>           <none>
+hh-lake              pairs-low-n64r2                                 0/1     Completed   0          5m33s   10.244.2.20   hh-lake-worker          <none>           <none>
+hh-lake              pairs-low-z4t67                                 0/1     Completed   0          5m57s   10.244.1.13   hh-lake-worker2         <none>           <none>
+hh-lake              pairs-map-0-j6pwq                               0/1     Completed   0          8m39s   10.244.2.7    hh-lake-worker          <none>           <none>
+hh-lake              pairs-map-1-vwlkd                               0/1     Completed   0          8m39s   10.244.1.7    hh-lake-worker2         <none>           <none>
+hh-lake              pairs-map-2-2cwgv                               0/1     Completed   0          8m39s   10.244.2.8    hh-lake-worker          <none>           <none>
+hh-lake              pairs-map-3-88dsl                               0/1     Completed   0          8m39s   10.244.2.9    hh-lake-worker          <none>           <none>
+hh-lake              pairs-map-4-dm9vf                               0/1     Completed   0          8m34s   10.244.2.10   hh-lake-worker          <none>           <none>
+hh-lake              pairs-map-5-gtj2r                               0/1     Completed   0          8m34s   10.244.1.8    hh-lake-worker2         <none>           <none>
+hh-lake              pairs-map-6-rzzzk                               0/1     Completed   0          8m34s   10.244.2.11   hh-lake-worker          <none>           <none>
+hh-lake              pairs-map-7-4xf6c                               0/1     Completed   0          8m34s   10.244.2.12   hh-lake-worker          <none>           <none>
+hh-lake              pairs-map-cpu-0-mw5s4                           0/1     Completed   0          7m38s   10.244.2.14   hh-lake-worker          <none>           <none>
+hh-lake              pairs-map-cpu-1-9hqpv                           0/1     Completed   0          7m38s   10.244.2.15   hh-lake-worker          <none>           <none>
+hh-lake              pairs-map-cpu-2-tp8jz                           0/1     Completed   0          7m38s   10.244.1.9    hh-lake-worker2         <none>           <none>
+hh-lake              pairs-map-cpu-3-9hn6j                           0/1     Completed   0          7m33s   10.244.1.10   hh-lake-worker2         <none>           <none>
+hh-lake              pairs-map-cpu-4-wbmqk                           0/1     Completed   0          7m32s   10.244.2.16   hh-lake-worker          <none>           <none>
+hh-lake              pairs-map-cpu-5-vtt2b                           0/1     Completed   0          7m28s   10.244.1.11   hh-lake-worker2         <none>           <none>
+hh-lake              pairs-map-cpu-6-tgtxv                           0/1     Completed   0          7m27s   10.244.2.17   hh-lake-worker          <none>           <none>
+hh-lake              pairs-map-cpu-7-82sqb                           0/1     Completed   0          7m25s   10.244.1.12   hh-lake-worker2         <none>           <none>
+hh-lake              pairs-reduce-4dzcb                              0/1     Completed   0          8m28s   10.244.2.13   hh-lake-worker          <none>           <none>
+hh-lake              rustfs-0                                        1/1     Running     0          11m     10.244.1.6    hh-lake-worker2         <none>           <none>
+kube-system          coredns-559f6c778d-gwd65                        1/1     Running     0          14m     10.244.0.2    hh-lake-control-plane   <none>           <none>
+kube-system          coredns-559f6c778d-jfrcl                        1/1     Running     0          14m     10.244.0.3    hh-lake-control-plane   <none>           <none>
+kube-system          etcd-hh-lake-control-plane                      1/1     Running     0          14m     172.23.0.3    hh-lake-control-plane   <none>           <none>
+kube-system          kindnet-n6lnt                                   1/1     Running     0          14m     172.23.0.3    hh-lake-control-plane   <none>           <none>
+kube-system          kindnet-tqvfx                                   1/1     Running     0          14m     172.23.0.2    hh-lake-worker2         <none>           <none>
+kube-system          kindnet-zdkt6                                   1/1     Running     0          14m     172.23.0.4    hh-lake-worker          <none>           <none>
+kube-system          kube-apiserver-hh-lake-control-plane            1/1     Running     0          14m     172.23.0.3    hh-lake-control-plane   <none>           <none>
+kube-system          kube-controller-manager-hh-lake-control-plane   1/1     Running     0          14m     172.23.0.3    hh-lake-control-plane   <none>           <none>
+kube-system          kube-proxy-7mv8z                                1/1     Running     0          14m     172.23.0.4    hh-lake-worker          <none>           <none>
+kube-system          kube-proxy-8fdh6                                1/1     Running     0          14m     172.23.0.3    hh-lake-control-plane   <none>           <none>
+kube-system          kube-proxy-tgv7j                                1/1     Running     0          14m     172.23.0.2    hh-lake-worker2         <none>           <none>
+kube-system          kube-scheduler-hh-lake-control-plane            1/1     Running     0          14m     172.23.0.3    hh-lake-control-plane   <none>           <none>
+local-path-storage   local-path-provisioner-75f7fc7dc5-rkxdx         1/1     Running     0          14m     10.244.0.4    hh-lake-control-plane   <none>           <none>
+team-php             pairs-map-quota-0-zg6qh                         0/1     Completed   0          74s     10.244.2.21   hh-lake-worker          <none>           <none>
+team-php             pairs-map-quota-1-cgjl9                         0/1     Completed   0          74s     10.244.2.22   hh-lake-worker          <none>           <none>
+team-php             pairs-map-quota-2-cbn22                         0/1     Completed   0          68s     10.244.2.23   hh-lake-worker          <none>           <none>
+team-php             pairs-map-quota-3-46wj7                         0/1     Completed   0          68s     10.244.2.24   hh-lake-worker          <none>           <none>
+team-php             pairs-map-quota-4-4hhvm                         0/1     Completed   0          63s     10.244.2.25   hh-lake-worker          <none>           <none>
+team-php             pairs-map-quota-5-fk96s                         0/1     Completed   0          63s     10.244.2.26   hh-lake-worker          <none>           <none>
+team-php             pairs-map-quota-6-cbgj7                         0/1     Completed   0          59s     10.244.2.28   hh-lake-worker          <none>           <none>
+team-php             pairs-map-quota-7-b7f9k                         0/1     Completed   0          59s     10.244.2.27   hh-lake-worker          <none>           <none>
+
+$ kubectl get priorityclass
+NAME                      VALUE        GLOBAL-DEFAULT   AGE    PREEMPTIONPOLICY
+batch-high                100000       false            6m8s   PreemptLowerPriority
+batch-low                 1000         false            6m8s   Never
+system-cluster-critical   2000000000   false            14m    PreemptLowerPriority
+system-node-critical      2000001000   false            14m    PreemptLowerPriority
+
+$ kubectl get ns
+NAME                 STATUS   AGE
+default              Active   14m
+hh-lake              Active   11m
+kube-node-lease      Active   14m
+kube-public          Active   14m
+kube-system          Active   14m
+local-path-storage   Active   14m
+team-php             Active   2m40s
+

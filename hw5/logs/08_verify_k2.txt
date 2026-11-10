@@ -1,0 +1,20 @@
+$ S3_ENDPOINT=http://localhost:29000 uv run python hw5/scripts/verify_k2.py indexed full
+endpoint http://localhost:29000
+s3://hh-lake/results/k8s/indexed/k2.csv -> hw5/results/indexed/k2.csv
+  reference results/mapreduce/k2.csv: rows 15,921 sum 135,362
+  kubernetes: rows 15,921 sum 135,362
+  k8s EXCEPT ALL ref: 0 rows
+  ref EXCEPT ALL k8s: 0 rows
+  top-10: mysql+php 2096, git+php 1686, laravel+php 1342, git+mysql 1116, javascript+php 1103, php+postgresql 975, docker+php 907, php+symfony 872, html+php 839, php+sql 800
+s3://hh-lake/results/k8s/full/k2.csv -> hw5/results/full/k2.csv
+  reference results/mapreduce/k2.csv: rows 15,921 sum 135,362
+  kubernetes: rows 15,921 sum 135,362
+  k8s EXCEPT ALL ref: 0 rows
+  ref EXCEPT ALL k8s: 0 rows
+  top-10: mysql+php 2096, git+php 1686, laravel+php 1342, git+mysql 1116, javascript+php 1103, php+postgresql 975, docker+php 907, php+symfony 872, html+php 839, php+sql 800
+MATCH
+
+$ shasum -a 256 results/mapreduce/k2.csv hw5/results/indexed/k2.csv hw5/results/full/k2.csv
+ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f  results/mapreduce/k2.csv
+ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f  hw5/results/indexed/k2.csv
+ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f  hw5/results/full/k2.csv

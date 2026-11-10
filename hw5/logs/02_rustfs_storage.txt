@@ -1,0 +1,28 @@
+$ kubectl -n hh-lake get sts,pod,svc,pvc -o wide
+NAME                      READY   AGE   CONTAINERS   IMAGES
+statefulset.apps/rustfs   1/1     46s   rustfs       rustfs/rustfs:1.0.0
+
+NAME           READY   STATUS    RESTARTS   AGE   IP           NODE              NOMINATED NODE   READINESS GATES
+pod/rustfs-0   1/1     Running   0          46s   10.244.1.6   hh-lake-worker2   <none>           <none>
+
+NAME             TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)             AGE   SELECTOR
+service/rustfs   ClusterIP   10.96.48.175   <none>        9000/TCP,9001/TCP   46s   app=rustfs
+
+NAME                                   STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE   VOLUMEMODE
+persistentvolumeclaim/disk1-rustfs-0   Bound    pvc-1b1f2cc6-73bd-4799-a924-cf9fad36f628   2Gi        RWO            standard       <unset>                 46s   Filesystem
+persistentvolumeclaim/disk2-rustfs-0   Bound    pvc-83e964f4-2bcd-426d-9063-553d719c9e46   2Gi        RWO            standard       <unset>                 46s   Filesystem
+persistentvolumeclaim/disk3-rustfs-0   Bound    pvc-be01749a-364b-48e0-b94b-6e14050ea51c   2Gi        RWO            standard       <unset>                 46s   Filesystem
+persistentvolumeclaim/disk4-rustfs-0   Bound    pvc-9d81fb82-3273-493e-b68c-156c2b6bd416   2Gi        RWO            standard       <unset>                 46s   Filesystem
+
+$ kubectl -n hh-lake exec rustfs-0 -- du -sk /data/disk1 /data/disk2 /data/disk3 /data/disk4
+414200	/data/disk1
+414200	/data/disk2
+414196	/data/disk3
+414200	/data/disk4
+
+$ bytes of raw/it_vacancies_2024.csv shards per disk
+disk1 423835580 B  share 0.5000 of object
+disk2 423835580 B  share 0.5000 of object
+disk3 423835580 B  share 0.5000 of object
+disk4 423835580 B  share 0.5000 of object
+total 1695342320 B  overhead 2.0001x

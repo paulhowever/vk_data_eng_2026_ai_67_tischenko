@@ -1,0 +1,936 @@
+$ kubectl -n hh-lake get job pairs-map -o wide
+NAME        STATUS     COMPLETIONS   DURATION   AGE   CONTAINERS   IMAGES             SELECTOR
+pairs-map   Complete   8/8           10s        10s   pairs        hhlake-pairs:hw5   batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+
+$ kubectl -n hh-lake describe job pairs-map
+Name:                        pairs-map
+Namespace:                   hh-lake
+Selector:                    batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+Labels:                      app=pairs
+                             batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                             batch.kubernetes.io/job-name=pairs-map
+                             controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                             job-name=pairs-map
+                             run=indexed
+Annotations:                 <none>
+Parallelism:                 4
+Completions:                 8
+Completion Mode:             Indexed
+Suspend:                     false
+Backoff Limit:               2147483647
+TTL Seconds After Finished:  86400
+Start Time:                  Tue, 10 Nov 2026 12:37:48 +0300
+Completed At:                Tue, 10 Nov 2026 12:37:58 +0300
+Duration:                    10s
+Pods Statuses:               0 Active (0 Ready) / 8 Succeeded / 0 Failed
+Completed Indexes:           0-7
+Pod Template:
+  Labels:  app=pairs
+           batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+           batch.kubernetes.io/job-name=pairs-map
+           controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+           job-name=pairs-map
+           run=indexed
+  Containers:
+   pairs:
+    Image:      hhlake-pairs:hw5
+    Port:       <none>
+    Host Port:  <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      indexed
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:  http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:     (v1:spec.nodeName)
+    Mounts:         <none>
+  Volumes:          <none>
+  Node-Selectors:   <none>
+  Tolerations:      <none>
+Events:
+  Type    Reason            Age   From            Message
+  ----    ------            ----  ----            -------
+  Normal  SuccessfulCreate  10s   job-controller  Created pod: pairs-map-0-j6pwq
+  Normal  SuccessfulCreate  10s   job-controller  Created pod: pairs-map-2-2cwgv
+  Normal  SuccessfulCreate  10s   job-controller  Created pod: pairs-map-1-vwlkd
+  Normal  SuccessfulCreate  10s   job-controller  Created pod: pairs-map-3-88dsl
+  Normal  SuccessfulCreate  5s    job-controller  Created pod: pairs-map-4-dm9vf
+  Normal  SuccessfulCreate  5s    job-controller  Created pod: pairs-map-6-rzzzk
+  Normal  SuccessfulCreate  5s    job-controller  Created pod: pairs-map-5-gtj2r
+  Normal  SuccessfulCreate  5s    job-controller  Created pod: pairs-map-7-4xf6c
+  Normal  Completed         0s    job-controller  Job completed
+
+$ kubectl -n hh-lake get pods -l batch.kubernetes.io/job-name=pairs-map -o wide
+NAME                READY   STATUS      RESTARTS   AGE   IP            NODE              NOMINATED NODE   READINESS GATES
+pairs-map-0-j6pwq   0/1     Completed   0          10s   10.244.2.7    hh-lake-worker    <none>           <none>
+pairs-map-1-vwlkd   0/1     Completed   0          10s   10.244.1.7    hh-lake-worker2   <none>           <none>
+pairs-map-2-2cwgv   0/1     Completed   0          10s   10.244.2.8    hh-lake-worker    <none>           <none>
+pairs-map-3-88dsl   0/1     Completed   0          10s   10.244.2.9    hh-lake-worker    <none>           <none>
+pairs-map-4-dm9vf   0/1     Completed   0          5s    10.244.2.10   hh-lake-worker    <none>           <none>
+pairs-map-5-gtj2r   0/1     Completed   0          5s    10.244.1.8    hh-lake-worker2   <none>           <none>
+pairs-map-6-rzzzk   0/1     Completed   0          5s    10.244.2.11   hh-lake-worker    <none>           <none>
+pairs-map-7-4xf6c   0/1     Completed   0          5s    10.244.2.12   hh-lake-worker    <none>           <none>
+
+$ kubectl -n hh-lake describe pod/pairs-map-0-j6pwq
+Name:             pairs-map-0-j6pwq
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:37:48 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  batch.kubernetes.io/job-completion-index=0
+                  batch.kubernetes.io/job-name=pairs-map
+                  controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  job-name=pairs-map
+                  run=indexed
+Annotations:      batch.kubernetes.io/job-completion-index: 0
+                  batch.kubernetes.io/job-index-failure-count: 0
+Status:           Succeeded
+IP:               10.244.2.7
+IPs:
+  IP:           10.244.2.7
+Controlled By:  Job/pairs-map
+Containers:
+  pairs:
+    Container ID:  containerd://0ce4ac48e5af14ea322eb1c8aba2dc6fc7b650a6dafecabcc9c0a899cc43b97a
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      indexed
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:37:48 +0300
+      Finished:     Tue, 10 Nov 2026 12:37:50 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-tz9rr (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-tz9rr:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  10s   default-scheduler  Successfully assigned hh-lake/pairs-map-0-j6pwq to hh-lake-worker
+  Normal  Pulled     10s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    10s   kubelet            Container created
+  Normal  Started    10s   kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-map-0-j6pwq -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:37:48Z finished=2026-11-10T09:37:50Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-map-0-j6pwq
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 0/8: range [0, 105,952,423) chunk 32.0 MiB pod pairs-map-0 node hh-lake-worker
+  chunk [222, 33,555,287)  records 8,969  variant 169
+  chunk [33,555,287, 67,111,156)  records 9,119  variant 147
+  chunk [67,111,156, 100,666,764)  records 9,059  variant 161
+  chunk [100,666,764, 105,958,703)  records 1,417  variant 25
+aligned [222, 105,958,703) records 28,564 variant 502 keys 3,549 time 1.6 s
+memory {"ru_maxrss_mib": 112.9, "cgroup_memory_peak_mib": 107.7, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n hh-lake describe pod/pairs-map-1-vwlkd
+Name:             pairs-map-1-vwlkd
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker2/172.23.0.2
+Start Time:       Tue, 10 Nov 2026 12:37:48 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  batch.kubernetes.io/job-completion-index=1
+                  batch.kubernetes.io/job-name=pairs-map
+                  controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  job-name=pairs-map
+                  run=indexed
+Annotations:      batch.kubernetes.io/job-completion-index: 1
+                  batch.kubernetes.io/job-index-failure-count: 0
+Status:           Succeeded
+IP:               10.244.1.7
+IPs:
+  IP:           10.244.1.7
+Controlled By:  Job/pairs-map
+Containers:
+  pairs:
+    Container ID:  containerd://f8d7b8a0be20471a48328e5f380200b36ae618747de47e8b405e5e70cb3b3476
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      indexed
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:37:48 +0300
+      Finished:     Tue, 10 Nov 2026 12:37:50 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-sk422 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-sk422:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  10s   default-scheduler  Successfully assigned hh-lake/pairs-map-1-vwlkd to hh-lake-worker2
+  Normal  Pulled     10s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    10s   kubelet            Container created
+  Normal  Started    10s   kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-map-1-vwlkd -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:37:48Z finished=2026-11-10T09:37:50Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-map-1-vwlkd
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 1/8: range [105,952,423, 211,904,846) chunk 32.0 MiB pod pairs-map-1 node hh-lake-worker2
+  chunk [105,958,703, 139,509,348)  records 9,156  variant 158
+  chunk [139,509,348, 173,064,895)  records 9,342  variant 211
+  chunk [173,064,895, 206,620,349)  records 9,264  variant 162
+  chunk [206,620,349, 211,909,622)  records 1,434  variant 25
+aligned [105,958,703, 211,909,622) records 29,196 variant 556 keys 4,398 time 1.6 s
+memory {"ru_maxrss_mib": 112.6, "cgroup_memory_peak_mib": 131.2, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n hh-lake describe pod/pairs-map-2-2cwgv
+Name:             pairs-map-2-2cwgv
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:37:48 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  batch.kubernetes.io/job-completion-index=2
+                  batch.kubernetes.io/job-name=pairs-map
+                  controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  job-name=pairs-map
+                  run=indexed
+Annotations:      batch.kubernetes.io/job-completion-index: 2
+                  batch.kubernetes.io/job-index-failure-count: 0
+Status:           Succeeded
+IP:               10.244.2.8
+IPs:
+  IP:           10.244.2.8
+Controlled By:  Job/pairs-map
+Containers:
+  pairs:
+    Container ID:  containerd://95bd7a189a57d9069aac3bac34d3c2d37d374e7ebf5f867018a586ac17df03d4
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      indexed
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:37:48 +0300
+      Finished:     Tue, 10 Nov 2026 12:37:50 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-q4pgt (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-q4pgt:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  10s   default-scheduler  Successfully assigned hh-lake/pairs-map-2-2cwgv to hh-lake-worker
+  Normal  Pulled     10s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    10s   kubelet            Container created
+  Normal  Started    10s   kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-map-2-2cwgv -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:37:48Z finished=2026-11-10T09:37:50Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-map-2-2cwgv
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 2/8: range [211,904,846, 317,857,269) chunk 32.0 MiB pod pairs-map-2 node hh-lake-worker
+  chunk [211,909,622, 245,459,690)  records 9,164  variant 162
+  chunk [245,459,690, 279,015,974)  records 8,999  variant 153
+  chunk [279,015,974, 312,573,321)  records 9,132  variant 142
+  chunk [312,573,321, 317,857,720)  records 1,444  variant 19
+aligned [211,909,622, 317,857,720) records 28,739 variant 476 keys 3,852 time 1.5 s
+memory {"ru_maxrss_mib": 113.2, "cgroup_memory_peak_mib": 107.5, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n hh-lake describe pod/pairs-map-3-88dsl
+Name:             pairs-map-3-88dsl
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:37:48 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  batch.kubernetes.io/job-completion-index=3
+                  batch.kubernetes.io/job-name=pairs-map
+                  controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  job-name=pairs-map
+                  run=indexed
+Annotations:      batch.kubernetes.io/job-completion-index: 3
+                  batch.kubernetes.io/job-index-failure-count: 0
+Status:           Succeeded
+IP:               10.244.2.9
+IPs:
+  IP:           10.244.2.9
+Controlled By:  Job/pairs-map
+Containers:
+  pairs:
+    Container ID:  containerd://577715664525818437946e1f0e8be755d822cb70babf5b52de961df8345824ef
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      indexed
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:37:48 +0300
+      Finished:     Tue, 10 Nov 2026 12:37:50 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-tz88r (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-tz88r:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  10s   default-scheduler  Successfully assigned hh-lake/pairs-map-3-88dsl to hh-lake-worker
+  Normal  Pulled     10s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    10s   kubelet            Container created
+  Normal  Started    10s   kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-map-3-88dsl -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:37:48Z finished=2026-11-10T09:37:50Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-map-3-88dsl
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 3/8: range [317,857,269, 423,809,692) chunk 32.0 MiB pod pairs-map-3 node hh-lake-worker
+  chunk [317,857,720, 351,414,642)  records 9,454  variant 202
+  chunk [351,414,642, 384,966,947)  records 9,057  variant 247
+  chunk [384,966,947, 418,521,307)  records 9,158  variant 245
+  chunk [418,521,307, 423,810,887)  records 1,417  variant 39
+aligned [317,857,720, 423,810,887) records 29,086 variant 733 keys 5,212 time 1.6 s
+memory {"ru_maxrss_mib": 113.0, "cgroup_memory_peak_mib": 107.9, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n hh-lake describe pod/pairs-map-4-dm9vf
+Name:             pairs-map-4-dm9vf
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:37:53 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  batch.kubernetes.io/job-completion-index=4
+                  batch.kubernetes.io/job-name=pairs-map
+                  controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  job-name=pairs-map
+                  run=indexed
+Annotations:      batch.kubernetes.io/job-completion-index: 4
+                  batch.kubernetes.io/job-index-failure-count: 0
+Status:           Succeeded
+IP:               10.244.2.10
+IPs:
+  IP:           10.244.2.10
+Controlled By:  Job/pairs-map
+Containers:
+  pairs:
+    Container ID:  containerd://c8220bba2570958227a1d425cc959ad24cf7d58e8328513fc1d01719590fa102
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      indexed
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:37:53 +0300
+      Finished:     Tue, 10 Nov 2026 12:37:55 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-d69t9 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-d69t9:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  5s    default-scheduler  Successfully assigned hh-lake/pairs-map-4-dm9vf to hh-lake-worker
+  Normal  Pulled     5s    kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    5s    kubelet            Container created
+  Normal  Started    5s    kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-map-4-dm9vf -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:37:53Z finished=2026-11-10T09:37:55Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-map-4-dm9vf
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 4/8: range [423,809,692, 529,762,115) chunk 32.0 MiB pod pairs-map-4 node hh-lake-worker
+  chunk [423,810,887, 457,364,993)  records 9,054  variant 229
+  chunk [457,364,993, 490,920,047)  records 8,967  variant 163
+  chunk [490,920,047, 524,474,427)  records 9,395  variant 286
+  chunk [524,474,427, 529,763,672)  records 1,499  variant 49
+aligned [423,810,887, 529,763,672) records 28,915 variant 727 keys 4,697 time 1.1 s
+memory {"ru_maxrss_mib": 113.3, "cgroup_memory_peak_mib": 106.3, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n hh-lake describe pod/pairs-map-5-gtj2r
+Name:             pairs-map-5-gtj2r
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker2/172.23.0.2
+Start Time:       Tue, 10 Nov 2026 12:37:53 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  batch.kubernetes.io/job-completion-index=5
+                  batch.kubernetes.io/job-name=pairs-map
+                  controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  job-name=pairs-map
+                  run=indexed
+Annotations:      batch.kubernetes.io/job-completion-index: 5
+                  batch.kubernetes.io/job-index-failure-count: 0
+Status:           Succeeded
+IP:               10.244.1.8
+IPs:
+  IP:           10.244.1.8
+Controlled By:  Job/pairs-map
+Containers:
+  pairs:
+    Container ID:  containerd://aa37f1b334591ca6dd2a1c5a5cbb78fc254b5325df506e301e79948ffa2f39e5
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      indexed
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:37:53 +0300
+      Finished:     Tue, 10 Nov 2026 12:37:55 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-wmtfh (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-wmtfh:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  5s    default-scheduler  Successfully assigned hh-lake/pairs-map-5-gtj2r to hh-lake-worker2
+  Normal  Pulled     5s    kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    5s    kubelet            Container created
+  Normal  Started    5s    kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-map-5-gtj2r -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:37:53Z finished=2026-11-10T09:37:55Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-map-5-gtj2r
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 5/8: range [529,762,115, 635,714,538) chunk 32.0 MiB pod pairs-map-5 node hh-lake-worker2
+  chunk [529,763,672, 563,320,934)  records 9,098  variant 253
+  chunk [563,320,934, 596,874,265)  records 8,852  variant 255
+  chunk [596,874,265, 630,428,663)  records 8,994  variant 278
+  chunk [630,428,663, 635,715,091)  records 1,500  variant 37
+aligned [529,763,672, 635,715,091) records 28,444 variant 823 keys 6,288 time 1.2 s
+memory {"ru_maxrss_mib": 113.2, "cgroup_memory_peak_mib": 105.8, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n hh-lake describe pod/pairs-map-6-rzzzk
+Name:             pairs-map-6-rzzzk
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:37:53 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  batch.kubernetes.io/job-completion-index=6
+                  batch.kubernetes.io/job-name=pairs-map
+                  controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  job-name=pairs-map
+                  run=indexed
+Annotations:      batch.kubernetes.io/job-completion-index: 6
+                  batch.kubernetes.io/job-index-failure-count: 0
+Status:           Succeeded
+IP:               10.244.2.11
+IPs:
+  IP:           10.244.2.11
+Controlled By:  Job/pairs-map
+Containers:
+  pairs:
+    Container ID:  containerd://d1b1dee7903831ee5e43533aa84756d8c1ebdf37f44978af034701ae9ac14ca3
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      indexed
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:37:53 +0300
+      Finished:     Tue, 10 Nov 2026 12:37:55 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-7mtqf (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-7mtqf:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  5s    default-scheduler  Successfully assigned hh-lake/pairs-map-6-rzzzk to hh-lake-worker
+  Normal  Pulled     5s    kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    5s    kubelet            Container created
+  Normal  Started    5s    kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-map-6-rzzzk -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:37:53Z finished=2026-11-10T09:37:55Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-map-6-rzzzk
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 6/8: range [635,714,538, 741,666,961) chunk 32.0 MiB pod pairs-map-6 node hh-lake-worker
+  chunk [635,715,091, 669,270,538)  records 9,222  variant 245
+  chunk [669,270,538, 702,825,154)  records 8,846  variant 201
+  chunk [702,825,154, 736,379,359)  records 8,935  variant 254
+  chunk [736,379,359, 741,667,049)  records 1,397  variant 34
+aligned [635,715,091, 741,667,049) records 28,400 variant 734 keys 5,199 time 1.2 s
+memory {"ru_maxrss_mib": 113.0, "cgroup_memory_peak_mib": 106.4, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n hh-lake describe pod/pairs-map-7-4xf6c
+Name:             pairs-map-7-4xf6c
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:37:53 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  batch.kubernetes.io/job-completion-index=7
+                  batch.kubernetes.io/job-name=pairs-map
+                  controller-uid=28e1f7ad-1406-4ffa-921c-2e51f292b166
+                  job-name=pairs-map
+                  run=indexed
+Annotations:      batch.kubernetes.io/job-completion-index: 7
+                  batch.kubernetes.io/job-index-failure-count: 0
+Status:           Succeeded
+IP:               10.244.2.12
+IPs:
+  IP:           10.244.2.12
+Controlled By:  Job/pairs-map
+Containers:
+  pairs:
+    Container ID:  containerd://e7a39947142ec5d99f15a92b68906019448bdea1ee84ce49c1fb497b04a11375
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      indexed
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:37:53 +0300
+      Finished:     Tue, 10 Nov 2026 12:37:55 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-xwlk6 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-xwlk6:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  5s    default-scheduler  Successfully assigned hh-lake/pairs-map-7-4xf6c to hh-lake-worker
+  Normal  Pulled     5s    kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    5s    kubelet            Container created
+  Normal  Started    5s    kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-map-7-4xf6c -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:37:53Z finished=2026-11-10T09:37:55Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-map-7-4xf6c
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 7/8: range [741,666,961, 847,619,384) chunk 32.0 MiB pod pairs-map-7 node hh-lake-worker
+  chunk [741,667,049, 775,224,214)  records 8,823  variant 231
+  chunk [775,224,214, 808,778,103)  records 8,913  variant 265
+  chunk [808,778,103, 842,331,627)  records 8,927  variant 288
+  chunk [842,331,627, 847,619,384)  records 1,381  variant 47
+aligned [741,667,049, 847,619,384) records 28,044 variant 831 keys 6,016 time 1.2 s
+memory {"ru_maxrss_mib": 113.4, "cgroup_memory_peak_mib": 106.3, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n hh-lake get events --sort-by=.lastTimestamp -o custom-columns=... | grep -E 'LAST|pairs-map'
+LAST                   TYPE      REASON                  OBJECT                     MESSAGE
+2026-11-10T09:37:48Z   Normal    Created                 pairs-map-0-j6pwq          Container created
+2026-11-10T09:37:48Z   Normal    SuccessfulCreate        pairs-map                  Created pod: pairs-map-0-j6pwq
+2026-11-10T09:37:48Z   Normal    Scheduled               pairs-map-3-88dsl          Successfully assigned hh-lake/pairs-map-3-88dsl to hh-lake-worker
+2026-11-10T09:37:48Z   Normal    Pulled                  pairs-map-3-88dsl          Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:37:48Z   Normal    Created                 pairs-map-3-88dsl          Container created
+2026-11-10T09:37:48Z   Normal    Started                 pairs-map-3-88dsl          Container started
+2026-11-10T09:37:48Z   Normal    Scheduled               pairs-map-0-j6pwq          Successfully assigned hh-lake/pairs-map-0-j6pwq to hh-lake-worker
+2026-11-10T09:37:48Z   Normal    Pulled                  pairs-map-0-j6pwq          Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:37:48Z   Normal    Started                 pairs-map-0-j6pwq          Container started
+2026-11-10T09:37:48Z   Normal    Scheduled               pairs-map-1-vwlkd          Successfully assigned hh-lake/pairs-map-1-vwlkd to hh-lake-worker2
+2026-11-10T09:37:48Z   Normal    Pulled                  pairs-map-1-vwlkd          Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:37:48Z   Normal    Started                 pairs-map-2-2cwgv          Container started
+2026-11-10T09:37:48Z   Normal    Created                 pairs-map-1-vwlkd          Container created
+2026-11-10T09:37:48Z   Normal    Started                 pairs-map-1-vwlkd          Container started
+2026-11-10T09:37:48Z   Normal    Scheduled               pairs-map-2-2cwgv          Successfully assigned hh-lake/pairs-map-2-2cwgv to hh-lake-worker
+2026-11-10T09:37:48Z   Normal    Pulled                  pairs-map-2-2cwgv          Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:37:48Z   Normal    Created                 pairs-map-2-2cwgv          Container created
+2026-11-10T09:37:48Z   Normal    SuccessfulCreate        pairs-map                  Created pod: pairs-map-3-88dsl
+2026-11-10T09:37:48Z   Normal    SuccessfulCreate        pairs-map                  Created pod: pairs-map-1-vwlkd
+2026-11-10T09:37:48Z   Normal    SuccessfulCreate        pairs-map                  Created pod: pairs-map-2-2cwgv
+2026-11-10T09:37:53Z   Normal    Pulled                  pairs-map-5-gtj2r          Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:37:53Z   Normal    Created                 pairs-map-6-rzzzk          Container created
+2026-11-10T09:37:53Z   Normal    Created                 pairs-map-7-4xf6c          Container created
+2026-11-10T09:37:53Z   Normal    Pulled                  pairs-map-7-4xf6c          Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:37:53Z   Normal    Scheduled               pairs-map-7-4xf6c          Successfully assigned hh-lake/pairs-map-7-4xf6c to hh-lake-worker
+2026-11-10T09:37:53Z   Normal    Started                 pairs-map-6-rzzzk          Container started
+2026-11-10T09:37:53Z   Normal    SuccessfulCreate        pairs-map                  Created pod: pairs-map-4-dm9vf
+2026-11-10T09:37:53Z   Normal    SuccessfulCreate        pairs-map                  Created pod: pairs-map-6-rzzzk
+2026-11-10T09:37:53Z   Normal    SuccessfulCreate        pairs-map                  Created pod: pairs-map-5-gtj2r
+2026-11-10T09:37:53Z   Normal    SuccessfulCreate        pairs-map                  Created pod: pairs-map-7-4xf6c
+2026-11-10T09:37:53Z   Normal    Scheduled               pairs-map-4-dm9vf          Successfully assigned hh-lake/pairs-map-4-dm9vf to hh-lake-worker
+2026-11-10T09:37:53Z   Normal    Started                 pairs-map-7-4xf6c          Container started
+2026-11-10T09:37:53Z   Normal    Pulled                  pairs-map-6-rzzzk          Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:37:53Z   Normal    Scheduled               pairs-map-6-rzzzk          Successfully assigned hh-lake/pairs-map-6-rzzzk to hh-lake-worker
+2026-11-10T09:37:53Z   Normal    Started                 pairs-map-5-gtj2r          Container started
+2026-11-10T09:37:53Z   Normal    Created                 pairs-map-5-gtj2r          Container created
+2026-11-10T09:37:53Z   Normal    Scheduled               pairs-map-5-gtj2r          Successfully assigned hh-lake/pairs-map-5-gtj2r to hh-lake-worker2
+2026-11-10T09:37:53Z   Normal    Started                 pairs-map-4-dm9vf          Container started
+2026-11-10T09:37:53Z   Normal    Created                 pairs-map-4-dm9vf          Container created
+2026-11-10T09:37:53Z   Normal    Pulled                  pairs-map-4-dm9vf          Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:37:58Z   Normal    Completed               pairs-map                  Job completed
