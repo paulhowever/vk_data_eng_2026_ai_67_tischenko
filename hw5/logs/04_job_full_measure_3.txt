@@ -1,0 +1,222 @@
+$ kubectl -n hh-lake get job pairs-full-measure -o wide
+NAME                 STATUS     COMPLETIONS   DURATION   AGE   CONTAINERS   IMAGES             SELECTOR
+pairs-full-measure   Complete   1/1           8s         8s    pairs        hhlake-pairs:hw5   batch.kubernetes.io/controller-uid=f2759112-e3f2-4ff1-8dba-df6cd4365452
+
+$ kubectl -n hh-lake describe job pairs-full-measure
+Name:                        pairs-full-measure
+Namespace:                   hh-lake
+Selector:                    batch.kubernetes.io/controller-uid=f2759112-e3f2-4ff1-8dba-df6cd4365452
+Labels:                      app=pairs
+                             batch.kubernetes.io/controller-uid=f2759112-e3f2-4ff1-8dba-df6cd4365452
+                             batch.kubernetes.io/job-name=pairs-full-measure
+                             controller-uid=f2759112-e3f2-4ff1-8dba-df6cd4365452
+                             job-name=pairs-full-measure
+                             run=full-measure
+Annotations:                 <none>
+Parallelism:                 1
+Completions:                 1
+Completion Mode:             NonIndexed
+Suspend:                     false
+Backoff Limit:               0
+TTL Seconds After Finished:  86400
+Start Time:                  Tue, 10 Nov 2026 12:36:58 +0300
+Completed At:                Tue, 10 Nov 2026 12:37:06 +0300
+Duration:                    8s
+Pods Statuses:               0 Active (0 Ready) / 1 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=pairs
+           batch.kubernetes.io/controller-uid=f2759112-e3f2-4ff1-8dba-df6cd4365452
+           batch.kubernetes.io/job-name=pairs-full-measure
+           controller-uid=f2759112-e3f2-4ff1-8dba-df6cd4365452
+           job-name=pairs-full-measure
+           run=full-measure
+  Containers:
+   pairs:
+    Image:      hhlake-pairs:hw5
+    Port:       <none>
+    Host Port:  <none>
+    Args:
+      full
+      --chunk-mib
+      32
+    Limits:
+      cpu:     1
+      memory:  1Gi
+    Requests:
+      cpu:     500m
+      memory:  1Gi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:  http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:     (v1:spec.nodeName)
+    Mounts:         <none>
+  Volumes:          <none>
+  Node-Selectors:   <none>
+  Tolerations:      <none>
+Events:
+  Type    Reason            Age   From            Message
+  ----    ------            ----  ----            -------
+  Normal  SuccessfulCreate  8s    job-controller  Created pod: pairs-full-measure-8cj7n
+  Normal  Completed         0s    job-controller  Job completed
+
+$ kubectl -n hh-lake get pods -l batch.kubernetes.io/job-name=pairs-full-measure -o wide
+NAME                       READY   STATUS      RESTARTS   AGE   IP           NODE             NOMINATED NODE   READINESS GATES
+pairs-full-measure-8cj7n   0/1     Completed   0          9s    10.244.2.5   hh-lake-worker   <none>           <none>
+
+$ kubectl -n hh-lake describe pod/pairs-full-measure-8cj7n
+Name:             pairs-full-measure-8cj7n
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:36:58 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=f2759112-e3f2-4ff1-8dba-df6cd4365452
+                  batch.kubernetes.io/job-name=pairs-full-measure
+                  controller-uid=f2759112-e3f2-4ff1-8dba-df6cd4365452
+                  job-name=pairs-full-measure
+                  run=full-measure
+Annotations:      <none>
+Status:           Succeeded
+IP:               10.244.2.5
+IPs:
+  IP:           10.244.2.5
+Controlled By:  Job/pairs-full-measure
+Containers:
+  pairs:
+    Container ID:  containerd://48d886760f8fc7fba2a86615d6af205d357b9af49dbac66f6e6353564854b1da
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      full
+      --chunk-mib
+      32
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:36:59 +0300
+      Finished:     Tue, 10 Nov 2026 12:37:03 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  1Gi
+    Requests:
+      cpu:     500m
+      memory:  1Gi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:  http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:     (v1:spec.nodeName)
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-ptzrl (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-ptzrl:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  9s    default-scheduler  Successfully assigned hh-lake/pairs-full-measure-8cj7n to hh-lake-worker
+  Normal  Pulled     9s    kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    9s    kubelet            Container created
+  Normal  Started    8s    kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-full-measure-8cj7n -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:36:59Z finished=2026-11-10T09:37:03Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-full-measure-8cj7n
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+full: object s3://hh-lake/raw/it_vacancies_2024.csv size 847,619,384 B, chunk 32.0 MiB
+  chunk [222, 33,555,287)  records 8,969  variant 169
+  chunk [33,555,287, 67,111,156)  records 9,119  variant 147
+  chunk [67,111,156, 100,666,764)  records 9,059  variant 161
+  chunk [100,666,764, 134,222,989)  records 9,114  variant 163
+  chunk [134,222,989, 167,775,029)  records 9,305  variant 192
+  chunk [167,775,029, 201,326,829)  records 9,288  variant 179
+  chunk [201,326,829, 234,885,825)  records 9,178  variant 149
+  chunk [234,885,825, 268,435,470)  records 9,063  variant 175
+  chunk [268,435,470, 301,991,284)  records 9,109  variant 138
+  chunk [301,991,284, 335,549,935)  records 9,310  variant 160
+  chunk [335,549,935, 369,105,733)  records 9,220  variant 248
+  chunk [369,105,733, 402,655,883)  records 9,123  variant 232
+  chunk [402,655,883, 436,209,093)  records 9,033  variant 239
+  chunk [436,209,093, 469,763,676)  records 9,107  variant 202
+  chunk [469,763,676, 503,319,387)  records 9,071  variant 203
+  chunk [503,319,387, 536,875,223)  records 9,474  variant 297
+  chunk [536,875,223, 570,425,853)  records 8,885  variant 244
+  chunk [570,425,853, 603,981,789)  records 8,895  variant 265
+  chunk [603,981,789, 637,537,352)  records 9,135  variant 264
+  chunk [637,537,352, 671,089,299)  records 9,202  variant 245
+  chunk [671,089,299, 704,648,084)  records 8,819  variant 205
+  chunk [704,648,084, 738,202,833)  records 8,973  variant 255
+  chunk [738,202,833, 771,756,695)  records 8,817  variant 219
+  chunk [771,756,695, 805,306,785)  records 8,876  variant 265
+  chunk [805,306,785, 838,862,280)  records 8,940  variant 284
+  chunk [838,862,280, 847,619,384)  records 2,304  variant 82
+check OK   aligned ranges tile [header_end, size): True (expected True)
+check OK   records: 229388 (expected 229388)
+check OK   variant: 5382 (expected 5382)
+check OK   with skills: 4380 (expected 4380)
+check OK   k=2 sum(count) == emitted: 135362 (expected 135362)
+check OK   k=2 unique keys: 15921 (expected 15921)
+check OK   k=2 sum count: 135362 (expected 135362)
+check OK   k=2 top: (('mysql', 'php'), 2096) (expected (('mysql', 'php'), 2096))
+written s3://hh-lake/results/k8s/full/k2.csv  467,629 B
+top-10:
+  mysql+php 2096
+  git+php 1686
+  laravel+php 1342
+  git+mysql 1116
+  javascript+php 1103
+  php+postgresql 975
+  docker+php 907
+  php+symfony 872
+  html+php 839
+  php+sql 800
+time 4.5 s
+memory {"ru_maxrss_mib": 145.1, "cgroup_memory_peak_mib": 150.9, "cgroup_memory_max_mib": 1024.0}
+
+$ kubectl -n hh-lake get events --sort-by=.lastTimestamp -o custom-columns=... | grep -E 'LAST|pairs-full-measure'
+LAST                   TYPE      REASON                  OBJECT                     MESSAGE
+2026-11-10T09:36:40Z   Normal    SuccessfulCreate        pairs-full-measure         Created pod: pairs-full-measure-txz7x
+2026-11-10T09:36:40Z   Normal    Created                 pairs-full-measure-txz7x   Container created
+2026-11-10T09:36:40Z   Normal    Scheduled               pairs-full-measure-txz7x   Successfully assigned hh-lake/pairs-full-measure-txz7x to hh-lake-worker
+2026-11-10T09:36:40Z   Normal    Started                 pairs-full-measure-txz7x   Container started
+2026-11-10T09:36:40Z   Normal    Pulled                  pairs-full-measure-txz7x   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:36:48Z   Normal    Completed               pairs-full-measure         Job completed
+2026-11-10T09:36:49Z   Normal    Scheduled               pairs-full-measure-jzvs7   Successfully assigned hh-lake/pairs-full-measure-jzvs7 to hh-lake-worker
+2026-11-10T09:36:49Z   Normal    SuccessfulCreate        pairs-full-measure         Created pod: pairs-full-measure-jzvs7
+2026-11-10T09:36:49Z   Normal    Started                 pairs-full-measure-jzvs7   Container started
+2026-11-10T09:36:49Z   Normal    Created                 pairs-full-measure-jzvs7   Container created
+2026-11-10T09:36:49Z   Normal    Pulled                  pairs-full-measure-jzvs7   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:36:57Z   Normal    Completed               pairs-full-measure         Job completed
+2026-11-10T09:36:58Z   Normal    SuccessfulCreate        pairs-full-measure         Created pod: pairs-full-measure-8cj7n
+2026-11-10T09:36:58Z   Normal    Created                 pairs-full-measure-8cj7n   Container created
+2026-11-10T09:36:58Z   Normal    Pulled                  pairs-full-measure-8cj7n   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:36:58Z   Normal    Scheduled               pairs-full-measure-8cj7n   Successfully assigned hh-lake/pairs-full-measure-8cj7n to hh-lake-worker
+2026-11-10T09:36:59Z   Normal    Started                 pairs-full-measure-8cj7n   Container started
+2026-11-10T09:37:06Z   Normal    Completed               pairs-full-measure         Job completed

@@ -1,0 +1,193 @@
+$ kubectl -n hh-lake get job pairs-reduce -o wide
+NAME           STATUS     COMPLETIONS   DURATION   AGE   CONTAINERS   IMAGES             SELECTOR
+pairs-reduce   Complete   1/1           4s         4s    pairs        hhlake-pairs:hw5   batch.kubernetes.io/controller-uid=8e8553c1-ccf8-4eaa-9a31-3ef0196df33b
+
+$ kubectl -n hh-lake describe job pairs-reduce
+Name:                        pairs-reduce
+Namespace:                   hh-lake
+Selector:                    batch.kubernetes.io/controller-uid=8e8553c1-ccf8-4eaa-9a31-3ef0196df33b
+Labels:                      app=pairs
+                             batch.kubernetes.io/controller-uid=8e8553c1-ccf8-4eaa-9a31-3ef0196df33b
+                             batch.kubernetes.io/job-name=pairs-reduce
+                             controller-uid=8e8553c1-ccf8-4eaa-9a31-3ef0196df33b
+                             job-name=pairs-reduce
+                             run=reduce
+Annotations:                 <none>
+Parallelism:                 1
+Completions:                 1
+Completion Mode:             NonIndexed
+Suspend:                     false
+Backoff Limit:               1
+TTL Seconds After Finished:  86400
+Start Time:                  Tue, 10 Nov 2026 12:37:59 +0300
+Completed At:                Tue, 10 Nov 2026 12:38:03 +0300
+Duration:                    4s
+Pods Statuses:               0 Active (0 Ready) / 1 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=pairs
+           batch.kubernetes.io/controller-uid=8e8553c1-ccf8-4eaa-9a31-3ef0196df33b
+           batch.kubernetes.io/job-name=pairs-reduce
+           controller-uid=8e8553c1-ccf8-4eaa-9a31-3ef0196df33b
+           job-name=pairs-reduce
+           run=reduce
+  Containers:
+   pairs:
+    Image:      hhlake-pairs:hw5
+    Port:       <none>
+    Host Port:  <none>
+    Args:
+      reduce
+      --parts
+      8
+      --run
+      indexed
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:  http://rustfs.hh-lake.svc.cluster.local:9000
+    Mounts:         <none>
+  Volumes:          <none>
+  Node-Selectors:   <none>
+  Tolerations:      <none>
+Events:
+  Type    Reason            Age   From            Message
+  ----    ------            ----  ----            -------
+  Normal  SuccessfulCreate  4s    job-controller  Created pod: pairs-reduce-4dzcb
+  Normal  Completed         0s    job-controller  Job completed
+
+$ kubectl -n hh-lake get pods -l batch.kubernetes.io/job-name=pairs-reduce -o wide
+NAME                 READY   STATUS      RESTARTS   AGE   IP            NODE             NOMINATED NODE   READINESS GATES
+pairs-reduce-4dzcb   0/1     Completed   0          4s    10.244.2.13   hh-lake-worker   <none>           <none>
+
+$ kubectl -n hh-lake describe pod/pairs-reduce-4dzcb
+Name:             pairs-reduce-4dzcb
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:37:59 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=8e8553c1-ccf8-4eaa-9a31-3ef0196df33b
+                  batch.kubernetes.io/job-name=pairs-reduce
+                  controller-uid=8e8553c1-ccf8-4eaa-9a31-3ef0196df33b
+                  job-name=pairs-reduce
+                  run=reduce
+Annotations:      <none>
+Status:           Succeeded
+IP:               10.244.2.13
+IPs:
+  IP:           10.244.2.13
+Controlled By:  Job/pairs-reduce
+Containers:
+  pairs:
+    Container ID:  containerd://0418ef025dfbf509ea8a1b382f2b18fe819d3cdc0254dcf113f80ac85fdec268
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      reduce
+      --parts
+      8
+      --run
+      indexed
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:37:59 +0300
+      Finished:     Tue, 10 Nov 2026 12:38:00 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:  http://rustfs.hh-lake.svc.cluster.local:9000
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-r577f (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-r577f:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  4s    default-scheduler  Successfully assigned hh-lake/pairs-reduce-4dzcb to hh-lake-worker
+  Normal  Pulled     4s    kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    4s    kubelet            Container created
+  Normal  Started    4s    kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-reduce-4dzcb -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:37:59Z finished=2026-11-10T09:38:00Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-reduce-4dzcb
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+part  0 node hh-lake-worker   aligned [222, 105,958,703) records 28,564 variant  502 keys 3,549 time   1.6 s peak 107.7 MiB
+part  1 node hh-lake-worker2  aligned [105,958,703, 211,909,622) records 29,196 variant  556 keys 4,398 time   1.6 s peak 131.2 MiB
+part  2 node hh-lake-worker   aligned [211,909,622, 317,857,720) records 28,739 variant  476 keys 3,852 time   1.5 s peak 107.5 MiB
+part  3 node hh-lake-worker   aligned [317,857,720, 423,810,887) records 29,086 variant  733 keys 5,212 time   1.6 s peak 107.9 MiB
+part  4 node hh-lake-worker   aligned [423,810,887, 529,763,672) records 28,915 variant  727 keys 4,697 time   1.1 s peak 106.3 MiB
+part  5 node hh-lake-worker2  aligned [529,763,672, 635,715,091) records 28,444 variant  823 keys 6,288 time   1.1 s peak 105.8 MiB
+part  6 node hh-lake-worker   aligned [635,715,091, 741,667,049) records 28,400 variant  734 keys 5,199 time   1.2 s peak 106.4 MiB
+part  7 node hh-lake-worker   aligned [741,667,049, 847,619,384) records 28,044 variant  831 keys 6,016 time   1.1 s peak 106.3 MiB
+check OK   aligned ranges tile [header_end, size): True (expected True)
+check OK   records: 229388 (expected 229388)
+check OK   variant: 5382 (expected 5382)
+check OK   with skills: 4380 (expected 4380)
+check OK   k=2 sum(count) == emitted: 135362 (expected 135362)
+check OK   k=2 unique keys: 15921 (expected 15921)
+check OK   k=2 sum count: 135362 (expected 135362)
+check OK   k=2 top: (('mysql', 'php'), 2096) (expected (('mysql', 'php'), 2096))
+written s3://hh-lake/results/k8s/indexed/k2.csv  467,629 B
+top-10:
+  mysql+php 2096
+  git+php 1686
+  laravel+php 1342
+  git+mysql 1116
+  javascript+php 1103
+  php+postgresql 975
+  docker+php 907
+  php+symfony 872
+  html+php 839
+  php+sql 800
+time 0.3 s
+memory {"ru_maxrss_mib": 55.5, "cgroup_memory_peak_mib": 54.3, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n hh-lake get events --sort-by=.lastTimestamp -o custom-columns=... | grep -E 'LAST|pairs-reduce'
+LAST                   TYPE      REASON                  OBJECT                     MESSAGE
+2026-11-10T09:37:59Z   Normal    SuccessfulCreate        pairs-reduce               Created pod: pairs-reduce-4dzcb
+2026-11-10T09:37:59Z   Normal    Started                 pairs-reduce-4dzcb         Container started
+2026-11-10T09:37:59Z   Normal    Created                 pairs-reduce-4dzcb         Container created
+2026-11-10T09:37:59Z   Normal    Pulled                  pairs-reduce-4dzcb         Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:37:59Z   Normal    Scheduled               pairs-reduce-4dzcb         Successfully assigned hh-lake/pairs-reduce-4dzcb to hh-lake-worker
+2026-11-10T09:38:03Z   Normal    Completed               pairs-reduce               Job completed

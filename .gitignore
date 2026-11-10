@@ -11,3 +11,8 @@ report/*.log
 report/*.out
 report/*.toc
 .ruff_cache/
+hw5/results/
+hw5/report/*.aux
+hw5/report/*.log
+hw5/report/*.out
+hw5/report/*.toc

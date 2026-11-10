@@ -1,0 +1,1080 @@
+$ kubectl -n team-php describe resourcequota team-php-quota
+Name:            team-php-quota
+Namespace:       team-php
+Resource         Used  Hard
+--------         ----  ----
+limits.cpu       0     4
+limits.memory    0     512Mi
+pods             0     4
+requests.cpu     0     2
+requests.memory  0     512Mi
+
+$ kubectl -n team-php describe limitrange team-php-defaults
+Name:       team-php-defaults
+Namespace:  team-php
+Type        Resource  Min  Max    Default Request  Default Limit  Max Limit/Request Ratio
+----        --------  ---  ---    ---------------  -------------  -----------------------
+Container   memory    -    512Mi  208Mi            208Mi          -
+Container   cpu       -    -      500m             1              -
+
+$ kubectl apply -f hw5/k8s/job-quota.yaml
+job.batch/pairs-map-quota created
+
+$ kubectl -n team-php get pods -o wide   (2 s after apply)
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE             NOMINATED NODE   READINESS GATES
+pairs-map-quota-0-zg6qh   1/1     Running   0          2s    10.244.2.21   hh-lake-worker   <none>           <none>
+pairs-map-quota-1-cgjl9   1/1     Running   0          2s    10.244.2.22   hh-lake-worker   <none>           <none>
+
+$ kubectl -n team-php describe resourcequota team-php-quota
+Name:            team-php-quota
+Namespace:       team-php
+Resource         Used   Hard
+--------         ----   ----
+limits.cpu       2      4
+limits.memory    416Mi  512Mi
+pods             2      4
+requests.cpu     1      2
+requests.memory  416Mi  512Mi
+
+$ kubectl -n team-php run quota-probe --image=hhlake-pairs:hw5 --restart=Never --overrides={"spec":{"containers":[{"name":"quota-probe","image":"hhlake-pairs:hw5","args":["full"],"resources":{"requests":{"memory":"400Mi"},"limits":{"memory":"400Mi"}}}]}}
+Error from server (Forbidden): pods "quota-probe" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=400Mi,requests.memory=400Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+
+--- pod watch ---
+$ kubectl -n team-php get pods -l batch.kubernetes.io/job-name=pairs-map-quota -o wide -w --output-watch-events  (60s)
+09:45:13  EVENT      NAME                      READY   STATUS    RESTARTS   AGE   IP       NODE     NOMINATED NODE   READINESS GATES
+09:45:13  ADDED      pairs-map-quota-0-zg6qh   0/1     Pending   0          0s    <none>   <none>   <none>           <none>
+09:45:13  MODIFIED   pairs-map-quota-0-zg6qh   0/1     Pending   0          0s    <none>   hh-lake-worker   <none>           <none>
+09:45:13  ADDED      pairs-map-quota-1-cgjl9   0/1     Pending   0          0s    <none>   <none>           <none>           <none>
+09:45:13  MODIFIED   pairs-map-quota-1-cgjl9   0/1     Pending   0          0s    <none>   hh-lake-worker   <none>           <none>
+09:45:13  MODIFIED   pairs-map-quota-0-zg6qh   0/1     ContainerCreating   0          0s    <none>   hh-lake-worker   <none>           <none>
+09:45:13  MODIFIED   pairs-map-quota-1-cgjl9   0/1     ContainerCreating   0          0s    <none>   hh-lake-worker   <none>           <none>
+09:45:14  MODIFIED   pairs-map-quota-0-zg6qh   0/1     ContainerCreating   0          1s    <none>   hh-lake-worker   <none>           <none>
+09:45:14  MODIFIED   pairs-map-quota-1-cgjl9   0/1     ContainerCreating   0          1s    <none>   hh-lake-worker   <none>           <none>
+09:45:14  MODIFIED   pairs-map-quota-1-cgjl9   1/1     Running             0          1s    10.244.2.22   hh-lake-worker   <none>           <none>
+09:45:14  MODIFIED   pairs-map-quota-0-zg6qh   1/1     Running             0          1s    10.244.2.21   hh-lake-worker   <none>           <none>
+09:45:17  MODIFIED   pairs-map-quota-0-zg6qh   0/1     Completed           0          4s    10.244.2.21   hh-lake-worker   <none>           <none>
+09:45:17  MODIFIED   pairs-map-quota-1-cgjl9   0/1     Completed           0          4s    10.244.2.22   hh-lake-worker   <none>           <none>
+09:45:18  MODIFIED   pairs-map-quota-1-cgjl9   0/1     Completed           0          5s    10.244.2.22   hh-lake-worker   <none>           <none>
+09:45:18  MODIFIED   pairs-map-quota-0-zg6qh   0/1     Completed           0          5s    10.244.2.21   hh-lake-worker   <none>           <none>
+09:45:19  MODIFIED   pairs-map-quota-0-zg6qh   0/1     Completed           0          6s    10.244.2.21   hh-lake-worker   <none>           <none>
+09:45:19  MODIFIED   pairs-map-quota-1-cgjl9   0/1     Completed           0          6s    10.244.2.22   hh-lake-worker   <none>           <none>
+09:45:19  ADDED      pairs-map-quota-2-cbn22   0/1     Pending             0          0s    <none>        <none>           <none>           <none>
+09:45:19  MODIFIED   pairs-map-quota-2-cbn22   0/1     Pending             0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:19  ADDED      pairs-map-quota-3-46wj7   0/1     Pending             0          0s    <none>        <none>           <none>           <none>
+09:45:19  MODIFIED   pairs-map-quota-3-46wj7   0/1     Pending             0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:19  MODIFIED   pairs-map-quota-2-cbn22   0/1     ContainerCreating   0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:19  MODIFIED   pairs-map-quota-0-zg6qh   0/1     Completed           0          6s    10.244.2.21   hh-lake-worker   <none>           <none>
+09:45:19  MODIFIED   pairs-map-quota-1-cgjl9   0/1     Completed           0          6s    10.244.2.22   hh-lake-worker   <none>           <none>
+09:45:19  MODIFIED   pairs-map-quota-3-46wj7   0/1     ContainerCreating   0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:19  MODIFIED   pairs-map-quota-2-cbn22   0/1     ContainerCreating   0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:19  MODIFIED   pairs-map-quota-3-46wj7   0/1     ContainerCreating   0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:20  MODIFIED   pairs-map-quota-2-cbn22   1/1     Running             0          1s    10.244.2.23   hh-lake-worker   <none>           <none>
+09:45:20  MODIFIED   pairs-map-quota-3-46wj7   1/1     Running             0          1s    10.244.2.24   hh-lake-worker   <none>           <none>
+09:45:22  MODIFIED   pairs-map-quota-3-46wj7   0/1     Completed           0          3s    10.244.2.24   hh-lake-worker   <none>           <none>
+09:45:22  MODIFIED   pairs-map-quota-2-cbn22   0/1     Completed           0          3s    10.244.2.23   hh-lake-worker   <none>           <none>
+09:45:23  MODIFIED   pairs-map-quota-2-cbn22   0/1     Completed           0          4s    10.244.2.23   hh-lake-worker   <none>           <none>
+09:45:23  MODIFIED   pairs-map-quota-3-46wj7   0/1     Completed           0          4s    10.244.2.24   hh-lake-worker   <none>           <none>
+09:45:24  ADDED      pairs-map-quota-4-4hhvm   0/1     Pending             0          0s    <none>        <none>           <none>           <none>
+09:45:24  MODIFIED   pairs-map-quota-4-4hhvm   0/1     Pending             0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:24  ADDED      pairs-map-quota-5-fk96s   0/1     Pending             0          0s    <none>        <none>           <none>           <none>
+09:45:24  MODIFIED   pairs-map-quota-5-fk96s   0/1     Pending             0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:24  MODIFIED   pairs-map-quota-4-4hhvm   0/1     ContainerCreating   0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:24  MODIFIED   pairs-map-quota-2-cbn22   0/1     Completed           0          5s    10.244.2.23   hh-lake-worker   <none>           <none>
+09:45:24  MODIFIED   pairs-map-quota-3-46wj7   0/1     Completed           0          5s    10.244.2.24   hh-lake-worker   <none>           <none>
+09:45:24  MODIFIED   pairs-map-quota-5-fk96s   0/1     ContainerCreating   0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:24  MODIFIED   pairs-map-quota-4-4hhvm   0/1     ContainerCreating   0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:24  MODIFIED   pairs-map-quota-5-fk96s   0/1     ContainerCreating   0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:25  MODIFIED   pairs-map-quota-4-4hhvm   1/1     Running             0          1s    10.244.2.25   hh-lake-worker   <none>           <none>
+09:45:25  MODIFIED   pairs-map-quota-5-fk96s   1/1     Running             0          1s    10.244.2.26   hh-lake-worker   <none>           <none>
+09:45:26  MODIFIED   pairs-map-quota-5-fk96s   0/1     Completed           0          2s    10.244.2.26   hh-lake-worker   <none>           <none>
+09:45:26  MODIFIED   pairs-map-quota-4-4hhvm   0/1     Completed           0          2s    10.244.2.25   hh-lake-worker   <none>           <none>
+09:45:27  MODIFIED   pairs-map-quota-4-4hhvm   0/1     Completed           0          3s    10.244.2.25   hh-lake-worker   <none>           <none>
+09:45:27  MODIFIED   pairs-map-quota-5-fk96s   0/1     Completed           0          3s    10.244.2.26   hh-lake-worker   <none>           <none>
+09:45:28  ADDED      pairs-map-quota-6-cbgj7   0/1     Pending             0          0s    <none>        <none>           <none>           <none>
+09:45:28  MODIFIED   pairs-map-quota-6-cbgj7   0/1     Pending             0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:28  ADDED      pairs-map-quota-7-b7f9k   0/1     Pending             0          0s    <none>        <none>           <none>           <none>
+09:45:28  MODIFIED   pairs-map-quota-7-b7f9k   0/1     Pending             0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:28  MODIFIED   pairs-map-quota-5-fk96s   0/1     Completed           0          4s    10.244.2.26   hh-lake-worker   <none>           <none>
+09:45:28  MODIFIED   pairs-map-quota-4-4hhvm   0/1     Completed           0          4s    10.244.2.25   hh-lake-worker   <none>           <none>
+09:45:28  MODIFIED   pairs-map-quota-6-cbgj7   0/1     ContainerCreating   0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:28  MODIFIED   pairs-map-quota-7-b7f9k   0/1     ContainerCreating   0          0s    <none>        hh-lake-worker   <none>           <none>
+09:45:29  MODIFIED   pairs-map-quota-6-cbgj7   0/1     ContainerCreating   0          1s    <none>        hh-lake-worker   <none>           <none>
+09:45:29  MODIFIED   pairs-map-quota-7-b7f9k   0/1     ContainerCreating   0          1s    <none>        hh-lake-worker   <none>           <none>
+09:45:29  MODIFIED   pairs-map-quota-6-cbgj7   1/1     Running             0          1s    10.244.2.28   hh-lake-worker   <none>           <none>
+09:45:29  MODIFIED   pairs-map-quota-7-b7f9k   1/1     Running             0          1s    10.244.2.27   hh-lake-worker   <none>           <none>
+09:45:30  MODIFIED   pairs-map-quota-6-cbgj7   0/1     Completed           0          2s    10.244.2.28   hh-lake-worker   <none>           <none>
+09:45:30  MODIFIED   pairs-map-quota-7-b7f9k   0/1     Completed           0          2s    10.244.2.27   hh-lake-worker   <none>           <none>
+09:45:31  MODIFIED   pairs-map-quota-6-cbgj7   0/1     Completed           0          3s    10.244.2.28   hh-lake-worker   <none>           <none>
+09:45:31  MODIFIED   pairs-map-quota-7-b7f9k   0/1     Completed           0          3s    10.244.2.27   hh-lake-worker   <none>           <none>
+09:45:31  MODIFIED   pairs-map-quota-6-cbgj7   0/1     Completed           0          3s    10.244.2.28   hh-lake-worker   <none>           <none>
+09:45:31  MODIFIED   pairs-map-quota-7-b7f9k   0/1     Completed           0          3s    10.244.2.27   hh-lake-worker   <none>           <none>
+
+$ kubectl -n team-php get job pairs-map-quota -o wide
+NAME              STATUS     COMPLETIONS   DURATION   AGE   CONTAINERS   IMAGES             SELECTOR
+pairs-map-quota   Complete   8/8           18s        59s   pairs        hhlake-pairs:hw5   batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+
+$ kubectl -n team-php describe job pairs-map-quota
+Name:                        pairs-map-quota
+Namespace:                   team-php
+Selector:                    batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+Labels:                      app=pairs
+                             batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                             batch.kubernetes.io/job-name=pairs-map-quota
+                             controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                             job-name=pairs-map-quota
+                             run=quota
+Annotations:                 <none>
+Parallelism:                 4
+Completions:                 8
+Completion Mode:             Indexed
+Suspend:                     false
+Backoff Limit:               2147483647
+TTL Seconds After Finished:  86400
+Start Time:                  Tue, 10 Nov 2026 12:45:13 +0300
+Completed At:                Tue, 10 Nov 2026 12:45:31 +0300
+Duration:                    18s
+Pods Statuses:               0 Active (0 Ready) / 8 Succeeded / 0 Failed
+Completed Indexes:           0-7
+Pod Template:
+  Labels:  app=pairs
+           batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+           batch.kubernetes.io/job-name=pairs-map-quota
+           controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+           job-name=pairs-map-quota
+           run=quota
+  Containers:
+   pairs:
+    Image:      hhlake-pairs:hw5
+    Port:       <none>
+    Host Port:  <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      quota
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:  http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:     (v1:spec.nodeName)
+    Mounts:         <none>
+  Volumes:          <none>
+  Node-Selectors:   <none>
+  Tolerations:      <none>
+Events:
+  Type     Reason            Age                From            Message
+  ----     ------            ----               ----            -------
+  Normal   SuccessfulCreate  59s                job-controller  Created pod: pairs-map-quota-0-zg6qh
+  Warning  FailedCreate      59s                job-controller  Error creating: pods "pairs-map-quota-2-zfmtx" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+  Normal   SuccessfulCreate  59s                job-controller  Created pod: pairs-map-quota-1-cgjl9
+  Warning  FailedCreate      58s                job-controller  Error creating: pods "pairs-map-quota-2-dcdms" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+  Warning  FailedCreate      57s                job-controller  Error creating: pods "pairs-map-quota-2-r94pv" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+  Warning  FailedCreate      54s                job-controller  Error creating: pods "pairs-map-quota-2-2rdrx" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+  Normal   SuccessfulCreate  53s                job-controller  Created pod: pairs-map-quota-2-cbn22
+  Warning  FailedCreate      53s                job-controller  Error creating: pods "pairs-map-quota-4-pmd6x" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+  Normal   SuccessfulCreate  53s                job-controller  Created pod: pairs-map-quota-3-46wj7
+  Warning  FailedCreate      52s                job-controller  Error creating: pods "pairs-map-quota-4-85kvb" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+  Warning  FailedCreate      51s                job-controller  Error creating: pods "pairs-map-quota-4-7bmsk" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+  Warning  FailedCreate      49s                job-controller  Error creating: pods "pairs-map-quota-4-csc9k" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+  Normal   SuccessfulCreate  48s                job-controller  Created pod: pairs-map-quota-4-4hhvm
+  Warning  FailedCreate      48s                job-controller  Error creating: pods "pairs-map-quota-6-s7f6g" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+  Normal   SuccessfulCreate  48s                job-controller  Created pod: pairs-map-quota-5-fk96s
+  Warning  FailedCreate      45s (x3 over 47s)  job-controller  (combined from similar events): Error creating: pods "pairs-map-quota-6-2n575" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+  Normal   SuccessfulCreate  44s                job-controller  Created pod: pairs-map-quota-6-cbgj7
+  Normal   SuccessfulCreate  44s                job-controller  Created pod: pairs-map-quota-7-b7f9k
+  Normal   Completed         41s                job-controller  Job completed
+
+$ kubectl -n team-php get pods -l batch.kubernetes.io/job-name=pairs-map-quota -o wide
+NAME                      READY   STATUS      RESTARTS   AGE   IP            NODE             NOMINATED NODE   READINESS GATES
+pairs-map-quota-0-zg6qh   0/1     Completed   0          59s   10.244.2.21   hh-lake-worker   <none>           <none>
+pairs-map-quota-1-cgjl9   0/1     Completed   0          59s   10.244.2.22   hh-lake-worker   <none>           <none>
+pairs-map-quota-2-cbn22   0/1     Completed   0          53s   10.244.2.23   hh-lake-worker   <none>           <none>
+pairs-map-quota-3-46wj7   0/1     Completed   0          53s   10.244.2.24   hh-lake-worker   <none>           <none>
+pairs-map-quota-4-4hhvm   0/1     Completed   0          48s   10.244.2.25   hh-lake-worker   <none>           <none>
+pairs-map-quota-5-fk96s   0/1     Completed   0          48s   10.244.2.26   hh-lake-worker   <none>           <none>
+pairs-map-quota-6-cbgj7   0/1     Completed   0          44s   10.244.2.28   hh-lake-worker   <none>           <none>
+pairs-map-quota-7-b7f9k   0/1     Completed   0          44s   10.244.2.27   hh-lake-worker   <none>           <none>
+
+$ kubectl -n team-php describe pod/pairs-map-quota-0-zg6qh
+Name:             pairs-map-quota-0-zg6qh
+Namespace:        team-php
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:45:13 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  batch.kubernetes.io/job-completion-index=0
+                  batch.kubernetes.io/job-name=pairs-map-quota
+                  controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  job-name=pairs-map-quota
+                  run=quota
+Annotations:      batch.kubernetes.io/job-completion-index: 0
+                  batch.kubernetes.io/job-index-failure-count: 0
+                  kubernetes.io/limit-ranger: LimitRanger plugin set: cpu, memory request for container pairs; cpu, memory limit for container pairs
+Status:           Succeeded
+IP:               10.244.2.21
+IPs:
+  IP:           10.244.2.21
+Controlled By:  Job/pairs-map-quota
+Containers:
+  pairs:
+    Container ID:  containerd://222504c9ffe7f77fd88037126d3a49b31b9d65c71ea1cbbc70f498a5bc8b0527
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      quota
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:45:14 +0300
+      Finished:     Tue, 10 Nov 2026 12:45:17 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-hh6nr (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-hh6nr:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  60s   default-scheduler  Successfully assigned team-php/pairs-map-quota-0-zg6qh to hh-lake-worker
+  Normal  Pulled     59s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    59s   kubelet            Container created
+  Normal  Started    59s   kubelet            Container started
+
+$ kubectl -n team-php get pod/pairs-map-quota-0-zg6qh -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:45:14Z finished=2026-11-10T09:45:17Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n team-php logs pod/pairs-map-quota-0-zg6qh
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 0/8: range [0, 105,952,423) chunk 32.0 MiB pod pairs-map-quota-0 node hh-lake-worker
+  chunk [222, 33,555,287)  records 8,969  variant 169
+  chunk [33,555,287, 67,111,156)  records 9,119  variant 147
+  chunk [67,111,156, 100,666,764)  records 9,059  variant 161
+  chunk [100,666,764, 105,958,703)  records 1,417  variant 25
+aligned [222, 105,958,703) records 28,564 variant 502 keys 3,549 time 1.9 s
+memory {"ru_maxrss_mib": 112.7, "cgroup_memory_peak_mib": 110.7, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n team-php describe pod/pairs-map-quota-1-cgjl9
+Name:             pairs-map-quota-1-cgjl9
+Namespace:        team-php
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:45:13 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  batch.kubernetes.io/job-completion-index=1
+                  batch.kubernetes.io/job-name=pairs-map-quota
+                  controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  job-name=pairs-map-quota
+                  run=quota
+Annotations:      batch.kubernetes.io/job-completion-index: 1
+                  batch.kubernetes.io/job-index-failure-count: 0
+                  kubernetes.io/limit-ranger: LimitRanger plugin set: cpu, memory request for container pairs; cpu, memory limit for container pairs
+Status:           Succeeded
+IP:               10.244.2.22
+IPs:
+  IP:           10.244.2.22
+Controlled By:  Job/pairs-map-quota
+Containers:
+  pairs:
+    Container ID:  containerd://1bc98b462d6d4f3f8f8b188507e469b4c9437412df01cf2dbc3b9e6b7e11061e
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      quota
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:45:14 +0300
+      Finished:     Tue, 10 Nov 2026 12:45:17 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-xhk6h (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-xhk6h:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  60s   default-scheduler  Successfully assigned team-php/pairs-map-quota-1-cgjl9 to hh-lake-worker
+  Normal  Pulled     59s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    59s   kubelet            Container created
+  Normal  Started    59s   kubelet            Container started
+
+$ kubectl -n team-php get pod/pairs-map-quota-1-cgjl9 -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:45:14Z finished=2026-11-10T09:45:17Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n team-php logs pod/pairs-map-quota-1-cgjl9
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 1/8: range [105,952,423, 211,904,846) chunk 32.0 MiB pod pairs-map-quota-1 node hh-lake-worker
+  chunk [105,958,703, 139,509,348)  records 9,156  variant 158
+  chunk [139,509,348, 173,064,895)  records 9,342  variant 211
+  chunk [173,064,895, 206,620,349)  records 9,264  variant 162
+  chunk [206,620,349, 211,909,622)  records 1,434  variant 25
+aligned [105,958,703, 211,909,622) records 29,196 variant 556 keys 4,398 time 1.7 s
+memory {"ru_maxrss_mib": 112.8, "cgroup_memory_peak_mib": 112.3, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n team-php describe pod/pairs-map-quota-2-cbn22
+Name:             pairs-map-quota-2-cbn22
+Namespace:        team-php
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:45:19 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  batch.kubernetes.io/job-completion-index=2
+                  batch.kubernetes.io/job-name=pairs-map-quota
+                  controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  job-name=pairs-map-quota
+                  run=quota
+Annotations:      batch.kubernetes.io/job-completion-index: 2
+                  batch.kubernetes.io/job-index-failure-count: 0
+                  kubernetes.io/limit-ranger: LimitRanger plugin set: cpu, memory request for container pairs; cpu, memory limit for container pairs
+Status:           Succeeded
+IP:               10.244.2.23
+IPs:
+  IP:           10.244.2.23
+Controlled By:  Job/pairs-map-quota
+Containers:
+  pairs:
+    Container ID:  containerd://5a55edbaa0ef8c8d584be06ccc2e5d2cbec5ded7fd36a65127046ba106c23738
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      quota
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:45:19 +0300
+      Finished:     Tue, 10 Nov 2026 12:45:21 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-7w4gm (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-7w4gm:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  54s   default-scheduler  Successfully assigned team-php/pairs-map-quota-2-cbn22 to hh-lake-worker
+  Normal  Pulled     54s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    54s   kubelet            Container created
+  Normal  Started    54s   kubelet            Container started
+
+$ kubectl -n team-php get pod/pairs-map-quota-2-cbn22 -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:45:19Z finished=2026-11-10T09:45:21Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n team-php logs pod/pairs-map-quota-2-cbn22
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 2/8: range [211,904,846, 317,857,269) chunk 32.0 MiB pod pairs-map-quota-2 node hh-lake-worker
+  chunk [211,909,622, 245,459,690)  records 9,164  variant 162
+  chunk [245,459,690, 279,015,974)  records 8,999  variant 153
+  chunk [279,015,974, 312,573,321)  records 9,132  variant 142
+  chunk [312,573,321, 317,857,720)  records 1,444  variant 19
+aligned [211,909,622, 317,857,720) records 28,739 variant 476 keys 3,852 time 1.0 s
+memory {"ru_maxrss_mib": 113.5, "cgroup_memory_peak_mib": 107.0, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n team-php describe pod/pairs-map-quota-3-46wj7
+Name:             pairs-map-quota-3-46wj7
+Namespace:        team-php
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:45:19 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  batch.kubernetes.io/job-completion-index=3
+                  batch.kubernetes.io/job-name=pairs-map-quota
+                  controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  job-name=pairs-map-quota
+                  run=quota
+Annotations:      batch.kubernetes.io/job-completion-index: 3
+                  batch.kubernetes.io/job-index-failure-count: 0
+                  kubernetes.io/limit-ranger: LimitRanger plugin set: cpu, memory request for container pairs; cpu, memory limit for container pairs
+Status:           Succeeded
+IP:               10.244.2.24
+IPs:
+  IP:           10.244.2.24
+Controlled By:  Job/pairs-map-quota
+Containers:
+  pairs:
+    Container ID:  containerd://0db3ba5dc3688731689f3e211313bf6dc0b350ed0fe0b491691562b3f9c81101
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      quota
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:45:19 +0300
+      Finished:     Tue, 10 Nov 2026 12:45:21 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-spprn (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-spprn:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  54s   default-scheduler  Successfully assigned team-php/pairs-map-quota-3-46wj7 to hh-lake-worker
+  Normal  Pulled     54s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    54s   kubelet            Container created
+  Normal  Started    54s   kubelet            Container started
+
+$ kubectl -n team-php get pod/pairs-map-quota-3-46wj7 -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:45:19Z finished=2026-11-10T09:45:21Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n team-php logs pod/pairs-map-quota-3-46wj7
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 3/8: range [317,857,269, 423,809,692) chunk 32.0 MiB pod pairs-map-quota-3 node hh-lake-worker
+  chunk [317,857,720, 351,414,642)  records 9,454  variant 202
+  chunk [351,414,642, 384,966,947)  records 9,057  variant 247
+  chunk [384,966,947, 418,521,307)  records 9,158  variant 245
+  chunk [418,521,307, 423,810,887)  records 1,417  variant 39
+aligned [317,857,720, 423,810,887) records 29,086 variant 733 keys 5,212 time 1.0 s
+memory {"ru_maxrss_mib": 113.4, "cgroup_memory_peak_mib": 107.1, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n team-php describe pod/pairs-map-quota-4-4hhvm
+Name:             pairs-map-quota-4-4hhvm
+Namespace:        team-php
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:45:24 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  batch.kubernetes.io/job-completion-index=4
+                  batch.kubernetes.io/job-name=pairs-map-quota
+                  controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  job-name=pairs-map-quota
+                  run=quota
+Annotations:      batch.kubernetes.io/job-completion-index: 4
+                  batch.kubernetes.io/job-index-failure-count: 0
+                  kubernetes.io/limit-ranger: LimitRanger plugin set: cpu, memory request for container pairs; cpu, memory limit for container pairs
+Status:           Succeeded
+IP:               10.244.2.25
+IPs:
+  IP:           10.244.2.25
+Controlled By:  Job/pairs-map-quota
+Containers:
+  pairs:
+    Container ID:  containerd://ba493b7b10e11b9b21dedd18baffed63d565458fdef195e162d57a41ac86413a
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      quota
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:45:25 +0300
+      Finished:     Tue, 10 Nov 2026 12:45:26 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-9mfb7 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-9mfb7:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  49s   default-scheduler  Successfully assigned team-php/pairs-map-quota-4-4hhvm to hh-lake-worker
+  Normal  Pulled     49s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    49s   kubelet            Container created
+  Normal  Started    48s   kubelet            Container started
+
+$ kubectl -n team-php get pod/pairs-map-quota-4-4hhvm -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:45:25Z finished=2026-11-10T09:45:26Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n team-php logs pod/pairs-map-quota-4-4hhvm
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 4/8: range [423,809,692, 529,762,115) chunk 32.0 MiB pod pairs-map-quota-4 node hh-lake-worker
+  chunk [423,810,887, 457,364,993)  records 9,054  variant 229
+  chunk [457,364,993, 490,920,047)  records 8,967  variant 163
+  chunk [490,920,047, 524,474,427)  records 9,395  variant 286
+  chunk [524,474,427, 529,763,672)  records 1,499  variant 49
+aligned [423,810,887, 529,763,672) records 28,915 variant 727 keys 4,697 time 0.8 s
+memory {"ru_maxrss_mib": 113.2, "cgroup_memory_peak_mib": 109.4, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n team-php describe pod/pairs-map-quota-5-fk96s
+Name:             pairs-map-quota-5-fk96s
+Namespace:        team-php
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:45:24 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  batch.kubernetes.io/job-completion-index=5
+                  batch.kubernetes.io/job-name=pairs-map-quota
+                  controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  job-name=pairs-map-quota
+                  run=quota
+Annotations:      batch.kubernetes.io/job-completion-index: 5
+                  batch.kubernetes.io/job-index-failure-count: 0
+                  kubernetes.io/limit-ranger: LimitRanger plugin set: cpu, memory request for container pairs; cpu, memory limit for container pairs
+Status:           Succeeded
+IP:               10.244.2.26
+IPs:
+  IP:           10.244.2.26
+Controlled By:  Job/pairs-map-quota
+Containers:
+  pairs:
+    Container ID:  containerd://f74c66460a146b0e647406ed9db46eefca027d9e9f1243d2b6ab96425b531d4e
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      quota
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:45:25 +0300
+      Finished:     Tue, 10 Nov 2026 12:45:26 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-k7skk (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-k7skk:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  49s   default-scheduler  Successfully assigned team-php/pairs-map-quota-5-fk96s to hh-lake-worker
+  Normal  Pulled     49s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    49s   kubelet            Container created
+  Normal  Started    48s   kubelet            Container started
+
+$ kubectl -n team-php get pod/pairs-map-quota-5-fk96s -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:45:25Z finished=2026-11-10T09:45:26Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n team-php logs pod/pairs-map-quota-5-fk96s
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 5/8: range [529,762,115, 635,714,538) chunk 32.0 MiB pod pairs-map-quota-5 node hh-lake-worker
+  chunk [529,763,672, 563,320,934)  records 9,098  variant 253
+  chunk [563,320,934, 596,874,265)  records 8,852  variant 255
+  chunk [596,874,265, 630,428,663)  records 8,994  variant 278
+  chunk [630,428,663, 635,715,091)  records 1,500  variant 37
+aligned [529,763,672, 635,715,091) records 28,444 variant 823 keys 6,288 time 0.8 s
+memory {"ru_maxrss_mib": 113.6, "cgroup_memory_peak_mib": 109.5, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n team-php describe pod/pairs-map-quota-6-cbgj7
+Name:             pairs-map-quota-6-cbgj7
+Namespace:        team-php
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:45:28 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  batch.kubernetes.io/job-completion-index=6
+                  batch.kubernetes.io/job-name=pairs-map-quota
+                  controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  job-name=pairs-map-quota
+                  run=quota
+Annotations:      batch.kubernetes.io/job-completion-index: 6
+                  batch.kubernetes.io/job-index-failure-count: 0
+                  kubernetes.io/limit-ranger: LimitRanger plugin set: cpu, memory request for container pairs; cpu, memory limit for container pairs
+Status:           Succeeded
+IP:               10.244.2.28
+IPs:
+  IP:           10.244.2.28
+Controlled By:  Job/pairs-map-quota
+Containers:
+  pairs:
+    Container ID:  containerd://2d3c510f31e59f82c266b2efdb45ce608d12f6b9b737c75c1544ee0a8908b0e8
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      quota
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:45:29 +0300
+      Finished:     Tue, 10 Nov 2026 12:45:30 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-zxrhz (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-zxrhz:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  45s   default-scheduler  Successfully assigned team-php/pairs-map-quota-6-cbgj7 to hh-lake-worker
+  Normal  Pulled     44s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    44s   kubelet            Container created
+  Normal  Started    44s   kubelet            Container started
+
+$ kubectl -n team-php get pod/pairs-map-quota-6-cbgj7 -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:45:29Z finished=2026-11-10T09:45:30Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n team-php logs pod/pairs-map-quota-6-cbgj7
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 6/8: range [635,714,538, 741,666,961) chunk 32.0 MiB pod pairs-map-quota-6 node hh-lake-worker
+  chunk [635,715,091, 669,270,538)  records 9,222  variant 245
+  chunk [669,270,538, 702,825,154)  records 8,846  variant 201
+  chunk [702,825,154, 736,379,359)  records 8,935  variant 254
+  chunk [736,379,359, 741,667,049)  records 1,397  variant 34
+aligned [635,715,091, 741,667,049) records 28,400 variant 734 keys 5,199 time 0.8 s
+memory {"ru_maxrss_mib": 113.5, "cgroup_memory_peak_mib": 108.9, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n team-php describe pod/pairs-map-quota-7-b7f9k
+Name:             pairs-map-quota-7-b7f9k
+Namespace:        team-php
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:45:28 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  batch.kubernetes.io/job-completion-index=7
+                  batch.kubernetes.io/job-name=pairs-map-quota
+                  controller-uid=9b69f16f-ee82-4d93-9223-d114d2697ec5
+                  job-name=pairs-map-quota
+                  run=quota
+Annotations:      batch.kubernetes.io/job-completion-index: 7
+                  batch.kubernetes.io/job-index-failure-count: 0
+                  kubernetes.io/limit-ranger: LimitRanger plugin set: cpu, memory request for container pairs; cpu, memory limit for container pairs
+Status:           Succeeded
+IP:               10.244.2.27
+IPs:
+  IP:           10.244.2.27
+Controlled By:  Job/pairs-map-quota
+Containers:
+  pairs:
+    Container ID:  containerd://69c8b5cf3a5ab6ea2e6b98c1db7fbee4ecfaec14cba042659109aa22a7712e72
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      map
+      --parts
+      8
+      --chunk-mib
+      32
+      --run
+      quota
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 10 Nov 2026 12:45:29 +0300
+      Finished:     Tue, 10 Nov 2026 12:45:30 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  208Mi
+    Requests:
+      cpu:     500m
+      memory:  208Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:           http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:              (v1:spec.nodeName)
+      JOB_COMPLETION_INDEX:   (v1:metadata.labels['batch.kubernetes.io/job-completion-index'])
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-hczlt (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-hczlt:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  45s   default-scheduler  Successfully assigned team-php/pairs-map-quota-7-b7f9k to hh-lake-worker
+  Normal  Pulled     44s   kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    44s   kubelet            Container created
+  Normal  Started    44s   kubelet            Container started
+
+$ kubectl -n team-php get pod/pairs-map-quota-7-b7f9k -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=Completed exitCode=0 started=2026-11-10T09:45:29Z finished=2026-11-10T09:45:30Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True PodCompleted
+Ready=False PodCompleted
+ContainersReady=False PodCompleted
+PodScheduled=True 
+
+$ kubectl -n team-php logs pod/pairs-map-quota-7-b7f9k
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+map 7/8: range [741,666,961, 847,619,384) chunk 32.0 MiB pod pairs-map-quota-7 node hh-lake-worker
+  chunk [741,667,049, 775,224,214)  records 8,823  variant 231
+  chunk [775,224,214, 808,778,103)  records 8,913  variant 265
+  chunk [808,778,103, 842,331,627)  records 8,927  variant 288
+  chunk [842,331,627, 847,619,384)  records 1,381  variant 47
+aligned [741,667,049, 847,619,384) records 28,044 variant 831 keys 6,016 time 0.8 s
+memory {"ru_maxrss_mib": 113.8, "cgroup_memory_peak_mib": 108.1, "cgroup_memory_max_mib": 208.0}
+
+$ kubectl -n team-php get events --sort-by=.lastTimestamp -o custom-columns=... | grep -E 'LAST|pairs-map-quota'
+LAST                   TYPE      REASON             OBJECT                    MESSAGE
+2026-11-10T09:45:13Z   Normal    SuccessfulCreate   pairs-map-quota           Created pod: pairs-map-quota-0-zg6qh
+2026-11-10T09:45:13Z   Warning   FailedCreate       pairs-map-quota           Error creating: pods "pairs-map-quota-2-zfmtx" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+2026-11-10T09:45:13Z   Normal    Scheduled          pairs-map-quota-0-zg6qh   Successfully assigned team-php/pairs-map-quota-0-zg6qh to hh-lake-worker
+2026-11-10T09:45:13Z   Normal    SuccessfulCreate   pairs-map-quota           Created pod: pairs-map-quota-1-cgjl9
+2026-11-10T09:45:13Z   Normal    Scheduled          pairs-map-quota-1-cgjl9   Successfully assigned team-php/pairs-map-quota-1-cgjl9 to hh-lake-worker
+2026-11-10T09:45:14Z   Normal    Created            pairs-map-quota-1-cgjl9   Container created
+2026-11-10T09:45:14Z   Normal    Pulled             pairs-map-quota-1-cgjl9   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:45:14Z   Normal    Started            pairs-map-quota-1-cgjl9   Container started
+2026-11-10T09:45:14Z   Warning   FailedCreate       pairs-map-quota           Error creating: pods "pairs-map-quota-2-dcdms" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+2026-11-10T09:45:14Z   Normal    Started            pairs-map-quota-0-zg6qh   Container started
+2026-11-10T09:45:14Z   Normal    Created            pairs-map-quota-0-zg6qh   Container created
+2026-11-10T09:45:14Z   Normal    Pulled             pairs-map-quota-0-zg6qh   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:45:15Z   Warning   FailedCreate       pairs-map-quota           Error creating: pods "pairs-map-quota-2-r94pv" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+2026-11-10T09:45:18Z   Warning   FailedCreate       pairs-map-quota           Error creating: pods "pairs-map-quota-2-2rdrx" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+2026-11-10T09:45:19Z   Normal    Scheduled          pairs-map-quota-3-46wj7   Successfully assigned team-php/pairs-map-quota-3-46wj7 to hh-lake-worker
+2026-11-10T09:45:19Z   Normal    Created            pairs-map-quota-3-46wj7   Container created
+2026-11-10T09:45:19Z   Normal    Started            pairs-map-quota-3-46wj7   Container started
+2026-11-10T09:45:19Z   Normal    SuccessfulCreate   pairs-map-quota           Created pod: pairs-map-quota-3-46wj7
+2026-11-10T09:45:19Z   Warning   FailedCreate       pairs-map-quota           Error creating: pods "pairs-map-quota-4-pmd6x" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+2026-11-10T09:45:19Z   Normal    SuccessfulCreate   pairs-map-quota           Created pod: pairs-map-quota-2-cbn22
+2026-11-10T09:45:19Z   Normal    Scheduled          pairs-map-quota-2-cbn22   Successfully assigned team-php/pairs-map-quota-2-cbn22 to hh-lake-worker
+2026-11-10T09:45:19Z   Normal    Pulled             pairs-map-quota-2-cbn22   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:45:19Z   Normal    Created            pairs-map-quota-2-cbn22   Container created
+2026-11-10T09:45:19Z   Normal    Started            pairs-map-quota-2-cbn22   Container started
+2026-11-10T09:45:19Z   Normal    Pulled             pairs-map-quota-3-46wj7   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:45:20Z   Warning   FailedCreate       pairs-map-quota           Error creating: pods "pairs-map-quota-4-85kvb" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+2026-11-10T09:45:21Z   Warning   FailedCreate       pairs-map-quota           Error creating: pods "pairs-map-quota-4-7bmsk" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+2026-11-10T09:45:23Z   Warning   FailedCreate       pairs-map-quota           Error creating: pods "pairs-map-quota-4-csc9k" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+2026-11-10T09:45:24Z   Normal    Pulled             pairs-map-quota-5-fk96s   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:45:24Z   Normal    SuccessfulCreate   pairs-map-quota           Created pod: pairs-map-quota-5-fk96s
+2026-11-10T09:45:24Z   Warning   FailedCreate       pairs-map-quota           Error creating: pods "pairs-map-quota-6-s7f6g" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+2026-11-10T09:45:24Z   Normal    SuccessfulCreate   pairs-map-quota           Created pod: pairs-map-quota-4-4hhvm
+2026-11-10T09:45:24Z   Normal    Scheduled          pairs-map-quota-4-4hhvm   Successfully assigned team-php/pairs-map-quota-4-4hhvm to hh-lake-worker
+2026-11-10T09:45:24Z   Normal    Pulled             pairs-map-quota-4-4hhvm   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:45:24Z   Normal    Created            pairs-map-quota-4-4hhvm   Container created
+2026-11-10T09:45:24Z   Normal    Scheduled          pairs-map-quota-5-fk96s   Successfully assigned team-php/pairs-map-quota-5-fk96s to hh-lake-worker
+2026-11-10T09:45:24Z   Normal    Created            pairs-map-quota-5-fk96s   Container created
+2026-11-10T09:45:25Z   Normal    Started            pairs-map-quota-4-4hhvm   Container started
+2026-11-10T09:45:25Z   Normal    Started            pairs-map-quota-5-fk96s   Container started
+2026-11-10T09:45:27Z   Warning   FailedCreate       pairs-map-quota           (combined from similar events): Error creating: pods "pairs-map-quota-6-2n575" is forbidden: exceeded quota: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+2026-11-10T09:45:28Z   Normal    Scheduled          pairs-map-quota-7-b7f9k   Successfully assigned team-php/pairs-map-quota-7-b7f9k to hh-lake-worker
+2026-11-10T09:45:28Z   Normal    SuccessfulCreate   pairs-map-quota           Created pod: pairs-map-quota-7-b7f9k
+2026-11-10T09:45:28Z   Normal    Scheduled          pairs-map-quota-6-cbgj7   Successfully assigned team-php/pairs-map-quota-6-cbgj7 to hh-lake-worker
+2026-11-10T09:45:28Z   Normal    SuccessfulCreate   pairs-map-quota           Created pod: pairs-map-quota-6-cbgj7
+2026-11-10T09:45:29Z   Normal    Pulled             pairs-map-quota-6-cbgj7   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:45:29Z   Normal    Pulled             pairs-map-quota-7-b7f9k   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:45:29Z   Normal    Created            pairs-map-quota-7-b7f9k   Container created
+2026-11-10T09:45:29Z   Normal    Started            pairs-map-quota-7-b7f9k   Container started
+2026-11-10T09:45:29Z   Normal    Created            pairs-map-quota-6-cbgj7   Container created
+2026-11-10T09:45:29Z   Normal    Started            pairs-map-quota-6-cbgj7   Container started
+2026-11-10T09:45:31Z   Normal    Completed          pairs-map-quota           Job completed
+$ kubectl -n team-php describe resourcequota team-php-quota
+Name:            team-php-quota
+Namespace:       team-php
+Resource         Used  Hard
+--------         ----  ----
+limits.cpu       0     4
+limits.memory    0     512Mi
+pods             0     4
+requests.cpu     0     2
+requests.memory  0     512Mi
+

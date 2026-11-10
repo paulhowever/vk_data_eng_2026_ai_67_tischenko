@@ -1,0 +1,176 @@
+$ kubectl -n hh-lake get job pairs-full-oom -o wide
+NAME             STATUS   COMPLETIONS   DURATION   AGE   CONTAINERS   IMAGES             SELECTOR
+pairs-full-oom   Failed   0/1           7s         7s    pairs        hhlake-pairs:hw5   batch.kubernetes.io/controller-uid=54d3b71c-de88-4d7c-983b-2cf8e7cddb5c
+
+$ kubectl -n hh-lake describe job pairs-full-oom
+Name:                        pairs-full-oom
+Namespace:                   hh-lake
+Selector:                    batch.kubernetes.io/controller-uid=54d3b71c-de88-4d7c-983b-2cf8e7cddb5c
+Labels:                      app=pairs
+                             batch.kubernetes.io/controller-uid=54d3b71c-de88-4d7c-983b-2cf8e7cddb5c
+                             batch.kubernetes.io/job-name=pairs-full-oom
+                             controller-uid=54d3b71c-de88-4d7c-983b-2cf8e7cddb5c
+                             job-name=pairs-full-oom
+                             run=full-oom
+Annotations:                 <none>
+Parallelism:                 1
+Completions:                 1
+Completion Mode:             NonIndexed
+Suspend:                     false
+Backoff Limit:               0
+TTL Seconds After Finished:  86400
+Start Time:                  Tue, 10 Nov 2026 12:36:24 +0300
+Pods Statuses:               0 Active (0 Ready) / 0 Succeeded / 1 Failed
+Pod Template:
+  Labels:  app=pairs
+           batch.kubernetes.io/controller-uid=54d3b71c-de88-4d7c-983b-2cf8e7cddb5c
+           batch.kubernetes.io/job-name=pairs-full-oom
+           controller-uid=54d3b71c-de88-4d7c-983b-2cf8e7cddb5c
+           job-name=pairs-full-oom
+           run=full-oom
+  Containers:
+   pairs:
+    Image:      hhlake-pairs:hw5
+    Port:       <none>
+    Host Port:  <none>
+    Args:
+      full
+      --chunk-mib
+      32
+    Limits:
+      cpu:     1
+      memory:  128Mi
+    Requests:
+      cpu:     500m
+      memory:  128Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:  http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:     (v1:spec.nodeName)
+    Mounts:         <none>
+  Volumes:          <none>
+  Node-Selectors:   <none>
+  Tolerations:      <none>
+Events:
+  Type     Reason                Age   From            Message
+  ----     ------                ----  ----            -------
+  Normal   SuccessfulCreate      7s    job-controller  Created pod: pairs-full-oom-h4j97
+  Warning  BackoffLimitExceeded  1s    job-controller  Job has reached the specified backoff limit
+
+$ kubectl -n hh-lake get pods -l batch.kubernetes.io/job-name=pairs-full-oom -o wide
+NAME                   READY   STATUS      RESTARTS   AGE   IP           NODE             NOMINATED NODE   READINESS GATES
+pairs-full-oom-h4j97   0/1     OOMKilled   0          7s    10.244.2.2   hh-lake-worker   <none>           <none>
+
+$ kubectl -n hh-lake describe pod/pairs-full-oom-h4j97
+Name:             pairs-full-oom-h4j97
+Namespace:        hh-lake
+Priority:         0
+Service Account:  default
+Node:             hh-lake-worker/172.23.0.4
+Start Time:       Tue, 10 Nov 2026 12:36:24 +0300
+Labels:           app=pairs
+                  batch.kubernetes.io/controller-uid=54d3b71c-de88-4d7c-983b-2cf8e7cddb5c
+                  batch.kubernetes.io/job-name=pairs-full-oom
+                  controller-uid=54d3b71c-de88-4d7c-983b-2cf8e7cddb5c
+                  job-name=pairs-full-oom
+                  run=full-oom
+Annotations:      <none>
+Status:           Failed
+IP:               10.244.2.2
+IPs:
+  IP:           10.244.2.2
+Controlled By:  Job/pairs-full-oom
+Containers:
+  pairs:
+    Container ID:  containerd://9244f477b9953f84ffd869feb4f4f208047ea1eeb79f5a45135b554ab33eefb4
+    Image:         hhlake-pairs:hw5
+    Image ID:      docker.io/library/import-2026-11-10@sha256:19443621366697dac56e6fbe3a454244a46e8b247efec46d0ea92af44b14483e
+    Port:          <none>
+    Host Port:     <none>
+    Args:
+      full
+      --chunk-mib
+      32
+    State:          Terminated
+      Reason:       OOMKilled
+      Exit Code:    137
+      Started:      Tue, 10 Nov 2026 12:36:25 +0300
+      Finished:     Tue, 10 Nov 2026 12:36:28 +0300
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     1
+      memory:  128Mi
+    Requests:
+      cpu:     500m
+      memory:  128Mi
+    Environment Variables from:
+      hh-lake-s3  Secret  Optional: false
+    Environment:
+      S3_ENDPOINT:  http://rustfs.hh-lake.svc.cluster.local:9000
+      NODE_NAME:     (v1:spec.nodeName)
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-crcb2 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-crcb2:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  7s    default-scheduler  Successfully assigned hh-lake/pairs-full-oom-h4j97 to hh-lake-worker
+  Normal  Pulled     6s    kubelet            Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+  Normal  Created    6s    kubelet            Container created
+  Normal  Started    6s    kubelet            Container started
+
+$ kubectl -n hh-lake get pod/pairs-full-oom-h4j97 -o jsonpath={range .status.containerStatuses[*]}{.name} reason={.state.terminated.reason} exitCode={.state.terminated.exitCode} started={.state.terminated.startedAt} finished={.state.terminated.finishedAt}{"\n"}{end}{range .status.conditions[*]}{.type}={.status} {.reason}{"\n"}{end}
+pairs reason=OOMKilled exitCode=137 started=2026-11-10T09:36:25Z finished=2026-11-10T09:36:28Z
+PodReadyToStartContainers=False PodSandboxNotReady
+Initialized=True 
+Ready=False PodFailed
+ContainersReady=False PodFailed
+PodScheduled=True 
+
+$ kubectl -n hh-lake logs pod/pairs-full-oom-h4j97
+endpoint http://rustfs.hh-lake.svc.cluster.local:9000 bucket hh-lake
+full: object s3://hh-lake/raw/it_vacancies_2024.csv size 847,619,384 B, chunk 32.0 MiB
+  chunk [222, 33,555,287)  records 8,969  variant 169
+  chunk [33,555,287, 67,111,156)  records 9,119  variant 147
+  chunk [67,111,156, 100,666,764)  records 9,059  variant 161
+  chunk [100,666,764, 134,222,989)  records 9,114  variant 163
+  chunk [134,222,989, 167,775,029)  records 9,305  variant 192
+  chunk [167,775,029, 201,326,829)  records 9,288  variant 179
+  chunk [201,326,829, 234,885,825)  records 9,178  variant 149
+  chunk [234,885,825, 268,435,470)  records 9,063  variant 175
+  chunk [268,435,470, 301,991,284)  records 9,109  variant 138
+  chunk [301,991,284, 335,549,935)  records 9,310  variant 160
+  chunk [335,549,935, 369,105,733)  records 9,220  variant 248
+  chunk [369,105,733, 402,655,883)  records 9,123  variant 232
+  chunk [402,655,883, 436,209,093)  records 9,033  variant 239
+  chunk [436,209,093, 469,763,676)  records 9,107  variant 202
+  chunk [469,763,676, 503,319,387)  records 9,071  variant 203
+  chunk [503,319,387, 536,875,223)  records 9,474  variant 297
+
+$ kubectl -n hh-lake get events --sort-by=.lastTimestamp -o custom-columns=... | grep -E 'LAST|pairs-full-oom'
+LAST                   TYPE      REASON                  OBJECT                 MESSAGE
+2026-11-10T09:36:24Z   Normal    SuccessfulCreate        pairs-full-oom         Created pod: pairs-full-oom-h4j97
+2026-11-10T09:36:24Z   Normal    Scheduled               pairs-full-oom-h4j97   Successfully assigned hh-lake/pairs-full-oom-h4j97 to hh-lake-worker
+2026-11-10T09:36:25Z   Normal    Started                 pairs-full-oom-h4j97   Container started
+2026-11-10T09:36:25Z   Normal    Created                 pairs-full-oom-h4j97   Container created
+2026-11-10T09:36:25Z   Normal    Pulled                  pairs-full-oom-h4j97   Container image "hhlake-pairs:hw5" already present on machine and can be accessed by the pod
+2026-11-10T09:36:30Z   Warning   BackoffLimitExceeded    pairs-full-oom         Job has reached the specified backoff limit

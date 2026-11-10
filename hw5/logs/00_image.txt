@@ -1,0 +1,48 @@
+$ docker images hhlake-pairs:hw5
+WARNING: This output is designed for human readability. For machine-readable output, please use --format.
+IMAGE              ID             DISK USAGE   CONTENT SIZE   EXTRA
+hhlake-pairs:hw5   72859b78777f        704MB          169MB        
+
+$ docker image inspect hhlake-pairs:hw5 --format {{.Id}} {{.Architecture}} {{.Config.Entrypoint}} {{.Config.User}}
+sha256:72859b78777fa09c2ce83200366b25912eca3e47a73072c0d39d512b249ebb81 arm64 [python -m k8spairs] 10001
+
+$ docker exec hh-lake-worker crictl images
+IMAGE                                           TAG                  IMAGE ID            SIZE
+docker.io/kindest/kindnetd                      v20260820-69b56db7   8e13ccc0aaa68       35.7MB
+docker.io/kindest/local-path-helper             v20260131-7181c60a   8f375e9f93513       2.74MB
+docker.io/kindest/local-path-provisioner        v20260820-69b56db7   0771a8a05619f       14.2MB
+docker.io/library/hhlake-pairs                  hw5                  0c8e66c83c93c       169MB
+docker.io/rustfs/rustfs                         1.0.0                f962960e92fb1       104MB
+registry.k8s.io/coredns/coredns                 v1.14.6              fbccbf70a429f       21.2MB
+registry.k8s.io/etcd                            3.7.0-0              c2e426bbd1cd6       20.5MB
+registry.k8s.io/kube-apiserver-arm64            v1.37.0              6003d52023b9d       97.1MB
+registry.k8s.io/kube-apiserver                  v1.37.0              6003d52023b9d       97.1MB
+registry.k8s.io/kube-controller-manager-arm64   v1.37.0              b1ad0e33c9012       85.1MB
+registry.k8s.io/kube-controller-manager         v1.37.0              b1ad0e33c9012       85.1MB
+registry.k8s.io/kube-proxy-arm64                v1.37.0              550b682d81d41       84.5MB
+registry.k8s.io/kube-proxy                      v1.37.0              550b682d81d41       84.5MB
+registry.k8s.io/kube-scheduler-arm64            v1.37.0              384eabc4fe526       59.1MB
+registry.k8s.io/kube-scheduler                  v1.37.0              384eabc4fe526       59.1MB
+docker.io/library/import-2026-11-10             <none>               44136fa355b36       669kB
+registry.k8s.io/pause                           3.10                 afb61768ce381       268kB
+
+$ docker exec hh-lake-worker2 crictl images
+IMAGE                                           TAG                  IMAGE ID            SIZE
+docker.io/kindest/kindnetd                      v20260820-69b56db7   8e13ccc0aaa68       35.7MB
+docker.io/kindest/local-path-helper             v20260131-7181c60a   8f375e9f93513       2.74MB
+docker.io/kindest/local-path-provisioner        v20260820-69b56db7   0771a8a05619f       14.2MB
+docker.io/library/hhlake-pairs                  hw5                  0c8e66c83c93c       169MB
+docker.io/rustfs/rustfs                         1.0.0                f962960e92fb1       104MB
+registry.k8s.io/coredns/coredns                 v1.14.6              fbccbf70a429f       21.2MB
+registry.k8s.io/etcd                            3.7.0-0              c2e426bbd1cd6       20.5MB
+registry.k8s.io/kube-apiserver-arm64            v1.37.0              6003d52023b9d       97.1MB
+registry.k8s.io/kube-apiserver                  v1.37.0              6003d52023b9d       97.1MB
+registry.k8s.io/kube-controller-manager-arm64   v1.37.0              b1ad0e33c9012       85.1MB
+registry.k8s.io/kube-controller-manager         v1.37.0              b1ad0e33c9012       85.1MB
+registry.k8s.io/kube-proxy-arm64                v1.37.0              550b682d81d41       84.5MB
+registry.k8s.io/kube-proxy                      v1.37.0              550b682d81d41       84.5MB
+registry.k8s.io/kube-scheduler-arm64            v1.37.0              384eabc4fe526       59.1MB
+registry.k8s.io/kube-scheduler                  v1.37.0              384eabc4fe526       59.1MB
+docker.io/library/import-2026-11-10             <none>               44136fa355b36       669kB
+registry.k8s.io/pause                           3.10                 afb61768ce381       268kB
+
