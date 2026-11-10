@@ -1,0 +1,6 @@
+*
+!pyproject.toml
+!uv.lock
+!src/**
+!hw5/app/**
+**/__pycache__
