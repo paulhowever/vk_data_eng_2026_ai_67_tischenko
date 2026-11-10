@@ -8,6 +8,8 @@ DuckDB считают по нему частоты навыков, пар и т�
 Отчёт с выводами, таблицами и графиками: [`report/report.pdf`](report/report.pdf), исходник `report/report.tex`.
 Выводы всех прогонов, на которые ссылается отчёт, лежат в `report/logs/`.
 
+Домашнее задание 5 (Kubernetes) описано в разделе [ДЗ 5](#дз-5-расчёт-пар-навыков-в-kubernetes).
+
 ## Требования
 
 - Docker с Compose v2;
@@ -210,3 +212,90 @@ src/hhlake/nolocal.py    прогон без локального файла
 src/hhlake/bench.py      профилирование
 src/hhlake/memprobe.py   синтетическая нагрузка для проверки измерителя
 ```
+
+## ДЗ 5. Расчёт пар навыков в Kubernetes
+
+Отчёт: [`hw5/report/report.pdf`](hw5/report/report.pdf), исходник `hw5/report/report.tex`. Журналы всех
+запусков лежат в `hw5/logs/`, манифесты в `hw5/k8s/`, вспомогательные скрипты в `hw5/scripts/`.
+
+Нужны Docker, [kind](https://kind.sigs.k8s.io/), `kubectl` и `uv`. Ключи RustFS берутся из `.env` (см. «Настройка»)
+и попадают в кластер только как Secret. Пример Secret с заглушками: `hw5/k8s/secret.example.yaml`.
+
+### Кластер и образ
+
+```bash
+kind create cluster --config hw5/k8s/kind.yaml
+docker build -f hw5/Dockerfile -t hhlake-pairs:hw5 .
+docker tag rustfs/rustfs:latest rustfs/rustfs:1.0.0
+for image in hhlake-pairs:hw5 rustfs/rustfs:1.0.0; do
+  docker save --platform linux/arm64 -o /tmp/image.tar "$image"
+  kind load image-archive --name hh-lake /tmp/image.tar
+done
+```
+
+Кластер `hh-lake`: один control-plane и два worker. Образ содержит пакет `hhlake` и программу
+`hw5/app/k8spairs.py`. Она переиспользует разбиение по диапазонам байт (`hhlake.mr.split`), фильтр варианта и
+нормализацию навыков (`hhlake.mr.jobs`, `hhlake.segment`) из ДЗ 3 и работает в трёх режимах: `full` (весь файл в
+одном поде), `map` (часть файла с номером `JOB_COMPLETION_INDEX`) и `reduce` (сведение частей). Под
+Docker Desktop с containerd image store `kind load docker-image` падает на многоплатформенных образах, поэтому
+образы грузятся через `docker save --platform`.
+
+### RustFS в кластере
+
+```bash
+kubectl apply -f hw5/k8s/namespace.yaml
+hw5/scripts/secret.sh hh-lake
+kubectl apply -f hw5/k8s/rustfs.yaml
+kubectl -n hh-lake rollout status sts/rustfs
+kubectl -n hh-lake port-forward svc/rustfs 29000:9000 &
+S3_ENDPOINT=http://localhost:29000 uv run python -m hhlake.upload
+hw5/scripts/storage.sh
+```
+
+StatefulSet `rustfs` с четырьмя PVC `disk1..disk4` повторяет ДЗ 2: один узел RustFS, erasure set EC 2+2.
+`secret.sh` создаёт Secret `hh-lake-s3` из двух строк `.env` через `--from-env-file`. `storage.sh` показывает, что
+на каждом диске лежит половина объекта, а всего 2,0× его размера.
+
+### Job, OOMKilled и предел памяти
+
+```bash
+kubectl apply -f hw5/k8s/job-full-oom.yaml
+kubectl apply -f hw5/k8s/job-full-measure.yaml
+kubectl apply -f hw5/k8s/job-full.yaml
+hw5/scripts/capture.sh hh-lake pairs-full
+```
+
+`pairs-full-oom` с пределом 128Mi завершается с `OOMKilled`, exit 137. `pairs-full-measure` с пределом 1Gi
+печатает `memory.peak` из cgroup контейнера; запуск повторялся три раза. Предел в `job-full.yaml` равен
+максимальному пику × 1,25 с округлением вверх до 16 МиБ: 208Mi. Расчёт приведён в отчёте.
+
+### Indexed Job и сведение
+
+```bash
+kubectl apply -f hw5/k8s/job-indexed.yaml
+kubectl -n hh-lake wait --for=condition=Complete job/pairs-map --timeout=600s
+kubectl apply -f hw5/k8s/job-reduce.yaml
+S3_ENDPOINT=http://localhost:29000 uv run python hw5/scripts/verify_k2.py indexed full
+```
+
+8 частей файла, по 4 пода одновременно. Каждый под пишет `tmp/k8s/indexed/part-NNN.jsonl` и `meta-NNN.json`,
+`pairs-reduce` сводит их в `results/k8s/indexed/k2.csv`. `verify_k2.py` скачивает результат и сравнивает его с
+`results/mapreduce/k2.csv` из ДЗ 3 через `EXCEPT ALL` в DuckDB в обе стороны.
+
+### Планирование: Pending, вытеснение, квота
+
+```bash
+kubectl apply -f hw5/k8s/job-pending-cpu.yaml
+kubectl apply -f hw5/k8s/priority.yaml
+kubectl apply -f hw5/k8s/job-priority-low.yaml
+kubectl apply -f hw5/k8s/job-priority-high.yaml
+kubectl apply -f hw5/k8s/quota.yaml
+hw5/scripts/secret.sh team-php
+kubectl apply -f hw5/k8s/job-quota.yaml
+```
+
+`pairs-map-cpu` просит 6 CPU на под при 10 CPU на узле, поэтому третий под ждёт в Pending с `Insufficient cpu`.
+`pairs-low` (PriorityClass `batch-low`) занимает оба worker, `pairs-high` (`batch-high`) вытесняет один из его
+подов. В пространстве `team-php` квота `requests.memory: 512Mi` пропускает только два пода по 208Mi, остальные
+получают `exceeded quota`. `hw5/scripts/watch.sh` записывает смену состояний подов, `capture.sh` собирает
+`describe`, логи и события.

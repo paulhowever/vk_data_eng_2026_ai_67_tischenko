@@ -1,0 +1,304 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{fontspec}
+\usepackage[russian]{babel}
+\setmainfont{cmunrm.otf}[BoldFont=cmunbx.otf,ItalicFont=cmunti.otf,BoldItalicFont=cmunbi.otf]
+\setsansfont{cmunss.otf}[BoldFont=cmunsx.otf,ItalicFont=cmunsi.otf,BoldItalicFont=cmunso.otf]
+\setmonofont{cmuntt.otf}[BoldFont=cmuntb.otf,ItalicFont=cmunit.otf,BoldItalicFont=cmuntx.otf]
+
+\usepackage[left=20mm,right=15mm,top=18mm,bottom=20mm]{geometry}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage[labelsep=period,font=small,skip=3pt,justification=raggedright,singlelinecheck=true]{caption}
+\usepackage{enumitem}
+\usepackage{xurl}
+\usepackage[hidelinks,pdfauthor={Тищенко П. В.},pdftitle={Расчёт пар навыков в Kubernetes}]{hyperref}
+
+\definecolor{accent}{HTML}{2F5D9C}
+\definecolor{ok}{HTML}{1E7A45}
+\definecolor{bad}{HTML}{B3261E}
+\definecolor{codebg}{HTML}{F4F5F8}
+\definecolor{cmt}{HTML}{6B7280}
+
+\setlength{\parindent}{1cm}
+\setlength{\emergencystretch}{3em}
+\setlist{itemsep=1pt,topsep=3pt}
+\renewcommand{\arraystretch}{1.15}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\setlength{\abovecaptionskip}{3pt}
+\setlength{\intextsep}{6pt}
+\makeatletter
+\@secpenalty=0
+\makeatother
+
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  columns=fixed,
+  basewidth=0.525em,
+  keepspaces=true,
+  breaklines=true,
+  backgroundcolor=\color{codebg},
+  frame=leftline,
+  rulecolor=\color{accent},
+  framerule=1.5pt,
+  xleftmargin=6pt,
+  framexleftmargin=4pt,
+  aboveskip=4pt,
+  belowskip=6pt,
+  showstringspaces=false,
+  extendedchars=true,
+  moredelim=[is][\color{bad}\bfseries]{@@}{@@},
+  moredelim=[is][\color{ok}\bfseries]{++}{++},
+  moredelim=[is][\color{cmt}]{~~}{~~}
+}
+
+\DeclareRobustCommand{\code}[1]{\begingroup\renewcommand{\_}{\textunderscore\allowbreak}\renewcommand{\slash}{/\allowbreak}\texttt{#1}\endgroup}
+\newcommand{\logf}[1]{\code{hw5\slash logs\slash #1}}
+\newtcolorbox{keybox}{enhanced,colback=accent!6,colframe=accent,boxrule=0.6pt,arc=0pt,left=5pt,right=5pt,top=3pt,bottom=3pt,before upper={\setlength{\parindent}{0pt}}}
+
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{15mm}
+  {\large Домашнее задание №\,5\par}
+  {\large «Управление ресурсами кластера: Kubernetes»\par}
+  \vspace{40mm}
+  {\LARGE\bfseries Расчёт пар навыков\\[4pt] в кластере Kubernetes\par}
+  \vspace{8mm}
+  {\normalsize Job и Indexed Job, предел памяти по измеренному пику, RustFS внутри кластера\\ Pending, вытеснение по приоритету и квота пространства имён\par}
+  \vfill
+  \begin{flushright}
+    \begin{tabular}{@{}l@{}}
+      Выполнил: \textbf{Тищенко Павел Валерьевич}\\
+      Группа ИИИ-3-ИнжДан-1-1 (J3310), №\,16\\
+      Репозиторий: \url{https://github.com/paulhowever/vk_data_eng_2026_ai_67_tischenko}
+    \end{tabular}
+  \end{flushright}
+  \vspace{25mm}
+  {2026\par}
+\end{titlepage}
+
+
+\section{Стенд}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Стенд (\logf{00\_cluster.txt}, \logf{00\_image.txt})}
+\begin{tabularx}{\linewidth}{@{}lL@{}}
+\toprule
+Машина & Apple M5, 10 ядер, 16\,ГБ RAM, macOS; Docker Desktop, Engine 29.2.0, виртуальной машине выделено 10 CPU и 7,65\,ГиБ \\
+Кластер & kind v0.33.0, Kubernetes v1.37.0, containerd 2.3.4; узлы \code{hh-lake-control-plane}, \code{hh-lake-worker}, \code{hh-lake-worker2} (\code{hw5/k8s/kind.yaml}). У каждого узла allocatable 10 CPU и 8\,024\,724\,Ki памяти, на control-plane taint \code{node-role.kubernetes.io/control-plane} \\
+Образ & \code{hhlake-pairs:hw5} (\code{hw5/Dockerfile}): Python 3.12, зависимости из \code{uv.lock}, пакет \code{hhlake} из ДЗ\,3 и программа \code{hw5/app/k8spairs.py}; пользователь 10001 \\
+Хранилище & RustFS 1.0.0 (\code{rustfs/rustfs:1.0.0}) в StatefulSet \code{rustfs}, Service \code{rustfs.hh-lake.svc.cluster.local:9000}, бакет \code{hh-lake} \\
+Данные & \code{raw/it\_vacancies\_2024.csv}, 847\,619\,384\,Б; эталон --- \code{results/mapreduce/k2.csv} из ДЗ\,3 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Все журналы лежат в \code{hw5/logs/}, номер в имени файла --- порядок запуска. Почти каждый журнал Job собран скриптом \code{hw5/scripts/capture.sh}: \code{get job}, \code{describe job}, \code{get pods -o wide}, \code{describe pod}, состояние контейнера, логи пода и события. Смену состояний подов во времени записывает \code{hw5/scripts/watch.sh} (\code{kubectl get pods -w} с отметкой времени UTC).
+
+\section{Программа и образ}
+
+Код расчёта я не переписывал. Программа \code{k8spairs.py} берёт из ДЗ\,3 выравнивание диапазона байт по началу записи (\code{hhlake.mr.split.read\_split}), фильтр варианта, нормализацию навыков и перебор пар (\code{hhlake.mr.jobs.map\_rows}), сериализацию и слияние частей (\code{jobs.shuffle\_blobs}, \code{jobs.merge\_blob}), вывод CSV (\code{jobs.render\_csv}) и контрольные числа \code{jobs.EXPECTED}, \code{jobs.CONTROL}. Режимов три:
+\begin{itemize}
+  \item \code{full} --- весь объект в одном процессе, чанками по 32\,МиБ, как в ДЗ\,3; результат в \code{results/k8s/full/k2.csv};
+  \item \code{map} --- часть $i$ из $N$ (байты $[\lfloor iS/N\rfloor, \lfloor (i+1)S/N\rfloor)$, $S$ --- размер объекта), номер берётся из \code{JOB\_COMPLETION\_INDEX}; часть пишет \code{tmp/k8s/<run>/part-NNN.jsonl} и \code{meta-NNN.json};
+  \item \code{reduce} --- читает все части, проверяет, что выровненные диапазоны без зазоров и пересечений покрывают файл от конца заголовка до конца объекта, сводит счётчики и пишет \code{results/k8s/<run>/k2.csv}.
+\end{itemize}
+В конце каждый режим печатает \code{memory.peak} и \code{memory.max} из cgroup v2 контейнера (\code{\slash sys\slash fs\slash cgroup}) и \code{ru\_maxrss} процесса. Тест \code{tests\slash test\_k8spairs.py} проверяет на синтетическом CSV с переводами строк и запятыми внутри полей, что 1, 3 и 8 частей при чанках 512\,Б, 4\,КиБ и 1\,МиБ дают те же пары, что и прямой подсчёт.
+
+Образ собирается из корня репозитория (\code{docker build -f hw5/Dockerfile}), контекст ограничен файлом \code{hw5/Dockerfile.dockerignore}. Пакеты, которые программе не нужны (pandas, matplotlib, duckdb, kazoo, psutil), не ставятся. В kind образ загружен через \code{docker save --platform linux/arm64} и \code{kind load image-archive}: \code{kind load docker-image} падает с \code{content digest ... not found}, потому что Docker Desktop с containerd image store хранит многоплатформенный индекс без части платформ.
+
+\section{RustFS внутри кластера}
+
+Манифест \code{hw5/k8s/rustfs.yaml} повторяет ДЗ\,2 средствами Kubernetes: StatefulSet из одного пода и четыре \code{volumeClaimTemplates} \code{disk1..disk4} по 2\,Gi в StorageClass \code{standard} (local-path). Переменные окружения те же, что в \code{docker-compose.yml}: \code{RUSTFS\_VOLUMES=\slash data\slash disk\{1...4\}}, \code{RUSTFS\_UNSAFE\_BYPASS\_DISK\_CHECK=true}. Ключи передаются только через Secret \code{hh-lake-s3}. Его создаёт \code{hw5/scripts/secret.sh}: две строки \code{RUSTFS\_*\_KEY} из \code{.env} во временный файл, затем \code{kubectl create secret generic --from-env-file}. В репозитории лежит только \code{hw5/k8s/secret.example.yaml} с заглушками. Под RustFS просит 500m CPU и 512Mi, предел памяти 2Gi.
+
+Датасет загружен через \code{kubectl port-forward svc/rustfs 29000:9000} штатным модулем ДЗ\,3 с переопределённым адресом (\logf{01\_upload.txt}):
+\begin{lstlisting}
+$ S3_ENDPOINT=http://localhost:29000 uv run python -m hhlake.upload
+local size   847,619,384 B
+remote size  847,619,384 B  etag "0e6d21890db664d9bf83e1427665b106-13"
+upload time  6.66 s  (121 MiB/s)
+sha256 local  303db922b541e4440906f5a7e8be32fb55e8808f950ffddb8c272f1548212a65
+sha256 remote 303db922b541e4440906f5a7e8be32fb55e8808f950ffddb8c272f1548212a65
+++integrity     OK++
+\end{lstlisting}
+Раскладку проверяет \code{hw5/scripts/storage.sh} (\logf{02\_rustfs\_storage.txt}): на каждом из четырёх дисков лежит 423\,835\,580\,Б файлов-частей объекта, то есть 0,5000 объекта, а всего 2,0001$\times$ его размера. Это EC 2+2, как в ДЗ\,2: два блока данных и два блока чётности.
+
+\section{Job с requests/limits и предел памяти}
+
+\subsection{OOMKilled}
+
+Первый запуск \code{hw5/k8s/job-full-oom.yaml}: режим \code{full}, \code{requests}/\code{limits} по памяти 128Mi, CPU 500m/1, \code{backoffLimit: 0}. Предел я взял «на глаз»: программа читает файл чанками по 32\,МиБ и ничего крупного не копит. Под прошёл 16 чанков из 26 и был убит ядром (\logf{03\_job\_full\_oom.txt}):
+\begin{lstlisting}
+  chunk [469,763,676, 503,319,387)  records 9,071  variant 203
+  chunk [503,319,387, 536,875,223)  records 9,474  variant 297
+$ kubectl -n hh-lake describe pod/pairs-full-oom-h4j97
+    State:          Terminated
+      Reason:       @@OOMKilled@@
+      Exit Code:    @@137@@
+      Started:      Tue, 10 Nov 2026 12:36:25 +0300
+      Finished:     Tue, 10 Nov 2026 12:36:28 +0300
+    Limits:
+      cpu:     1
+      memory:  128Mi
+  Warning  BackoffLimitExceeded  1s    job-controller  Job has reached the specified backoff limit
+\end{lstlisting}
+Код 137 = 128 + 9: процесс получил SIGKILL от OOM killer, потому что память cgroup контейнера дошла до \code{memory.max} = 128\,МиБ.
+
+\subsection{Измерение пика}
+
+Тот же Job с пределом 1Gi (\code{hw5/k8s/job-full-measure.yaml}) я запустил три раза подряд (\logf{04\_job\_full\_measure\_1..3.txt}). Все три прогона прошли все контрольные проверки ДЗ\,3.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Пик памяти полного расчёта, предел 1Gi}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Прогон & \code{memory.peak} cgroup, МиБ & \code{ru\_maxrss}, МиБ & время расчёта, с \\
+\midrule
+1 & \textbf{163,9} & 145,3 & 5,1 \\
+2 & 138,3 & 145,3 & 5,5 \\
+3 & 150,9 & 145,1 & 4,5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Пик я беру по \code{memory.peak} cgroup, а не по \code{ru\_maxrss}: OOM killer сравнивает с \code{memory.max} именно память cgroup. В неё кроме анонимной памяти процесса входят страничный кэш прочитанных файлов образа (модули Python, библиотеки) и память ядра под сокеты. Поэтому \code{memory.peak} колеблется от прогона к прогону сильнее, чем \code{ru\_maxrss}: скорее всего, в первом прогоне кэш файлов образа был впервые учтён в этой cgroup, а в следующих часть страниц уже числилась за cgroup прошлых подов. Разброс 138--164\,МиБ, то есть $\pm$9\% вокруг среднего 151\,МиБ.
+
+\begin{keybox}
+\textbf{Расчёт предела.} $P = \max(163{,}9;\ 138{,}3;\ 150{,}9) = 163{,}9$\,МиБ. Запас $k = 1{,}25$:
+\[
+L = \left\lceil \frac{P \cdot k}{16} \right\rceil \cdot 16 = \left\lceil \frac{163{,}9 \cdot 1{,}25}{16} \right\rceil \cdot 16 = \lceil 12{,}8 \rceil \cdot 16 = 208\ \text{МиБ}.
+\]
+Почему 25\%: (1) разброс самого пика между прогонами около 9\%, а три прогона --- маленькая выборка; (2) пик зависит от данных: самый длинный чанк, число уникальных пар в счётчике, фрагментация кучи Python; в пределе 128Mi процесс упал на 17-м чанке, то есть память росла по ходу расчёта; (3) повторные запросы boto3 и буферы сокетов при медленном S3. Больше 25\% не беру: память здесь --- то, по чему считается квота и упаковка подов на узел (раздел~\ref{sec:quota}: 512Mi квоты вмещают ровно два пода по 208Mi). \code{requests} = \code{limits} = 208Mi, чтобы планировщик резервировал ровно то, что под может занять.
+\end{keybox}
+
+С пределом 208Mi Job \code{pairs-full} прошёл: контейнер завершился с \code{reason=Completed} и \code{exitCode=0}, \code{memory.peak} составил 145,3\,МиБ, то есть 70\% предела, а \code{memory.max} в контейнере был 208,0\,МиБ (журнал \logf{05\_job\_full\_limit.txt}). Части Indexed Job с тем же пределом заняли 105,8--131,2\,МиБ (\logf{06\_indexed\_map.txt}), сведение --- 54,3\,МиБ.
+
+\section{Indexed Job по частям файла}
+
+\code{hw5/k8s/job-indexed.yaml}: \code{completionMode: Indexed}, \code{completions: 8}, \code{parallelism: 4}, \code{backoffLimitPerIndex: 2}, ресурсы как у \code{pairs-full}. После него \code{hw5/k8s/job-reduce.yaml} сводит части. Порядок «map, затем reduce» задаю я сам через \code{kubectl wait --for=condition=Complete}: у Job нет зависимостей между заданиями.
+
+\begin{lstlisting}[basicstyle=\ttfamily\tiny]
+$ kubectl -n hh-lake logs job/pairs-reduce                                    ~~(hw5/logs/07_reduce.txt)~~
+part  0 node hh-lake-worker   aligned [222, 105,958,703) records 28,564 variant  502 keys 3,549 time 1.6 s peak 107.7 MiB
+part  1 node hh-lake-worker2  aligned [105,958,703, 211,909,622) records 29,196 variant  556 keys 4,398 time 1.6 s peak 131.2 MiB
+part  2 node hh-lake-worker   aligned [211,909,622, 317,857,720) records 28,739 variant  476 keys 3,852 time 1.5 s peak 107.5 MiB
+part  3 node hh-lake-worker   aligned [317,857,720, 423,810,887) records 29,086 variant  733 keys 5,212 time 1.6 s peak 107.9 MiB
+part  4 node hh-lake-worker   aligned [423,810,887, 529,763,672) records 28,915 variant  727 keys 4,697 time 1.1 s peak 106.3 MiB
+part  5 node hh-lake-worker2  aligned [529,763,672, 635,715,091) records 28,444 variant  823 keys 6,288 time 1.1 s peak 105.8 MiB
+part  6 node hh-lake-worker   aligned [635,715,091, 741,667,049) records 28,400 variant  734 keys 5,199 time 1.2 s peak 106.4 MiB
+part  7 node hh-lake-worker   aligned [741,667,049, 847,619,384) records 28,044 variant  831 keys 6,016 time 1.1 s peak 106.3 MiB
+check OK   aligned ranges tile [header_end, size): True (expected True)
+check OK   records: 229388 (expected 229388)
+check OK   variant: 5382 (expected 5382)
+check OK   with skills: 4380 (expected 4380)
+check OK   k=2 sum(count) == emitted: 135362 (expected 135362)
+check OK   k=2 unique keys: 15921 (expected 15921)
+check OK   k=2 sum count: 135362 (expected 135362)
+check OK   k=2 top: (('mysql', 'php'), 2096) (expected (('mysql', 'php'), 2096))
+written s3://hh-lake/results/k8s/indexed/k2.csv  467,629 B
+\end{lstlisting}
+
+Первая часть начинается с байта 222 --- это конец заголовка, последняя кончается на 847\,619\,384. Соседние выровненные диапазоны стыкуются, поэтому каждая запись прочитана ровно одним подом.
+
+\textbf{Время.} Job \code{pairs-map} шёл 10\,с: \code{startTime} 09:37:48, \code{completionTime} 09:37:58 (\logf{12\_jobs\_summary.txt}). Поды шли двумя волнами по четыре: 09:37:48--09:37:50 и 09:37:53--09:37:55. Сам расчёт части занимает 1,1--1,6\,с, остальное --- создание подов и запуск контейнеров. Полный расчёт в одном поде (\code{pairs-full}) занял 4,7\,с счёта и 8\,с от старта до завершения Job. На файле в 850\,МБ параллельность в Kubernetes не ускоряет расчёт: накладные расходы на под (около 3\,с) больше, чем выигрыш от деления 5\,с счёта на четыре.
+
+\textbf{Сверка.} \code{hw5/scripts/verify\_k2.py} скачивает результаты через port-forward и сравнивает с эталоном ДЗ\,3 в DuckDB (\logf{08\_verify\_k2.txt}):
+\begin{lstlisting}
+s3://hh-lake/results/k8s/indexed/k2.csv -> hw5/results/indexed/k2.csv
+  reference results/mapreduce/k2.csv: rows 15,921 sum 135,362
+  kubernetes: rows 15,921 sum 135,362
+  ++k8s EXCEPT ALL ref: 0 rows++
+  ++ref EXCEPT ALL k8s: 0 rows++
+  top-10: mysql+php 2096, git+php 1686, laravel+php 1342, git+mysql 1116, javascript+php 1103, php+postgresql 975, docker+php 907, php+symfony 872, html+php 839, php+sql 800
+ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f  results/mapreduce/k2.csv
+ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f  hw5/results/indexed/k2.csv
+ab85544b061cf897d33311e8e7a82b584e68e33bf9e8701673ca846ae6d19e3f  hw5/results/full/k2.csv
+\end{lstlisting}
+Результаты Indexed Job и полного Job совпадают с ДЗ\,3 и как множества строк (0/0 в обе стороны), и побайтно: sha256 одинаковый.
+
+\section{Планирование}
+
+\subsection{Pending при нехватке CPU}
+
+\code{hw5/k8s/job-pending-cpu.yaml} --- тот же Indexed Job, но каждый под просит 6 CPU при 10 CPU на узле, \code{parallelism: 3}. Рабочих узлов два, на каждый помещается один такой под, а control-plane закрыт taint (\logf{09\_pending\_cpu.txt}):
+\begin{lstlisting}
+$ kubectl -n hh-lake get pods -l batch.kubernetes.io/job-name=pairs-map-cpu -o wide   (3 s after apply)
+NAME                    READY   STATUS    RESTARTS   AGE   IP            NODE              NOMINATED NODE
+pairs-map-cpu-0-mw5s4   1/1     Running   0          2s    10.244.2.14   hh-lake-worker    <none>
+pairs-map-cpu-1-9hqpv   0/1     @@Pending@@   0          2s    <none>        <none>            <none>
+pairs-map-cpu-2-tp8jz   1/1     Running   0          2s    10.244.1.9    hh-lake-worker2   <none>
+  Warning  @@FailedScheduling@@  2s    default-scheduler  0/3 nodes are available: 1 node(s) had untolerated taint(s), 2 Insufficient cpu. preemption: 0/3 nodes are available: 1 Preemption is not helpful for scheduling, 2 No preemption victims found for incoming pod.
+\end{lstlisting}
+Под 1 ждал 4\,с и встал на \code{hh-lake-worker}, как только там закончился под 0 (\code{watch}: 09:38:49 создан, 09:38:53 назначен). Дальше Job так и шёл по два пода: 8 частей заняли 18\,с против 10\,с у \code{pairs-map}, где под просил 500m. Планировщик смотрит только на \code{requests}: реальной нагрузки на CPU здесь почти нет, программа однопоточная.
+
+\subsection{Вытеснение по приоритету}
+
+\code{hw5/k8s/priority.yaml} создаёт два PriorityClass: \code{batch-low} (1000, \code{preemptionPolicy: Never}) и \code{batch-high} (100\,000, \code{PreemptLowerPriority}). Job \code{pairs-low} (два пода по 6 CPU, каждый 20 раз подряд считает полный файл) занимает оба worker. Через 9\,с запускается \code{pairs-high}: один под на 6 CPU, один полный расчёт (\logf{10\_preemption.txt}):
+\begin{lstlisting}
+$ kubectl -n hh-lake get pods -l run in (low,high) -o wide   (3 s after high)
+NAME               READY   STATUS        RESTARTS   AGE   IP            NODE              NOMINATED NODE
+pairs-high-86vtd   0/1     Pending       0          3s    <none>        <none>            hh-lake-worker
+pairs-low-97bw2    1/1     Terminating   0          12s   10.244.2.18   hh-lake-worker    <none>
+pairs-low-z4t67    1/1     Running       0          12s   10.244.1.13   hh-lake-worker2   <none>
+2026-11-10T09:40:39Z   Warning   FailedScheduling   pairs-high-86vtd   0/3 nodes are available: 1 node(s) had untolerated taint(s), 2 Insufficient cpu. preemption: found a potential placement for pod on node hh-lake-worker, preempting 1 victims
+2026-11-10T09:40:39Z   Normal    Killing            pairs-low-97bw2    Stopping container pairs
+2026-11-10T09:40:39Z   Normal    @@Preempted@@          pairs-low-97bw2    Preempted by pod ea3b662e-a481-4c6f-88a4-9cdd02d18f65 on node hh-lake-worker
+$ kubectl -n hh-lake get pod pairs-high-86vtd -o jsonpath={.metadata.uid} {.spec.priorityClassName} {.spec.priority}
+ea3b662e-a481-4c6f-88a4-9cdd02d18f65 batch-high 100000
+\end{lstlisting}
+Хронология по \code{watch}: в 09:40:39 планировщик выбрал жертву и записал высокоприоритетному поду \code{nominatedNodeName}, жертва получила SIGTERM. В 09:40:44, через \code{terminationGracePeriodSeconds: 5}, она завершилась (\code{Error}), и в 09:40:45 \code{pairs-high} запустился на освободившемся узле. В 09:40:50 он закончил расчёт. Job \code{pairs-low} создал замену вытесненному поду в 09:40:54, она начала свои 20 проходов с нуля. Итог \code{pairs-low}: \code{succeeded: 2}, без \code{failed}, 117\,с вместо примерно 95\,с у невытесненного пода. Вытеснение не засчитано как сбой, потому что в Job стоит \code{podFailurePolicy} с правилом \code{Ignore} для условия \code{DisruptionTarget}. Без него вытеснение тратило бы \code{backoffLimit}.
+
+\subsection{ResourceQuota пространства имён}
+\label{sec:quota}
+
+\code{hw5/k8s/quota.yaml} создаёт пространство \code{team-php} с квотой \code{pods: 4}, \code{requests.cpu: 2}, \code{requests.memory: 512Mi}, \code{limits.cpu: 4}, \code{limits.memory: 512Mi} и LimitRange: по умолчанию контейнер получает request 500m/208Mi и limit 1/208Mi, больше 512Mi одному контейнеру нельзя. В \code{job-quota.yaml} ресурсов нет вовсе, их подставляет LimitRange. \code{parallelism: 4}, но по памяти в квоту помещаются только два пода: $2 \cdot 208 = 416 \le 512$, а $3 \cdot 208 = 624 > 512$ (\logf{11\_quota.txt}):
+\begin{lstlisting}
+$ kubectl -n team-php describe resourcequota team-php-quota          ~~(2 s after apply)~~
+limits.memory    416Mi  512Mi
+pods             2      4
+requests.memory  416Mi  512Mi
+  Warning  FailedCreate  59s  job-controller  Error creating: pods "pairs-map-quota-2-zfmtx" is forbidden: @@exceeded quota@@: team-php-quota, requested: limits.memory=208Mi,requests.memory=208Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+$ kubectl -n team-php run quota-probe ... "requests":{"memory":"400Mi"},"limits":{"memory":"400Mi"}
+Error from server (Forbidden): pods "quota-probe" is forbidden: @@exceeded quota@@: team-php-quota, requested: limits.memory=400Mi,requests.memory=400Mi, used: limits.memory=416Mi,requests.memory=416Mi, limited: limits.memory=512Mi,requests.memory=512Mi
+\end{lstlisting}
+Квота срабатывает при создании пода, а не при планировании: API-сервер отклоняет запрос, под даже не появляется в Pending. Job-контроллер повторяет создание с задержкой. В журнале 10 отклонённых попыток, и одновременно в \code{team-php} работало не больше двух подов. 8 частей заняли 18\,с, как при нехватке CPU, все 8 завершились успешно.
+
+\section{Ответы на вопросы}
+
+\textbf{1. Что в Kubernetes соответствует ResourceManager, NodeManager, ApplicationMaster и Container из YARN.} ResourceManager --- это kube-apiserver с etcd (состояние кластера и учёт ресурсов) и kube-scheduler (выбор узла). NodeManager --- kubelet с containerd на каждом узле: он запускает контейнеры, ставит им cgroup-пределы и сообщает их состояние. Container --- под (точнее, контейнер пода), его \code{requests}/\code{limits} --- это запрос контейнера в YARN (память и vcores). ApplicationMaster ближе всего к контроллеру Job, но с важным отличием. AM в YARN свой у каждого приложения, работает в контейнере и сам ведёт приложение: просит контейнеры, перезапускает задачи, переводит map в reduce. Контроллер Job один на кластер и знает только «запусти $N$ подов до успеха». В моём запуске он создал \code{pairs-map-0..7}, четыре сразу и ещё четыре по мере завершения, и повторил бы упавший индекс (\code{backoffLimitPerIndex: 2}). Но переход к reduce сделал я, командой \code{kubectl wait}. Роль AM с логикой приложения в Kubernetes играют операторы (Spark operator, Argo Workflows) или драйвер Spark в собственном поде.
+
+\textbf{2. Двухуровневое планирование Mesos против kube-scheduler.} В Mesos мастер сам не размещает задачи. Его аллокатор делит ресурсы между фреймворками по DRF (выравнивает доминантные доли: у кого больше доля по самому дефицитному ресурсу, тот получает меньше) и отправляет фреймворкам предложения (offers) с ресурсами конкретных агентов. Планировщик фреймворка решает, принять предложение и что на нём запустить, или отказаться. Так каждый фреймворк (Spark, Marathon) планирует по своей логике, но видит только то, что ему предложили. Если задаче нужно 6 CPU на одном агенте, фреймворк отклоняет мелкие предложения и ждёт. kube-scheduler один и видит весь кластер: для каждого пода он отфильтровывает узлы (ресурсы, taints, affinity), оценивает оставшиеся и связывает под с лучшим. Поэтому сообщение \code{0/3 nodes are available: 1 node(s) had untolerated taint(s), 2 Insufficient cpu} перечисляет все три узла с причинами. Справедливого деления между арендаторами вроде DRF в kube-scheduler нет. Есть приоритеты, вытеснение и квоты, а очереди с долями добавляют надстройки (Kueue, Volcano, Apache YuniKorn).
+
+\textbf{3. Очереди Capacity/Fair Scheduler против Namespace + ResourceQuota/LimitRange.} Очередь YARN даёт гарантию и делится ресурсами. У очереди есть гарантированная доля кластера (capacity), простаивающие ресурсы других очередей можно занять до maximum-capacity, Fair Scheduler выравнивает доли со временем. Приложение, которому не хватает места, ждёт в очереди (ACCEPTED), и планировщик запустит его сам. ResourceQuota --- жёсткий потолок суммы \code{requests}/\code{limits} в пространстве имён. Она проверяется при создании объекта, ничего не гарантирует (квоту можно выставить больше, чем есть в кластере), занимать чужое не даёт и очереди не держит. В моём запуске лишние поды \code{team-php} не ждали в очереди, а получали \code{exceeded quota}, и ожидание обеспечивал Job-контроллер, повторяя попытки. LimitRange соответствует \code{yarn.scheduler.minimum/maximum-allocation-mb} и размеру контейнера по умолчанию: \code{job-quota.yaml} вообще без ресурсов получил 208Mi из LimitRange. Ближе всего к очередям YARN в Kubernetes Kueue: ClusterQueue с квотой, одалживание внутри cohort, приём заданий в порядке очереди.
+
+\textbf{4. Вытеснение в YARN против PriorityClass.} В Capacity Scheduler вытеснение восстанавливает гарантии очередей. Если очередь ниже своей capacity, а другая заняла её ресурсы, политика вытеснения сначала шлёт AM чужой очереди предупреждение, а после тайм-аута убивает контейнеры. Fair Scheduler так же возвращает очередям их справедливую долю. Вытесненный контейнер завершается со статусом PREEMPTED и не считается сбоем приложения. В Kubernetes вытеснение идёт по приоритету пода, а не по долям: когда под с большим приоритетом не помещается, планировщик ищет узел, где удаление подов с меньшим приоритетом освободит место, и вытесняет их с graceful termination. В моём запуске \code{pairs-high} (100\,000) вытеснил \code{pairs-low-97bw2} (1000) за 5\,с \code{terminationGracePeriodSeconds}. Как и в YARN, вытеснение не стало сбоем, но только благодаря \code{podFailurePolicy} с правилом \code{Ignore} для \code{DisruptionTarget}. Как и в YARN без чекпоинтов, работа вытесненного пода пропала: замена начала с первого прохода. Сами поды \code{batch-low} никого вытеснить не могут, у класса \code{preemptionPolicy: Never}: фоновые задания ждут, но никого не выталкивают.
+
+\textbf{5. Изоляция через cgroups.} И YARN, и Kubernetes, и Mesos ограничивают задачи средствами ядра Linux. В YARN это LinuxContainerExecutor с CGroupsHandler (cpu, memory) и, кроме того, монитор NodeManager: он периодически суммирует память дерева процессов контейнера и убивает контейнер, превысивший предел (\textit{running beyond physical memory limits}, код 143). У Mesos этим занимаются изоляторы \code{cgroups/cpu} и \code{cgroups/mem} контейнеризатора. В Kubernetes kubelet через containerd/runc создаёт cgroup v2 на под и на контейнер: \code{memory.max} равен limit, \code{cpu.max} задаётся по limit CPU, \code{cpu.weight} --- по request. Превышение памяти ловит само ядро, а не опрос. У меня это видно напрямую: \code{memory.max} внутри контейнера был 128, 1024 и 208\,МиБ в трёх Job, при 128\,МиБ ядро убило процесс (OOMKilled, 137), а \code{memory.peak} той же cgroup дал число для расчёта предела. CPU-limit ядро только притормаживает (throttling) и процесс не убивает, а память --- несжимаемый ресурс, поэтому её предел и пришлось измерять.
+
+\textbf{6. Где какая система уместна.} YARN --- кластер Hadoop, где данные лежат в HDFS на тех же машинах (планировщик учитывает локальность), а нагрузка --- Spark, Hive и MapReduce многих команд с гарантированными долями очередей. Mesos --- общий пул машин для нескольких фреймворков со своими планировщиками. Сейчас эту нишу почти целиком занял Kubernetes, а сообщество Mesos практически перестало развивать проект. Kubernetes --- контейнерные сервисы и пакетные задания на одном кластере, с декларативным API, хранилищем через PVC (как RustFS в StatefulSet здесь) и одинаковым запуском на ноутбуке (kind) и в облаке. Для пакетной нагрузки с очередями и справедливым делением к нему добавляют Kueue, Volcano или YuniKorn. На моих данных (850\,МБ, расчёт около 5\,с в одном поде) Kubernetes не ускорил расчёт: накладные расходы на под больше выигрыша от параллельности. Зато он дал воспроизводимый образ, явные пределы памяти с проверкой ядром, повтор упавших частей, приоритеты и квоты.
+
+\section{Замечания вне задачи}
+
+\begin{itemize}
+  \item \code{kubectl} 1.34.1 при сервере 1.37.0: в \logf{00\_cluster.txt} предупреждение о расхождении версий больше чем на одну минорную. Все команды работы прошли, но поведение не гарантировано. Вред P3, исправление --- обновить \code{kubectl}.
+  \item Образ RustFS в ДЗ\,2 указан как \code{rustfs\slash rustfs:latest}; здесь он закреплён как \code{rustfs\slash rustfs:1.0.0} (тот же образ, \code{sha256:8cc98017\ldots}). Вред P2 для ДЗ\,2: при новом \code{latest} стенд ДЗ\,2 может подняться с другой версией.
+\end{itemize}
+
+\section{Итог}
+
+Кластер kind из трёх узлов, образ с программой ДЗ\,3 и RustFS с EC 2+2 в StatefulSet работают. Job с пределом памяти 128Mi получил OOMKilled (exit 137). По трём замерам \code{memory.peak} (максимум 163,9\,МиБ) и запасу 25\% выведен предел 208Mi, с ним полный Job проходит при пике 145,3\,МиБ. Indexed Job из 8 частей по 4 пода за 10\,с и сведение дали k2, совпадающий с ДЗ\,3: топ-10 тот же, \code{EXCEPT ALL} пуст в обе стороны, sha256 одинаковый. Показаны Pending по CPU (\code{FailedScheduling}, \code{Insufficient cpu}), вытеснение \code{pairs-low} подом \code{pairs-high} (\code{Preempted}) и отказ по квоте (\code{exceeded quota}).
+
+\end{document}
